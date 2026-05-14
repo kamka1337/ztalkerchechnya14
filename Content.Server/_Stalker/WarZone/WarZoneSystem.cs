@@ -116,62 +116,29 @@ public sealed partial class WarZoneSystem : EntitySystem
         _ = InitializeWarZoneAsync(uid, component);
     }
 
+    //SESSION-STALKER EDIT
     private async Task InitializeWarZoneAsync(EntityUid uid, WarZoneComponent component)
     {
         try
         {
-            // Initialize Band Points
             foreach (var bandProto in _prototypeManager.EnumeratePrototypes<STBandPrototype>())
             {
-                var band = await _dbManager.GetStalkerBandAsync(bandProto.ID);
-                if (band == null)
-                {
-                    await _dbManager.SetStalkerBandAsync(bandProto.ID, 0);
-                    _bandPoints[bandProto.ID] = 0;
-                }
-                else
-                {
-                    _bandPoints[bandProto.ID] = band.RewardPoints;
-                }
+                _bandPoints[bandProto.ID] = 0;
             }
 
-            // Initialize Faction Points
             foreach (var factionProto in _prototypeManager.EnumeratePrototypes<NpcFactionPrototype>())
             {
-                var faction = await _dbManager.GetStalkerFactionAsync(factionProto.ID);
-                if (faction == null)
-                {
-                    await _dbManager.SetStalkerFactionAsync(factionProto.ID, 0);
-                    _factionPoints[factionProto.ID] = 0;
-                }
-                else
-                {
-                    _factionPoints[factionProto.ID] = faction.RewardPoints;
-                }
+                _factionPoints[factionProto.ID] = 0;
             }
 
             component.InitialLoadComplete = false;
-            component.PresentBandProtoIds = new(); // Represents bands with count > 0
-            component.PresentFactionProtoIds = new(); // Represents factions with count > 0
+            component.PresentBandProtoIds = new();
+            component.PresentFactionProtoIds = new();
             component.PresentEntities = new();
-            component.PresentBandCounts = new(); // Initialize new dictionary
-            component.PresentFactionCounts = new(); // Initialize new dictionary
+            component.PresentBandCounts = new();
+            component.PresentFactionCounts = new();
 
-            var initialOwnership = await _dbManager.GetStalkerWarOwnershipAsync(component.ZoneProto);
-
-            _ = LoadInitialZoneStateAsync(uid, component, initialOwnership);
-
-            if (initialOwnership != null && (initialOwnership.BandId != null || initialOwnership.FactionId != null))
-            {
-                var lastRewardTime = initialOwnership.LastCapturedByCurrentOwnerAt.HasValue
-                    ? _gameTiming.CurTime - (DateTime.UtcNow - initialOwnership.LastCapturedByCurrentOwnerAt.Value)
-                    : _gameTiming.CurTime;
-
-                _lastRewardTimes[uid] = lastRewardTime;
-
-                var ownerDesc = initialOwnership.BandId != null ? $"band:{initialOwnership.BandId}" : (initialOwnership.FactionId != null ? $"faction:{initialOwnership.FactionId}" : "unknown");
-                Logger.InfoS("warzone", $"Initialized reward timing for zone '{component.PortalName}', owned by {ownerDesc}");
-            }
+            _ = LoadInitialZoneStateAsync(uid, component, null);
         }
         catch (Exception ex)
         {
@@ -777,7 +744,7 @@ public sealed partial class WarZoneSystem : EntitySystem
         {
             if (_prototypeManager.TryIndex<STBandPrototype>(bandProtoId, out var bandProto))
                 return bandProto.Name; // Use LocId if available and localized? For now, just Name.
-        }        
+        }
         else if (!string.IsNullOrEmpty(factionProtoId))
         {
             if (_prototypeManager.TryIndex<NpcFactionPrototype>(factionProtoId, out var factionProto))

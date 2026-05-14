@@ -1,9 +1,13 @@
 using Content.Server._Stalker.WarZone;
 using Content.Shared._Session.Flag;
+using Content.Server._Stalker.StalkerDB;
+using Content.Server._Stalker.Storage;
 using Content.Shared._Stalker.WarZone;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Content.Server.RoundEnd;
+using System.Linq;
 
 namespace Content.Server._Session.Flag;
 
@@ -12,6 +16,10 @@ public sealed class FlagWarZoneSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly WarZoneSystem _warSys = default!;
+    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
+    [Dependency] private readonly StalkerStorageSystem _stalkerStorageSystem = default!;
+
 
     private const float UpdateInterval = 1f;
     private float _timer;
@@ -46,8 +54,23 @@ public sealed class FlagWarZoneSystem : EntitySystem
             if (progress <= 0f)      level = 3;
             else if (progress >= 0.8f) level = 1;
             else if (progress >= 0.5f) level = 2;
-            else                       level = 3;
+            else level = 3;
 
+            var zonesList = _warSys.GetAllWarZones().ToList();
+
+            var freedomZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "FreedomBase");
+            var dutyZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "DutyBase");
+
+            if (freedomZone != default && freedomZone.Component.DefendingBandProtoId != "STFreedomBand")
+            {
+                level = 4;
+                _roundEndSystem.EndRound();
+            }
+            else if (dutyZone != default && dutyZone.Component.DefendingBandProtoId != "STDolgBand")
+            {
+                level = 4;
+                _roundEndSystem.EndRound();
+            }
             _appearance.SetData(uid, WarZoneFlagVisuals.Level, level, app);
         }
     }

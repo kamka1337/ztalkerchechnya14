@@ -257,7 +257,7 @@
 #SESSION-STALKER START
 - type: stWarZone
   id: DutyBase
-  captureTime: 300
+  captureTime: 10
   captureCooldownHours: 0
   requirements:
   - !type:ZoneOwnershipRequirenment
@@ -273,6 +273,7 @@
   - type: WarZone
     proto: DutyBase
     portalName: DutyBase
+    defendingBandProtoId: STDolgBand
   - type: WarZoneFlag
   - type: Sprite
     sprite: _Session/Objects/Decoration/Flags/duty.rsi
@@ -303,7 +304,7 @@
 - type: stWarZone
   id: FreedomBase
   captureCooldownHours: 0
-  captureTime: 300
+  captureTime: 10
   requirements:
   - !type:ZoneOwnershipRequirenment
     requiredZones: []
@@ -318,6 +319,7 @@
   - type: WarZone
     proto: FreedomBase
     portalName: FreedomBase
+    defendingBandProtoId: STFreedomBand
   - type: WarZoneFlag
   - type: Sprite
     sprite: _Session/Objects/Decoration/Flags/freedom.rsi

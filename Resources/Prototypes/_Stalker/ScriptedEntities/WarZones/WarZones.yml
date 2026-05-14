@@ -257,7 +257,7 @@
 #SESSION-STALKER START
 - type: stWarZone
   id: DutyBase
-  captureTime: 10
+  captureTime: 300
   captureCooldownHours: 0
   requirements:
   - !type:ZoneOwnershipRequirenment
@@ -304,7 +304,7 @@
 - type: stWarZone
   id: FreedomBase
   captureCooldownHours: 0
-  captureTime: 10
+  captureTime: 300
   requirements:
   - !type:ZoneOwnershipRequirenment
     requiredZones: []

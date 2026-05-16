@@ -361,7 +361,12 @@
       STWeaponRifleM4: 3500
       STWeaponRifleG36: 5500
       STWeaponRifleSCARL: 5000
-      STWeaponRifleLR300v1: 100000
+      STWeaponRifleLR300v1: 45000
+      STWeaponSniperSVDS: 56000
+      STWeaponRifleHK416: 67500
+      STWeaponRifleARX160: 80000
+      STWeaponLauncherRGM40: 100000
+      STWeaponMachineGunPKM: 220000
   - name: shop-category-armor
     priority: 2
     items:
@@ -369,3 +374,15 @@
       ClothingHeadAssaultHelmetFreedom: 3000
       ClothingOuterArmorFreedomDefender: 4500
       STClothingOuterArmorVolchankaFreedom: 9500
+  - name: shop-category-magazines
+      priority: 1
+      items:
+      Magazine762x54PKM: 25000
+      754Mag10: 1000
+      751Mag30: 1500
+  - name: shop-category-ammunition
+      priority: 2
+      items:
+      GrenadeVOG25P: 10000
+      GrenadeVOG25: 17500
+      754PCBoxCink: 30000

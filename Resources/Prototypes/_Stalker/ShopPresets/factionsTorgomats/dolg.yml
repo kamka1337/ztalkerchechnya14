@@ -365,7 +365,12 @@
       STWeaponRifleAKS74: 3000
       STWeaponRifleAK74M: 5500
       STWeaponRifleAKM: 5000
-      STWeaponRifleA545: 100000
+      STWeaponRifleAM17: 37500
+      STWeaponRifleA545: 65000
+      STWeaponRifleAK103: 70000
+      STWeaponSniperTKPD: 98000
+      STWeaponLauncherRGM40: 100000
+      STWeaponMachineGunPKM: 220000
   - name: shop-category-armor
     priority: 2
     items:
@@ -373,3 +378,17 @@
       ClothingHeadAssaultHelmetDolg: 3000
       SetPS5MDolgBuyableCrate: 5500
       ClothingOuterArmorPSZ9D: 10000
+  - name: shop-category-magazines
+      priority: 1
+      items:
+      Magazine762x54PKM: 25000
+      BaseTKPDMag10: 2000
+  - name: shop-category-ammunition
+      priority: 2
+      items:
+      GrenadeVOG25P: 10000
+      GrenadeVOG25: 17500
+      754PCBoxCink: 30000
+      9364RBox: 10000
+
+

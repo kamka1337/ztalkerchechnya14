@@ -1,0 +1,38 @@
+- type: entity
+  id: BaseSTCartridge300
+  name: cartridge (.300 rifle)
+  parent: BaseCartridge
+  abstract: true
+  components:
+  - type: STWeight
+    self: 0.02
+  - type: Tag
+    tags:
+    - Cartridge
+    - STCartridge300
+  - type: CartridgeAmmo
+    deleteOnSpawn: true
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Ammunition/Casings/ammo_casing.rsi
+    layers:
+    - state: base
+      map: ["enum.AmmoVisualLayers.Base"]
+  - type: Appearance
+  - type: SpentAmmoVisuals
+    state: "base"
+
+- type: entity
+  id: STCartridge300FMJ
+  name: Патрон (.300)БПЗ FMJ
+  parent: BaseSTCartridge300
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet300FMJ
+
+- type: entity
+  id: STCartridge300VMAX
+  name: Патрон (.300)V-Max
+  parent: BaseSTCartridge300
+  components:
+  - type: CartridgeAmmo
+    proto: Bullet300VMAX

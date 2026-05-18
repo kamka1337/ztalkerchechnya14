@@ -367,6 +367,68 @@
     accuracyMultiplier: 1.47
 
 - type: entity
+  parent: STWeaponRifleAM17
+  id: STWeaponRifleVelociraptor
+  name: Velociraptor .300
+  suffix: ST
+  description: Специальная модификация на базе автомата АК под патрон .300 Blackout производства компании Aklys Defense. В ней стандартный ствол заменен на модифицированный ствол с интегральным глушителем, что позволило добиться существенного снижения звуковой сигнатуры.
+  components:
+  - type: STWeight
+    self: 2.5
+  - type: PullDoAfter
+    pullTime: 3.5
+  - type: GunWieldBonus
+    minAngle: -45
+    maxAngle: -50
+  - type: Gun
+    minAngle: 45
+    maxAngle: 80
+    fireRate: 7
+    angleIncrease: 1.6
+    angleDecay: 6.5
+    projectileSpeed: 60
+  - type: Clothing
+    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+  - type: Item
+    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+  - type: Sprite
+    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+    scale: 1, 1
+  - type: STWeaponDamageFalloff
+    falloffMultiplier: 0.6
+  - type: STWeaponAccuracy
+    accuracyMultiplier: 1.47
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        name: Magazine
+        startingItem: Base300Mag30
+        insertSound: /Audio/_Stalker/Weapons/Guns/RifleGen/MagIn/rifle_magin.ogg
+        ejectSound: /Audio/_Stalker/Weapons/Guns/RifleGen/MagOut/rifle_magout.ogg
+        priority: 4
+        whitelist:
+          tags:
+          - Magazine300
+      gun_chamber:
+        name: Chamber
+        priority: 1
+        whitelist:
+          tags:
+          - STCartridge300
+      gun_module_muzzle:
+        name: Muzzle
+        priority: 3
+        whitelist:
+          tags:
+          - STWeaponModuleRifleSilencerRu
+      gun_module_scope:
+        name: Scope
+        priority: 2
+        whitelist:
+          tags:
+          - STWeaponModuleRifleScopeRu
+
+- type: entity
   name: АК-105 Болотная тварь
   suffix: ST
   parent: STBaseWeaponRifle

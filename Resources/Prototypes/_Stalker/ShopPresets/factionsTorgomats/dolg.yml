@@ -371,6 +371,7 @@
       STWeaponSniperTKPD: 98000
       STWeaponLauncherRGM40: 100000
       STWeaponMachineGunPKM: 220000
+      STWeaponRifleVPO209: 10000
   - name: shop-category-armor
     priority: 2
     items:
@@ -379,16 +380,18 @@
       SetPS5MDolgBuyableCrate: 5500
       ClothingOuterArmorPSZ9D: 10000
   - name: shop-category-magazines
-      priority: 1
-      items:
+    priority: 3
+    items:
       Magazine762x54PKM: 25000
       BaseTKPDMag10: 2000
+      BaseVPO209Mag30: 500
   - name: shop-category-ammunition
-      priority: 2
-      items:
+    priority: 4
+    items:
       GrenadeVOG25P: 10000
       GrenadeVOG25: 17500
       754PCBoxCink: 30000
       9364RBox: 10000
-
+      366EKOBox: 1200
+      366GEKSABox: 2000
 

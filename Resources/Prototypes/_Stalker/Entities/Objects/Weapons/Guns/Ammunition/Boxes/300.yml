@@ -1,0 +1,74 @@
+- type: entity
+  parent: BaseAmmoBoxStalker
+  id: 300FMJBox
+  name: Коробка патронов (.300) БПЗ FMJ
+  description: Для некоторых некоторых редких автоматов в коробке 30 штук. Обеспечивает пробитие 3 класса брони.
+  suffix: Stalker
+  components:
+  - type: MagazineVisuals
+    magState: 300ammo
+  - type: BallisticAmmoProvider
+    capacity: 30
+    proto: STCartridge300FMJ
+    whitelist:
+      tags:
+        - STCartridge300
+  - type: Sprite
+    layers:
+    - state: 300BPZ_FMJ
+      map: ["enum.GunVisualLayers.Base"]
+    - state: 300ammo
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: 300FMJBox
+  id: 300VMAXBox
+  name: Коробка патронов (.300) V-Max
+  description: Для некоторых некоторых редких автоматов, в коробке 30 штук. Бесполезно против брони.
+  suffix: Stalker
+  components:
+  - type: BallisticAmmoProvider
+    proto: 300ammo
+  - type: Sprite
+    layers:
+    - state: 300VMAX
+      map: ["enum.GunVisualLayers.Base"]
+    - state: 300ammo
+      map: ["enum.GunVisualLayers.Mag"]
+
+
+- type: entity
+  parent: BaseAmmoCinkBoxStalker
+  id: 300FMJBoxCink
+  name: ящик патронов (.300) БПЗ FMJ
+  description: Для некоторых редких автоматов, в коробке 300 штук. Обеспечивает пробитие 3 класса брони.
+  suffix: Stalker
+  components:
+  - type: BallisticAmmoProvider
+    capacity: 300
+    proto: STCartridge300FMJ
+    whitelist:
+      tags:
+        - STCartridge300
+  - type: Sprite
+    layers:
+    - state: cink
+      map: ["enum.GunVisualLayers.Base"]
+    - state: cink
+      map: ["enum.GunVisualLayers.Mag"]
+
+- type: entity
+  parent: 300FMJBoxCink
+  id: 300VMAXBoxCink
+  name: ящик патронов (.300) V-Max
+  description: Для некоторых редких автоматов, в коробке 300 штук. Бесполезно против брони.
+  suffix: Stalker
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge300VMAX
+  - type: Sprite
+    layers:
+    - state: cink
+      map: ["enum.GunVisualLayers.Base"]
+    - state: cink
+      map: ["enum.GunVisualLayers.Mag"]

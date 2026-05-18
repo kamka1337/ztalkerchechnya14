@@ -367,6 +367,7 @@
       STWeaponRifleARX160: 80000
       STWeaponLauncherRGM40: 100000
       STWeaponMachineGunPKM: 220000
+      STWeaponRifleVelociraptor: 15000
   - name: shop-category-armor
     priority: 2
     items:
@@ -375,14 +376,17 @@
       ClothingOuterArmorFreedomDefender: 4500
       STClothingOuterArmorVolchankaFreedom: 9500
   - name: shop-category-magazines
-      priority: 1
-      items:
+    priority: 3
+    items:
       Magazine762x54PKM: 25000
       754Mag10: 1000
       751Mag30: 1500
+      Base300Mag30: 700
   - name: shop-category-ammunition
-      priority: 2
-      items:
+    priority: 4
+    items:
       GrenadeVOG25P: 10000
       GrenadeVOG25: 17500
       754PCBoxCink: 30000
+      300FMJBox: 1500
+      300VMAXBox: 1000

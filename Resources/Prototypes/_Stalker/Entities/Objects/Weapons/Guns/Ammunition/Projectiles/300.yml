@@ -1,0 +1,29 @@
+- type: entity
+  id: Bullet300FMJ
+  name: bullet (.300 rifle)
+  parent: STBaseMRBullet
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 6
+  - type: Projectile
+    projectileClass: 3
+    damage:
+      types:
+        Piercing: 33
+  - type: StaminaDamageOnCollide
+    damage: 4
+
+- type: entity
+  id: Bullet300VMAX
+  name: bullet (.300 rifle)
+  parent: Bullet300FMJ
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Projectile
+    projectileClass: 0
+    damage:
+      types:
+        Mutant: 90
+        Blunt: 10
+        Slash: 10

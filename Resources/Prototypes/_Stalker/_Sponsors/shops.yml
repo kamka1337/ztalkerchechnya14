@@ -356,8 +356,8 @@
       545BPBox: 2700
 
 - type: personalShop
-  id: PersonalTuhardShop
-  username: Tuhard
+  id: PersonalTuHardShop
+  username: TuHard
   categories:
   - name: Персональная категория
     items:

@@ -1782,6 +1782,60 @@
     sprite: _Stalker/Objects/Misc/casete.rsi
     state: c7
 
+- type: entity
+  parent: BaseItem
+  id: CasseteFiftyFiftyZOV2Radio
+  suffix: Stalker, кассета (kessoku band - Seishun Complex)
+  name: кассета "kessoku band - Seishun Complex"
+  description: Старая потрёпанная кассета. Предположительно, на неё записана какая-то песня. На передней части кассеты имеется неразборчивая надпись. Сделано на заказ для sandmita
+  components:
+  - type: STWeight
+    self: 0.15
+  - type: Cassete
+    sound: /Audio/_Stalker/Music/Radio/Donate/bocchi2.ogg
+  - type: Tag
+    tags:
+    - Cassete
+  - type: Sprite
+    sprite: _Stalker/Objects/Misc/casete.rsi
+    state: c7
+
+- type: entity
+  parent: BaseItem
+  id: CasseteFiftyFiftyZOV3Radio
+  suffix: Stalker, кассета (kessoku band - Never Forget)
+  name: кассета "kessoku band - Never Forget"
+  description: Старая потрёпанная кассета. Предположительно, на неё записана какая-то песня. На передней части кассеты имеется неразборчивая надпись. Сделано на заказ для sandmita
+  components:
+  - type: STWeight
+    self: 0.15
+  - type: Cassete
+    sound: /Audio/_Stalker/Music/Radio/Donate/bocchi3.ogg
+  - type: Tag
+    tags:
+    - Cassete
+  - type: Sprite
+    sprite: _Stalker/Objects/Misc/casete.rsi
+    state: c7
+
+- type: entity
+  parent: BaseItem
+  id: CasseteFiftyFiftyZOV4Radio
+  suffix: Stalker, кассета (kessoku band - That Band)
+  name: кассета "kessoku band - That Band"
+  description: Старая потрёпанная кассета. Предположительно, на неё записана какая-то песня. На передней части кассеты имеется неразборчивая надпись. Сделано на заказ для sandmita
+  components:
+  - type: STWeight
+    self: 0.15
+  - type: Cassete
+    sound: /Audio/_Stalker/Music/Radio/Donate/bocchi4.ogg
+  - type: Tag
+    tags:
+    - Cassete
+  - type: Sprite
+    sprite: _Stalker/Objects/Misc/casete.rsi
+    state: c7
+
 # Donate Premium
 
 - type: entity

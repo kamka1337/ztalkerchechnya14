@@ -365,13 +365,12 @@
       STWeaponRifleAKS74: 3000
       STWeaponRifleAK74M: 5500
       STWeaponRifleAKM: 5000
-      STWeaponRifleAM17: 37500
-      STWeaponRifleA545: 65000
-      STWeaponRifleAK103: 70000
-      STWeaponSniperTKPD: 98000
-      STWeaponLauncherRGM40: 100000
-      STWeaponMachineGunPKM: 220000
-      STWeaponRifleVPO209: 10000
+      STWeaponRifleAM17: 3300
+      STWeaponRifleA545: 47000
+      STWeaponRifleAK103: 57000
+      STWeaponSniperTKPD: 80000
+      STWeaponLauncherRGM40: 80000
+      STWeaponRifleVPO209: 8000
   - name: shop-category-armor
     priority: 2
     items:
@@ -382,7 +381,6 @@
   - name: shop-category-magazines
     priority: 3
     items:
-      Magazine762x54PKM: 25000
       BaseTKPDMag10: 2000
       BaseVPO209Mag30: 500
   - name: shop-category-ammunition

@@ -361,13 +361,13 @@
       STWeaponRifleM4: 3500
       STWeaponRifleG36: 5500
       STWeaponRifleSCARL: 5000
-      STWeaponRifleLR300v1: 45000
-      STWeaponSniperSVDS: 56000
-      STWeaponRifleHK416: 67500
-      STWeaponRifleARX160: 80000
-      STWeaponLauncherRGM40: 100000
-      STWeaponMachineGunPKM: 220000
-      STWeaponRifleVelociraptor: 15000
+      STWeaponRifleLR300v1: 37500
+      STWeaponSniperSVDS: 43000
+      STWeaponRifleHK416: 50500
+      STWeaponRifleARX160: 60000
+      STWeaponLauncherRGM40: 80000
+      STWeaponRifleVelociraptor: 12000
+      STWeaponSniperDVL10: 80000
   - name: shop-category-armor
     priority: 2
     items:
@@ -378,7 +378,6 @@
   - name: shop-category-magazines
     priority: 3
     items:
-      Magazine762x54PKM: 25000
       754Mag10: 1000
       751Mag30: 1500
       Base300Mag30: 700

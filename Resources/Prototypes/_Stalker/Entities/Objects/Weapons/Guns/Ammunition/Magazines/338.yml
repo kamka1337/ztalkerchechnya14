@@ -39,3 +39,45 @@
         storagebase: !type:Container
           ents: [ ]
         item_slot: !type:ContainerSlot { }
+
+- type: entity
+  id: BaseDVLMag10
+  name: магазин .338 DVL-10 (10)
+  description: Магазин .338 Lapua Magnum для DVL-10. Вместимость пуль 10. Продают пустым.
+  parent: Base545Mag10
+  suffix: Stalker
+  components:
+  - type: STWeight
+    self: 1
+  - type: Tag
+    tags:
+    - Magazine338DVL
+  - type: BallisticAmmoProvider
+    mayTransfer: true
+    whitelist:
+      tags:
+      - STCartridge338
+    capacity: 10
+  - type: Item
+    size: Small
+    shape:
+    - 0,0,0,1
+  - type: Sprite
+    scale: 0.8, 0.8
+    sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Magazines/338DVL.rsi
+    layers:
+    - state: base
+      map: ["enum.GunVisualLayers.Base"]
+    - state: mag-1
+      map: ["enum.GunVisualLayers.Mag"]
+  - type: MagazineVisuals
+    magState: mag
+    steps: 2
+    zeroVisible: false
+  - type: Appearance
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+      storagebase: !type:Container
+        ents: [ ]
+      item_slot: !type:ContainerSlot { }

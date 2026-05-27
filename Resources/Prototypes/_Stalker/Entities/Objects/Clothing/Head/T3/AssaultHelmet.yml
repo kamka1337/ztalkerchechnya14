@@ -18,7 +18,7 @@
   - type: ExplosionResistance
     damageCoefficient: 0.9
   - type: Reflect
-    reflectProb: 0.12
+    reflectProb: 0.75
     spread: 360
     reflects:
       - NonEnergy

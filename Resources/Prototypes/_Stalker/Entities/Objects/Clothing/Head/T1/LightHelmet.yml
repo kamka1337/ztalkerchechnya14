@@ -16,7 +16,7 @@
         Piercing: 0.90
   - type: Craftable
   - type: Reflect
-    reflectProb: 0.03
+    reflectProb: 0.25
     spread: 360
     reflects:
       - NonEnergy

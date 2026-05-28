@@ -93,10 +93,6 @@
   - type: HumanoidAppearance
     species: Human
   - type: TypingIndicator
-  - type: SlowOnDamage
-    speedModifierThresholds:
-      80: 0.7 # stalker-changes
-      65: 0.5 # stalker-changes
   - type: Fixtures
     fixtures: # TODO: This needs a second fixture just for mob collisions.
       fix1:
@@ -145,6 +141,13 @@
   - type: Body
     prototype: Human
     requiredLegs: 2
+  - type: LimbHealth
+  - type: BodyTargeting
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      370: Critical
+      440: Dead
   - type: Identity
   - type: IdExaminable
   - type: Hands
@@ -232,6 +235,12 @@
   id: BaseMobSpeciesOrganic
   abstract: true
   components:
+  - type: Bloodstream
+    maxBleedAmount: 0
+    bloodlossDamage:
+      types: {}
+    bloodlossHealDamage:
+      types: {}
   - type: Barotrauma
     damage:
       types:

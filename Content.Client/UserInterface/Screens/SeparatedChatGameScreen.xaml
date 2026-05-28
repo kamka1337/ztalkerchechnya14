@@ -11,6 +11,7 @@
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
     xmlns:inventory="clr-namespace:Content.Client.UserInterface.Systems.Inventory.Widgets"
     xmlns:psy="clr-namespace:Content.Client._Stalker.StalkerUi.Widgets"
+    xmlns:kukla="clr-namespace:Content.Client._Session.LimbHealth.Widgets"
     Name="SeparatedChatHud"
     VerticalExpand="False"
     VerticalAlignment="Bottom"
@@ -27,6 +28,7 @@
             </BoxContainer>
             <alerts:AlertsUI Name="Alerts" Access="Protected" />
             <psy:PsyGui Name="Psy" Access="Protected" /> <!--stalker-changes-->
+            <kukla:KuklaWidget Name="Kukla" Access="Protected" />
         </LayoutContainer>
         <PanelContainer Name="SeparatedChatPanel" MinWidth="300">
             <PanelContainer.PanelOverride>

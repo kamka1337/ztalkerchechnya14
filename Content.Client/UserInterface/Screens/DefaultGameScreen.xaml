@@ -10,6 +10,7 @@
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:inventory="clr-namespace:Content.Client.UserInterface.Systems.Inventory.Widgets"
     xmlns:psy="clr-namespace:Content.Client._Stalker.StalkerUi.Widgets"
+    xmlns:kukla="clr-namespace:Content.Client._Session.LimbHealth.Widgets"
     Name="DefaultHud"
     VerticalExpand="False"
     VerticalAlignment="Bottom"
@@ -32,4 +33,5 @@
     <chat:ResizableChatBox Name="Chat" Access="Protected" />
     <alerts:AlertsUI Name="Alerts" Access="Protected" />
     <psy:PsyGui Name="Psy" Access="Protected" /> <!--stalker-changes-->
+    <kukla:KuklaWidget Name="Kukla" Access="Protected" />
 </screens:DefaultGameScreen>

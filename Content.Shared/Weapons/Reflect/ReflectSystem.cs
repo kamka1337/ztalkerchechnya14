@@ -19,6 +19,7 @@ using Content.Shared.Examine;
 using Content.Shared.Localizations;
 using Content.Shared._Stalker_EN.Clothing;
 using Content.Shared._Stalker_EN.Clothing.Components; // stalker-changes
+using Content.Shared._Session.LimbHealth;
 
 namespace Content.Shared.Weapons.Reflect;
 
@@ -35,6 +36,7 @@ public sealed class ReflectSystem : EntitySystem
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     public override void Initialize()
     {
@@ -61,6 +63,10 @@ public sealed class ReflectSystem : EntitySystem
         if (!ent.Comp.InRightPlace)
             return; // only reflect when equipped correctly
 
+        var shooter = CompOrNull<ProjectileComponent>(args.ProjUid)?.Shooter;
+        if (HelmetBlockedByLimbTargeting(ent, shooter))
+            return;
+
         if (TryReflectProjectile(ent, ent.Owner, args.ProjUid))
             args.Cancelled = true;
     }
@@ -73,11 +79,24 @@ public sealed class ReflectSystem : EntitySystem
         if (!ent.Comp.InRightPlace)
             return; // only reflect when equipped correctly
 
+        if (HelmetBlockedByLimbTargeting(ent, args.Shooter))
+            return;
+
         if (TryReflectHitscan(ent, ent.Owner, args.Shooter, args.SourceItem, args.Direction, args.Reflective, out var dir))
         {
             args.Direction = dir.Value;
             args.Reflected = true;
         }
+    }
+
+    private bool HelmetBlockedByLimbTargeting(Entity<ReflectComponent> reflector, EntityUid? shooter)
+    {
+        if (!_inventory.TryGetContainingSlot(reflector.Owner, out var slot) || slot.Name != "head")
+            return false;
+
+        return shooter is { } s
+            && TryComp<BodyTargetingComponent>(s, out var targeting)
+            && targeting.SelectedLimb != LimbType.Head;
     }
 
     private void OnReflectCollide(Entity<ReflectComponent> ent, ref ProjectileReflectAttemptEvent args)

@@ -24,7 +24,7 @@
       item_slot: !type:ContainerSlot { }
   - type: Sprite
     scale: 0.8, 0.8
-    sprite: _Session\Objects\Weapons\Guns\Ammunition\Magazines\300\30.rsi
+    sprite: _Session/Objects/Weapons/Guns/Ammunition/Magazines/300/30.rsi
     layers:
     - state: base
       map: ["enum.GunVisualLayers.Base"]

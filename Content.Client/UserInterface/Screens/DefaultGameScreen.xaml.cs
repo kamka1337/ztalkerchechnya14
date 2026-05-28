@@ -23,6 +23,7 @@ public sealed partial class DefaultGameScreen : InGameScreen
         SetAnchorAndMarginPreset(Chat, LayoutPreset.TopRight, margin: 10);
         SetAnchorAndMarginPreset(Alerts, LayoutPreset.TopRight, margin: 10);
         SetAnchorAndMarginPreset(Psy, LayoutPreset.BottomRight, margin: 50); // stalker-changes
+        SetAnchorAndMarginPreset(Kukla, LayoutPreset.BottomRight, margin: 5);
 
         Chat.OnResized += ChatOnResized;
         Chat.OnChatResizeFinish += ChatOnResizeFinish;

@@ -388,11 +388,11 @@
     angleDecay: 6.5
     projectileSpeed: 60
   - type: Clothing
-    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+    sprite: _Session/Objects/Weapons/Guns/Rifles/velociraptor.rsi
   - type: Item
-    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+    sprite: _Session/Objects/Weapons/Guns/Rifles/velociraptor.rsi
   - type: Sprite
-    sprite: _Session\Objects\Weapons\Guns\Rifles\velociraptor.rsi
+    sprite: _Session/Objects/Weapons/Guns/Rifles/velociraptor.rsi
     scale: 1, 1
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.6

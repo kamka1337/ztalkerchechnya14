@@ -1,0 +1,291 @@
+- type: entity
+  parent: BaseItem
+  id: BaseSessionLimbSyringe
+  abstract: true
+  name: лечебный шприц
+  description: Одноразовый. Полностью убирает с выбранной на кукле конечности урон тех типов, что он лечит.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/syringe.rsi
+    layers:
+    - state: icon
+      map: ["base"]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.SyringeVisuals.Spent:
+        base:
+          True: { state: used }
+          False: { state: icon }
+  - type: Item
+    size: Tiny
+
+- type: entity
+  parent: BaseSessionLimbSyringe
+  id: SessionSyringeCivilian
+  name: гражданский шприц
+  description: Восстанавливает 50 ед. здоровья конечности за 16 секунд.
+  components:
+  - type: LimbSyringe
+    healAmount: 50
+    delay: 16
+
+- type: entity
+  parent: BaseSessionLimbSyringe
+  id: SessionSyringeMilitary
+  name: армейский шприц
+  description: Восстанавливает 50 ед. здоровья конечности за 10 секунд.
+  components:
+  - type: LimbSyringe
+    healAmount: 50
+    delay: 10
+
+- type: entity
+  parent: BaseSessionLimbSyringe
+  id: SessionSyringeScience
+  name: научный шприц
+  description: Восстанавливает 50 ед. здоровья конечности за 7 секунд.
+  components:
+  - type: LimbSyringe
+    healAmount: 50
+    delay: 7
+
+- type: entity
+  parent: BaseItem
+  id: SessionMedicalNeedle
+  name: медицинская нить
+  description: Первый этап хирургии выбитой конечности. Ограниченное число применений. После — тактические ножницы.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/igla.rsi
+    state: icon
+  - type: Item
+    size: Tiny
+  - type: LimbSurgeryTool
+    stage: Needle
+  - type: LimitedCharges
+    maxCharges: 5
+
+- type: entity
+  parent: BaseItem
+  id: SessionTacticalScissors
+  name: тактические ножницы
+  description: Завершают хирургию выбитой конечности после мед. нити, восстанавливая её.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/tactical_scissors.rsi
+    state: icon
+  - type: Item
+  - type: LimbSurgeryTool
+    stage: Scissors
+
+- type: entity
+  parent: BaseItem
+  id: SessionBandage
+  name: бинт
+  description: Останавливает лёгкое кровотечение на любой конечности. Два применения.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/bint.rsi
+    state: icon
+  - type: Item
+    size: Tiny
+  - type: LimbBleedCure
+    curesHeavy: false
+    armsLegsOnly: false
+  - type: LimitedCharges
+    maxCharges: 2
+
+- type: entity
+  parent: BaseItem
+  id: SessionEsmarchTourniquet
+  name: жгут Эсмарха
+  description: Останавливает любое кровотечение, но только на руке или ноге. Одноразовый.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/esmarch_tourniquet.rsi
+    state: icon
+  - type: Item
+  - type: LimbBleedCure
+    curesHeavy: true
+    armsLegsOnly: true
+  - type: LimitedCharges
+    maxCharges: 1
+
+- type: entity
+  parent: BaseStorageItem
+  id: SessionMedkitAI2
+  name: аптечка АИ-2
+  description: Универсальная аптечка. Пять гражданских шприцов, два бинта и два жгута.
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Medicine/medkit/ai1.rsi
+    state: medkit-1
+  - type: Item
+    size: Normal
+    sprite: _Stalker/Objects/Medicine/medkit/ai1.rsi
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,4,2
+  - type: StorageFill
+    contents:
+    - id: SessionSyringeCivilian
+      amount: 5
+    - id: SessionBandage
+      amount: 2
+    - id: SessionEsmarchTourniquet
+      amount: 2
+
+- type: entity
+  parent: BaseStorageItem
+  id: SessionMedkitRed
+  name: красная аптечка
+  description: Стандартная аптечка первой помощи. Содержит пять гражданских шприцов.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/firstaidkits.rsi
+    state: firstaid
+  - type: Item
+    size: Normal
+    sprite: Objects/Specific/Medical/firstaidkits.rsi
+    heldPrefix: firstaid
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,4,1
+  - type: StorageFill
+    contents:
+    - id: SessionSyringeCivilian
+      amount: 5
+
+- type: entity
+  parent: BaseStorageItem
+  id: SessionMedkitMilitary
+  name: армейская аптечка
+  description: Боевая аптечка. Пять армейских шприцов, два бинта и два жгута.
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Medicine/medkit/ai2.rsi
+    state: medkit-2
+  - type: Item
+    size: Normal
+    sprite: _Stalker/Objects/Medicine/medkit/ai2.rsi
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,4,2
+  - type: StorageFill
+    contents:
+    - id: SessionSyringeMilitary
+      amount: 5
+    - id: SessionBandage
+      amount: 2
+    - id: SessionEsmarchTourniquet
+      amount: 2
+
+- type: entity
+  parent: BaseStorageItem
+  id: SessionMedkitScience
+  name: научная аптечка
+  description: Аптечка для аномальных поражений. Пять научных шприцов, два бинта и два жгута.
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Medicine/medkit/ai3.rsi
+    state: medkit-3
+  - type: Item
+    size: Normal
+    sprite: _Stalker/Objects/Medicine/medkit/ai3.rsi
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,4,2
+  - type: StorageFill
+    contents:
+    - id: SessionSyringeScience
+      amount: 5
+    - id: SessionBandage
+      amount: 2
+    - id: SessionEsmarchTourniquet
+      amount: 2
+
+- type: entity
+  parent: BaseStorageItem
+  id: SessionMedkitCMS
+  name: набор CMS
+  description: "Хирургический набор: медицинская нить, тактические ножницы и шприц."
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/cms.rsi
+    state: icon
+  - type: Item
+    size: Normal
+    sprite: _Session/Objects/Medical/cms.rsi
+  - type: Storage
+    maxItemSize: Small
+    grid:
+    - 0,0,4,1
+  - type: StorageFill
+    contents:
+    - id: SessionMedicalNeedle
+    - id: SessionTacticalScissors
+    - id: SessionSyringeCivilian
+
+- type: entity
+  parent: BaseItem
+  id: SessionSplint
+  name: шина
+  description: Шина для фиксации конечности.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/shina.rsi
+    state: icon
+  - type: Item
+
+- type: entity
+  parent: BaseItem
+  id: SessionIbuprofen
+  name: ибупрофен
+  description: Обезболивающее.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/ibuprofen.rsi
+    state: icon
+  - type: Item
+    size: Tiny
+
+- type: entity
+  parent: BaseItem
+  id: SessionZagustin
+  name: загустин
+  description: Кровоостанавливающее средство.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/zagustin.rsi
+    state: icon
+  - type: Item
+    size: Tiny
+
+- type: entity
+  parent: BaseItem
+  id: SessionPropital
+  name: пропитал
+  description: Восстанавливающий препарат.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/propital.rsi
+    state: icon
+  - type: Item
+    size: Tiny
+
+- type: entity
+  parent: BaseItem
+  id: SessionMorphine
+  name: морфин
+  description: Сильное обезболивающее.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/morphine.rsi
+    state: icon
+  - type: Item
+    size: Tiny

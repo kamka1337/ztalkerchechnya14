@@ -62,6 +62,17 @@
   id: BaseWall
   components:
   - type: Occluder # Breaks on diagonal walls
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 20000
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalSlam
 
 - type: entity
   abstract: true

@@ -187,6 +187,17 @@
     damageModifierSet: Metallic
   - type: IconSmooth
     enabled: false
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 20000
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+      - !type:PlaySoundBehavior
+        sound:
+          collection: MetalSlam
 
 - type: entity
   id: MetalBarDoorFallout

@@ -58,7 +58,7 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (_limbs.IsDestroyed(target, limb))
         {
-            _popup.PopupEntity("Конечность выбита — шприц не поможет.", target, args.User);
+            _popup.PopupEntity("Конечность выбита - шприц не поможет.", target, args.User);
             return;
         }
 
@@ -178,7 +178,7 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (_mobState.IsDead(target))
         {
-            _popup.PopupEntity("Бесполезно — пациент мёртв.", target, args.User);
+            _popup.PopupEntity("Бесполезно - пациент мёртв.", target, args.User);
             return;
         }
 
@@ -186,7 +186,7 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (limb is LimbType.Head or LimbType.Chest)
         {
-            _popup.PopupEntity("Это ранение необратимо — зашить невозможно.", target, args.User);
+            _popup.PopupEntity("Это ранение необратимо - зашить невозможно.", target, args.User);
             return;
         }
 
@@ -212,7 +212,7 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (ent.Comp.Stage == LimbSurgeryStage.Needle && comp.NeedledLimbs.Contains(limb))
         {
-            _popup.PopupEntity("Игла уже введена — используйте тактические ножницы.", target, args.User);
+            _popup.PopupEntity("Игла уже введена - используйте тактические ножницы.", target, args.User);
             return;
         }
 

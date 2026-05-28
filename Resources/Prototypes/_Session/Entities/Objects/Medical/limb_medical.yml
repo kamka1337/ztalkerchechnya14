@@ -75,7 +75,7 @@
   parent: BaseItem
   id: SessionMedicalNeedle
   name: медицинская нить
-  description: Одноразовая. Первый этап хирургии выбитой конечности. После — тактические ножницы.
+  description: Одноразовая. Первый этап хирургии выбитой конечности. После - тактические ножницы.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/igla.rsi

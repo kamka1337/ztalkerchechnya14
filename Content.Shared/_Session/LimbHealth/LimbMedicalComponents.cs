@@ -25,7 +25,13 @@ public sealed partial class LimbBleedCureComponent : Component
     public bool CuresHeavy;
 
     [DataField]
+    public bool CuresLight = true;
+
+    [DataField]
     public bool ArmsLegsOnly;
+
+    [DataField]
+    public bool Spent;
 
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(3);

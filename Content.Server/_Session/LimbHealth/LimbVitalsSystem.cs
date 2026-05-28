@@ -109,34 +109,63 @@ public sealed class LimbVitalsSystem : EntitySystem
             Dirty(ent);
     }
 
-    private void TickBleed(Entity<LimbHealthComponent> ent)
+    private void TickBleed(Entity<LimbHealthComponent> ent, bool heavy)
     {
-        List<(LimbType Limb, FixedPoint2 Damage, FixedPoint2 Puddle)>? bleeds = null;
-        foreach (var (limb, st) in ent.Comp.Limbs)
-        {
-            if (st.Destroyed)
-                continue;
+        var flag = heavy ? LimbEffect.HeavyBleeding : LimbEffect.Bleeding;
 
-            if ((st.Effects & LimbEffect.HeavyBleeding) != 0)
-                (bleeds ??= new()).Add((limb, ent.Comp.HeavyBleedDamage, ent.Comp.HeavyBleedPuddle));
-            else if ((st.Effects & LimbEffect.Bleeding) != 0)
-                (bleeds ??= new()).Add((limb, ent.Comp.LightBleedDamage, ent.Comp.LightBleedPuddle));
+        var sources = 0;
+        var aliveCount = 0;
+        foreach (var (_, st) in ent.Comp.Limbs)
+        {
+            if (!st.Destroyed)
+                aliveCount++;
+
+            if ((st.Effects & flag) != 0)
+                sources++;
         }
 
-        if (bleeds == null)
+        if (sources == 0 || aliveCount == 0)
             return;
 
-        FixedPoint2 totalPuddle = 0;
-        foreach (var (limb, damage, puddle) in bleeds)
+        var budget = ent.Comp.BleedDamagePerLimb * aliveCount * sources;
+        _limbs.ApplyBleedTick(ent.Owner, budget, ent.Comp);
+
+        var puddle = ent.Comp.BleedPuddlePerTick * sources;
+        if (puddle > 0)
+            _puddle.TrySpillAt(ent.Owner, new Solution("Blood", puddle), out _, sound: false);
+    }
+
+    private void UpdateWeakBleedStops(Entity<LimbHealthComponent> ent, TimeSpan now)
+    {
+        if (ent.Comp.WeakBleedStopTime.Count == 0)
+            return;
+
+        List<LimbType>? toStop = null;
+        foreach (var (limb, stopTime) in ent.Comp.WeakBleedStopTime)
         {
-            var dmg = new DamageSpecifier();
-            dmg.DamageDict["Bloodloss"] = damage;
-            _limbs.ApplyLimbDamage(ent.Owner, limb, dmg, ent.Comp);
-            totalPuddle += puddle;
+            if (now >= stopTime)
+                (toStop ??= new()).Add(limb);
         }
 
-        if (totalPuddle > 0)
-            _puddle.TrySpillAt(ent.Owner, new Solution("Blood", totalPuddle), out _, sound: false);
+        if (toStop == null)
+            return;
+
+        var changed = false;
+        foreach (var limb in toStop)
+        {
+            ent.Comp.WeakBleedStopTime.Remove(limb);
+            if (ent.Comp.Limbs.TryGetValue(limb, out var st) && (st.Effects & LimbEffect.Bleeding) != 0)
+            {
+                st.Effects &= ~LimbEffect.Bleeding;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            Dirty(ent);
+            RaiseLocalEvent(new LimbHealthChangedEvent(ent.Owner));
+        }
     }
 
     private static float ChestAsphyxiationChance(int step)
@@ -170,18 +199,30 @@ public sealed class LimbVitalsSystem : EntitySystem
 
             if (comp.Limbs.TryGetValue(LimbType.Abdomen, out var abdomen) && abdomen.Destroyed)
             {
-                if (TryComp<HungerComponent>(uid, out var hunger))
-                    _hunger.ModifyHunger(uid, -hunger.ActualDecayRate * frameTime, hunger);
+                var extra = comp.AbdomenStarvationMultiplier - 1f;
+                if (extra > 0f)
+                {
+                    if (TryComp<HungerComponent>(uid, out var hunger))
+                        _hunger.ModifyHunger(uid, -hunger.ActualDecayRate * frameTime * extra, hunger);
 
-                if (TryComp<ThirstComponent>(uid, out var thirst))
-                    _thirst.ModifyThirst(uid, thirst, -thirst.ActualDecayRate * frameTime);
+                    if (TryComp<ThirstComponent>(uid, out var thirst))
+                        _thirst.ModifyThirst(uid, thirst, -thirst.ActualDecayRate * frameTime * extra);
+                }
             }
 
-            if (now >= comp.NextBleedTick)
+            if (now >= comp.NextWeakBleedTick)
             {
-                comp.NextBleedTick = now + comp.BleedInterval;
-                TickBleed((uid, comp));
+                comp.NextWeakBleedTick = now + comp.WeakBleedInterval;
+                TickBleed((uid, comp), heavy: false);
             }
+
+            if (now >= comp.NextHeavyBleedTick)
+            {
+                comp.NextHeavyBleedTick = now + comp.HeavyBleedInterval;
+                TickBleed((uid, comp), heavy: true);
+            }
+
+            UpdateWeakBleedStops((uid, comp), now);
 
             if (now >= comp.NextDoseTick)
             {

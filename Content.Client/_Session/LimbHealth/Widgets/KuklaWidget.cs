@@ -10,7 +10,7 @@ namespace Content.Client._Session.LimbHealth.Widgets;
 public sealed class KuklaWidget : UIWidget
 {
     private const float Scale = 3f;
-    private const string Base = "/Textures/_Session/Interface/LimbHealth/";
+    private const string Base = KuklaVisuals.Base;
 
     private readonly LayoutContainer _root;
     private readonly TextureRect _selectionOutline;
@@ -114,9 +114,9 @@ public sealed class KuklaWidget : UIWidget
             var max = maxFp.Float();
             var frac = max > 0 ? st.Health(maxFp).Float() / max : 0f;
 
-            _color[limb].TexturePath = Base + limb.SpriteFolder() + "/" + ColorFor(st, frac) + ".png";
+            _color[limb].TexturePath = Base + limb.SpriteFolder() + "/" + KuklaVisuals.ColorState(st, frac) + ".png";
 
-            var icon = EffectIcon(st);
+            var icon = KuklaVisuals.EffectIcon(st);
             if (icon != null)
             {
                 _effect[limb].TexturePath = Base + "effects/" + icon + ".png";
@@ -129,36 +129,6 @@ public sealed class KuklaWidget : UIWidget
         }
 
         UpdateOutlines();
-    }
-
-    private static string ColorFor(LimbState st, float frac)
-    {
-        if (st.Destroyed)
-            return "black";
-        if (frac > 0.75f)
-            return "green";
-        if (frac > 0.50f)
-            return "yellow";
-        if (frac > 0.25f)
-            return "orange";
-        return "red";
-    }
-
-    private static string? EffectIcon(LimbState st)
-    {
-        if ((st.Effects & LimbEffect.Fracture) != 0)
-            return "perelom";
-        if ((st.Effects & LimbEffect.HeavyBleeding) != 0)
-            return "BIG_KROVOTEK";
-        if ((st.Effects & LimbEffect.Bleeding) != 0)
-            return "SMALL_KROVOTEK";
-        if ((st.Effects & LimbEffect.Painkiller) != 0)
-            return "OBEZBOL";
-        if ((st.Effects & LimbEffect.Good) != 0)
-            return "good_effect";
-        if ((st.Effects & LimbEffect.Bad) != 0)
-            return "bad_effect";
-        return null;
     }
 }
 

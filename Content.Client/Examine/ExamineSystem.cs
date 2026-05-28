@@ -36,6 +36,8 @@ namespace Content.Client.Examine
 
         public const string StyleClassEntityTooltip = "entity-tooltip";
 
+        public event Action<EntityUid, EntityUid, BoxContainer, bool>? OnExamineTooltipBuilt;
+
         private EntityUid _examinedEntity;
         private Popup? _examineTooltipOpen;
         private ScreenCoordinates _popupPos;
@@ -283,6 +285,9 @@ namespace Content.Client.Examine
                 vBox.AddChild(richLabel);
                 break;
             }
+
+            if (vBox is BoxContainer examineBox)
+                OnExamineTooltipBuilt?.Invoke(player, target, examineBox, !getVerbs && verbs == null);
 
             var totalVerbs = _verbSystem.GetLocalVerbs(target, player, typeof(ExamineVerb));
 

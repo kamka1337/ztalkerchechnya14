@@ -132,6 +132,31 @@
     maxCharges: 1
 
 - type: entity
+  parent: BaseItem
+  id: SessionCalok
+  name: CALOK
+  description: Кровоостанавливающий гель-аппликатор. Закрывает сильное кровотечение на любой конечности. На слабое не действует. Одноразовый.
+  components:
+  - type: Sprite
+    sprite: _Session/Objects/Medical/calok.rsi
+    layers:
+    - state: icon
+      map: ["base"]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.SyringeVisuals.Spent:
+        base:
+          True: { state: used }
+          False: { state: icon }
+  - type: Item
+    size: Tiny
+  - type: LimbBleedCure
+    curesHeavy: true
+    curesLight: false
+    armsLegsOnly: false
+
+- type: entity
   parent: BaseStorageItem
   id: SessionMedkitAI2
   name: аптечка АИ-2
@@ -178,7 +203,7 @@
   parent: BaseStorageItem
   id: SessionMedkitAFAK
   name: AFAK
-  description: Боевая аптечка. Четыре шприца транексама, бинт и два жгута Эсмарха.
+  description: Боевая аптечка. Четыре шприца транексама, бинт, два жгута Эсмарха и CALOK.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/afak.rsi
@@ -197,12 +222,13 @@
     - id: SessionBandage
     - id: SessionEsmarchTourniquet
       amount: 2
+    - id: SessionCalok
 
 - type: entity
   parent: BaseStorageItem
   id: SessionMedkitIFAK
   name: IFAK
-  description: Расширенная аптечка. Пять шприцов декстропина, бинт и жгут Эсмарха.
+  description: Расширенная аптечка. Пять шприцов декстропина, бинт, жгут Эсмарха и два CALOK.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/ifak.rsi
@@ -220,6 +246,8 @@
       amount: 5
     - id: SessionBandage
     - id: SessionEsmarchTourniquet
+    - id: SessionCalok
+      amount: 2
 
 - type: entity
   parent: BaseStorageItem

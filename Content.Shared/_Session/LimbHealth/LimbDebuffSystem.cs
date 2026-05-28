@@ -1,6 +1,10 @@
 using Content.Shared.Hands;
+using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Interaction.Events;
+using Content.Shared.Item;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Throwing;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Weapons.Ranged.Systems;
@@ -23,8 +27,34 @@ public sealed class LimbDebuffSystem : EntitySystem
         SubscribeLocalEvent<LimbDestroyedEvent>(OnLimbChanged);
         SubscribeLocalEvent<LimbRestoredEvent>(OnLimbRestored);
 
+        SubscribeLocalEvent<LimbHealthComponent, UseAttemptEvent>(OnHandUseAttempt);
+        SubscribeLocalEvent<LimbHealthComponent, AttackAttemptEvent>(OnHandUseAttempt);
+        SubscribeLocalEvent<LimbHealthComponent, PickupAttemptEvent>(OnHandUseAttempt);
+        SubscribeLocalEvent<LimbHealthComponent, ThrowAttemptEvent>(OnHandUseAttempt);
+
         SubscribeLocalEvent<GunComponent, GunRefreshModifiersEvent>(OnGunRefresh);
         SubscribeLocalEvent<GunComponent, GotEquippedHandEvent>(OnGunEquipped);
+    }
+
+    private void OnHandUseAttempt(EntityUid uid, LimbHealthComponent comp, CancellableEntityEventArgs args)
+    {
+        if (ActiveHandDisabled(uid, comp))
+            args.Cancel();
+    }
+
+    private bool ActiveHandDisabled(EntityUid uid, LimbHealthComponent comp)
+    {
+        if (!TryComp<HandsComponent>(uid, out var hands))
+            return false;
+
+        var active = _hands.GetActiveHand((uid, hands));
+        if (active == null || !_hands.TryGetHand((uid, hands), active, out var hand))
+            return false;
+
+        if (!LimbHandMap.TryGetArmForHand(hand.Value.Location, out var arm))
+            return false;
+
+        return comp.Limbs.TryGetValue(arm, out var st) && st.Destroyed;
     }
 
     private void OnRefreshMovement(Entity<LimbHealthComponent> ent, ref RefreshMovementSpeedModifiersEvent args)
@@ -44,6 +74,40 @@ public sealed class LimbDebuffSystem : EntitySystem
     private void OnLimbChanged(LimbDestroyedEvent args)
     {
         RefreshLimbDebuffs(args.Owner, args.Limb);
+
+        if (args.Limb.IsArm())
+            SwitchAwayFromArm(args.Owner, args.Limb);
+    }
+
+    private void SwitchAwayFromArm(EntityUid owner, LimbType destroyedArm)
+    {
+        if (!TryComp<HandsComponent>(owner, out var hands))
+            return;
+
+        if (!TryComp<LimbHealthComponent>(owner, out var limbs))
+            return;
+
+        var active = _hands.GetActiveHand((owner, hands));
+        if (active == null || !_hands.TryGetHand((owner, hands), active, out var activeHand))
+            return;
+
+        if (!LimbHandMap.TryGetArmForHand(activeHand.Value.Location, out var activeArm) || activeArm != destroyedArm)
+            return;
+
+        foreach (var name in _hands.EnumerateHands((owner, hands)))
+        {
+            if (!_hands.TryGetHand((owner, hands), name, out var hand))
+                continue;
+
+            if (!LimbHandMap.TryGetArmForHand(hand.Value.Location, out var arm) || arm == destroyedArm)
+                continue;
+
+            if (limbs.Limbs.TryGetValue(arm, out var st) && st.Destroyed)
+                continue;
+
+            _hands.TrySetActiveHand((owner, hands), name);
+            return;
+        }
     }
 
     private void OnLimbRestored(LimbRestoredEvent args)

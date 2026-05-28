@@ -1,6 +1,7 @@
 using Content.Shared._Session.LimbHealth;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.DoAfter;
 using Content.Shared.FixedPoint;
 using Content.Shared.Interaction;
@@ -18,6 +19,7 @@ public sealed class LimbMedicalSystem : EntitySystem
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedChargesSystem _charges = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
 
     public override void Initialize()
     {
@@ -86,12 +88,27 @@ public sealed class LimbMedicalSystem : EntitySystem
         if (_limbs.IsDestroyed(target, args.Limb, comp))
             return;
 
-        var healed = _limbs.HealLimbAmount(target, args.Limb, ent.Comp.HealAmount, comp);
-
-        if (healed <= FixedPoint2.Zero)
+        if (!_solutions.TryGetSolution(ent.Owner, ent.Comp.Solution, out var solnEntity, out var solution)
+            || solution.Volume <= 0)
         {
-            _popup.PopupEntity("Нечего лечить этим шприцом.", target, args.Args.User);
+            _popup.PopupEntity("Шприц пуст.", ent.Owner, args.Args.User);
             return;
+        }
+
+        var anyInjected = false;
+        foreach (var reagentQty in solution.Contents.ToArray())
+        {
+            if (!LimbReagents.All.ContainsKey(reagentQty.Reagent.Prototype))
+                continue;
+            _limbs.InjectLimbDose(target, args.Limb, reagentQty.Reagent.Prototype, comp);
+            anyInjected = true;
+        }
+
+        _solutions.RemoveAllSolution(solnEntity.Value);
+
+        if (!anyInjected)
+        {
+            _popup.PopupEntity("В шприце нет подходящего препарата.", ent.Owner, args.Args.User);
         }
 
         SpendSyringe(ent);
@@ -196,14 +213,6 @@ public sealed class LimbMedicalSystem : EntitySystem
             return;
         }
 
-        if (ent.Comp.Stage == LimbSurgeryStage.Needle
-            && TryComp<LimitedChargesComponent>(ent.Owner, out _)
-            && _charges.IsEmpty(ent.Owner))
-        {
-            _popup.PopupEntity("Игла израсходована.", ent.Owner, args.User);
-            return;
-        }
-
         if (ent.Comp.Stage == LimbSurgeryStage.Scissors && !comp.NeedledLimbs.Contains(limb))
         {
             _popup.PopupEntity("Сначала введите мед. иглу.", target, args.User);
@@ -248,14 +257,9 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (args.Stage == LimbSurgeryStage.Needle)
         {
-            if (TryComp<LimitedChargesComponent>(ent.Owner, out _) && !_charges.TryUseCharge(ent.Owner))
-            {
-                _popup.PopupEntity("Игла израсходована.", ent.Owner, args.Args.User);
-                return;
-            }
-
             comp.NeedledLimbs.Add(args.Limb);
-            _popup.PopupEntity("Мед. игла введена. Завершите тактическими ножницами.", target, args.Args.User);
+            _popup.PopupEntity("Мед. нить наложена. Завершите тактическими ножницами.", target, args.Args.User);
+            QueueDel(ent.Owner);
         }
         else
         {

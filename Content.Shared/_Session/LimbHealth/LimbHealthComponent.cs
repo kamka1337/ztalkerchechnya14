@@ -37,10 +37,10 @@ public sealed partial class LimbHealthComponent : Component
     public float BleedEscalateChance = 0.25f;
 
     [DataField]
-    public FixedPoint2 LightBleedDamage = 4;
+    public FixedPoint2 LightBleedDamage = 5;
 
     [DataField]
-    public FixedPoint2 HeavyBleedDamage = 8;
+    public FixedPoint2 HeavyBleedDamage = 10;
 
     [DataField]
     public FixedPoint2 LightBleedPuddle = 2;
@@ -49,13 +49,10 @@ public sealed partial class LimbHealthComponent : Component
     public FixedPoint2 HeavyBleedPuddle = 8;
 
     [DataField]
-    public TimeSpan BleedInterval = TimeSpan.FromSeconds(1);
+    public TimeSpan BleedInterval = TimeSpan.FromSeconds(4);
 
     [DataField]
     public TimeSpan NextBleedTick;
-
-    [DataField]
-    public float ChestAsphyxiationChance = 0.07f;
 
     [DataField]
     public TimeSpan ChestAsphyxiationInterval = TimeSpan.FromSeconds(5);
@@ -63,11 +60,36 @@ public sealed partial class LimbHealthComponent : Component
     [DataField]
     public TimeSpan NextChestCheck;
 
+    [DataField]
+    public int ChestCheckStep;
+
     [DataField, AutoNetworkedField]
     public bool PermanentAsphyxiation;
 
     [DataField]
     public HashSet<LimbType> NeedledLimbs = new();
+
+    [DataField, AutoNetworkedField]
+    public List<LimbReagentDose> ActiveDoses = new();
+
+    [DataField]
+    public TimeSpan NextDoseTick;
+
+    [DataField]
+    public TimeSpan DoseInterval = TimeSpan.FromSeconds(1);
+}
+
+[Serializable, NetSerializable, DataDefinition]
+public sealed partial class LimbReagentDose
+{
+    [DataField]
+    public LimbType Limb;
+
+    [DataField]
+    public string Reagent = string.Empty;
+
+    [DataField]
+    public FixedPoint2 Healed;
 }
 
 [Serializable, NetSerializable, DataDefinition]

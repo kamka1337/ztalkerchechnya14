@@ -36,6 +36,9 @@ public sealed class LimbVitalsSystem : EntitySystem
             return;
         Entity<LimbHealthComponent> ent = (args.Owner, comp);
 
+        if (ent.Comp.ActiveDoses.RemoveAll(d => d.Limb == args.Limb) > 0)
+            Dirty(ent);
+
         switch (args.Limb)
         {
             case LimbType.Head:
@@ -44,12 +47,66 @@ public sealed class LimbVitalsSystem : EntitySystem
 
             case LimbType.Chest:
                 ent.Comp.NextChestCheck = _timing.CurTime + ent.Comp.ChestAsphyxiationInterval;
+                ent.Comp.ChestCheckStep = 0;
                 Dirty(ent);
                 break;
         }
 
         if (_limbs.CountDestroyed(ent.Comp) >= ent.Comp.MaxHealth.Count)
             _mobState.ChangeMobState(ent.Owner, MobState.Dead);
+    }
+
+    private void TickDoses(Entity<LimbHealthComponent> ent)
+    {
+        if (ent.Comp.ActiveDoses.Count == 0)
+            return;
+
+        var changed = false;
+        for (var i = ent.Comp.ActiveDoses.Count - 1; i >= 0; i--)
+        {
+            var dose = ent.Comp.ActiveDoses[i];
+
+            if (!LimbReagents.All.TryGetValue(dose.Reagent, out var info))
+            {
+                ent.Comp.ActiveDoses.RemoveAt(i);
+                changed = true;
+                continue;
+            }
+
+            if (!ent.Comp.Limbs.TryGetValue(dose.Limb, out var st) || st.Destroyed)
+            {
+                ent.Comp.ActiveDoses.RemoveAt(i);
+                changed = true;
+                continue;
+            }
+
+            var budget = info.TotalHeal - dose.Healed;
+            if (budget <= 0)
+            {
+                ent.Comp.ActiveDoses.RemoveAt(i);
+                changed = true;
+                continue;
+            }
+
+            var amount = FixedPoint2.Min(info.RatePerSecond, budget);
+            var actuallyHealed = _limbs.HealLimbTypes(ent.Owner, dose.Limb, amount, info.HealAllTypes, ent.Comp);
+
+            if (actuallyHealed <= 0)
+            {
+                ent.Comp.ActiveDoses.RemoveAt(i);
+                changed = true;
+                continue;
+            }
+
+            dose.Healed += actuallyHealed;
+            changed = true;
+
+            if (actuallyHealed < amount || dose.Healed >= info.TotalHeal)
+                ent.Comp.ActiveDoses.RemoveAt(i);
+        }
+
+        if (changed)
+            Dirty(ent);
     }
 
     private void TickBleed(Entity<LimbHealthComponent> ent)
@@ -80,6 +137,16 @@ public sealed class LimbVitalsSystem : EntitySystem
 
         if (totalPuddle > 0)
             _puddle.TrySpillAt(ent.Owner, new Solution("Blood", totalPuddle), out _, sound: false);
+    }
+
+    private static float ChestAsphyxiationChance(int step)
+    {
+        var raw = step switch
+        {
+            0 => 0.05f,
+            _ => 0.08f + 0.02f * step,
+        };
+        return MathF.Min(0.50f, raw);
     }
 
     private void KillByAsphyxiation(Entity<LimbHealthComponent> ent)
@@ -116,6 +183,12 @@ public sealed class LimbVitalsSystem : EntitySystem
                 TickBleed((uid, comp));
             }
 
+            if (now >= comp.NextDoseTick)
+            {
+                comp.NextDoseTick = now + comp.DoseInterval;
+                TickDoses((uid, comp));
+            }
+
             if (comp.PermanentAsphyxiation)
                 continue;
 
@@ -126,8 +199,10 @@ public sealed class LimbVitalsSystem : EntitySystem
                 continue;
 
             comp.NextChestCheck = now + comp.ChestAsphyxiationInterval;
+            var chance = ChestAsphyxiationChance(comp.ChestCheckStep);
+            comp.ChestCheckStep++;
 
-            if (_random.Prob(comp.ChestAsphyxiationChance))
+            if (_random.Prob(chance))
                 KillByAsphyxiation((uid, comp));
         }
     }

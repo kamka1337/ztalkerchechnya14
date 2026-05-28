@@ -9,10 +9,10 @@ namespace Content.Shared._Session.LimbHealth;
 public sealed partial class LimbSyringeComponent : Component
 {
     [DataField]
-    public TimeSpan Delay = TimeSpan.FromSeconds(16);
+    public TimeSpan Delay = TimeSpan.FromSeconds(2);
 
     [DataField]
-    public FixedPoint2 HealAmount = 50;
+    public string Solution = "injector";
 
     [DataField]
     public bool Spent;

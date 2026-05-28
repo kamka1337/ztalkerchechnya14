@@ -1,0 +1,26 @@
+- type: reagent
+  id: Ketorolac
+  name: reagent-name-ketorolac
+  group: Medicine
+  desc: reagent-desc-ketorolac
+  physicalDesc: reagent-physical-desc-opaque
+  flavor: medicine
+  color: "#e8d65a"
+
+- type: reagent
+  id: Dextropin
+  name: reagent-name-dextropin
+  group: Medicine
+  desc: reagent-desc-dextropin
+  physicalDesc: reagent-physical-desc-opaque
+  flavor: medicine
+  color: "#6ed1ff"
+
+- type: reagent
+  id: Tranexam
+  name: reagent-name-tranexam
+  group: Medicine
+  desc: reagent-desc-tranexam
+  physicalDesc: reagent-physical-desc-opaque
+  flavor: medicine
+  color: "#c93a3a"

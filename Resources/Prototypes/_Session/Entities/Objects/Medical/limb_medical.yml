@@ -127,6 +127,7 @@
   - type: Item
   - type: LimbBleedCure
     curesHeavy: true
+    curesLight: true
     armsLegsOnly: true
   - type: LimitedCharges
     maxCharges: 1
@@ -135,7 +136,7 @@
   parent: BaseItem
   id: SessionCalok
   name: CALOK
-  description: Кровоостанавливающий гель-аппликатор. Закрывает сильное кровотечение на любой конечности. На слабое не действует. Одноразовый.
+  description: Кровоостанавливающий гель-аппликатор. Закрывает кровотечение любой силы на любой конечности. Одноразовый.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/calok.rsi
@@ -153,7 +154,7 @@
     size: Tiny
   - type: LimbBleedCure
     curesHeavy: true
-    curesLight: false
+    curesLight: true
     armsLegsOnly: false
 
 - type: entity

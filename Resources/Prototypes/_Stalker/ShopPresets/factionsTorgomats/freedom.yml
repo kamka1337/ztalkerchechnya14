@@ -345,6 +345,7 @@
   - name: shop-category-weapons
     priority: 1
     items:
+      StalkerBombC3: 20000
       STWeaponRifleSCARH: 5000
       STWeaponRifleM4: 3500
       STWeaponRifleG36: 5500

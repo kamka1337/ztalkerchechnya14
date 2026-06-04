@@ -351,6 +351,7 @@
   - name: shop-category-weapons
     priority: 1
     items:
+      StalkerBombC3: 20000
       STWeaponShotgunSaiga12: 5000
       STWeaponRifleAKS74: 3000
       STWeaponRifleAK74M: 5500

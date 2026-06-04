@@ -130,11 +130,17 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         args.Handled = true;
 
+        if (ent.Comp.Spent)
+        {
+            _popup.PopupEntity("Уже использовано.", ent.Owner, args.User);
+            return;
+        }
+
         var limb = GetSelected(args.User);
 
         if (ent.Comp.ArmsLegsOnly && !(limb.IsArm() || limb.IsLeg()))
         {
-            _popup.PopupEntity("Жгут накладывается только на руки и ноги.", target, args.User);
+            _popup.PopupEntity("Это средство накладывается только на руки и ноги.", target, args.User);
             return;
         }
 
@@ -146,7 +152,13 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         if (heavy && !ent.Comp.CuresHeavy)
         {
-            _popup.PopupEntity("Сильное кровотечение бинтом не остановить.", target, args.User);
+            _popup.PopupEntity("Это средство не останавливает сильное кровотечение.", target, args.User);
+            return;
+        }
+
+        if (!heavy && !ent.Comp.CuresLight)
+        {
+            _popup.PopupEntity("Это средство предназначено только для сильных кровотечений.", target, args.User);
             return;
         }
 
@@ -168,7 +180,10 @@ public sealed class LimbMedicalSystem : EntitySystem
 
         args.Handled = true;
 
-        if (!_limbs.CureBleed(target, args.Limb, ent.Comp.CuresHeavy))
+        if (ent.Comp.Spent)
+            return;
+
+        if (!_limbs.CureBleed(target, args.Limb, ent.Comp.CuresLight, ent.Comp.CuresHeavy))
             return;
 
         if (TryComp<LimitedChargesComponent>(ent.Owner, out _))
@@ -179,7 +194,8 @@ public sealed class LimbMedicalSystem : EntitySystem
         }
         else
         {
-            QueueDel(ent.Owner);
+            ent.Comp.Spent = true;
+            _appearance.SetData(ent.Owner, SyringeVisuals.Spent, true);
         }
     }
 

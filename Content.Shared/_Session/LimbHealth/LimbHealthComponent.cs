@@ -35,24 +35,34 @@ public sealed partial class LimbHealthComponent : Component
 
     [DataField]
     public float BleedEscalateChance = 0.25f;
+    [DataField]
+    public FixedPoint2 BleedDamagePerLimb = 1;
 
     [DataField]
-    public FixedPoint2 LightBleedDamage = 5;
+    public FixedPoint2 BleedPuddlePerTick = 2;
 
     [DataField]
-    public FixedPoint2 HeavyBleedDamage = 10;
+    public TimeSpan WeakBleedInterval = TimeSpan.FromSeconds(4);
 
     [DataField]
-    public FixedPoint2 LightBleedPuddle = 2;
+    public TimeSpan HeavyBleedInterval = TimeSpan.FromSeconds(2);
 
     [DataField]
-    public FixedPoint2 HeavyBleedPuddle = 8;
+    public TimeSpan NextWeakBleedTick;
 
     [DataField]
-    public TimeSpan BleedInterval = TimeSpan.FromSeconds(4);
+    public TimeSpan NextHeavyBleedTick;
 
     [DataField]
-    public TimeSpan NextBleedTick;
+    public float WeakBleedMinDuration = 60f;
+
+    [DataField]
+    public float WeakBleedMaxDuration = 120f;
+
+    [DataField]
+    public Dictionary<LimbType, TimeSpan> WeakBleedStopTime = new();
+    [DataField]
+    public float AbdomenStarvationMultiplier = 50f;
 
     [DataField]
     public TimeSpan ChestAsphyxiationInterval = TimeSpan.FromSeconds(5);

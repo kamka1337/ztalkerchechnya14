@@ -5,10 +5,13 @@ using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
 using Content.Shared.Inventory;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Projectiles;
 using Content.Shared.Rejuvenate;
 using Robust.Shared.Network;
 using Robust.Shared.Random;
+using Robust.Shared.Timing;
 
 namespace Content.Shared._Session.LimbHealth;
 
@@ -19,6 +22,7 @@ public sealed class LimbHealthSystem : EntitySystem
     [Dependency] private readonly SharedBodyTargetingSystem _targeting = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly INetManager _net = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private bool _syncing;
 
@@ -30,8 +34,17 @@ public sealed class LimbHealthSystem : EntitySystem
 
         SubscribeLocalEvent<LimbHealthComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<LimbHealthComponent, BeforeDamageChangedEvent>(OnBeforeDamage);
-        SubscribeLocalEvent<LimbHealthComponent, RejuvenateEvent>(OnRejuvenate);
+        SubscribeLocalEvent<LimbHealthComponent, RejuvenateEvent>(OnRejuvenate,
+            before: new[] { typeof(DamageableSystem) });
+        SubscribeLocalEvent<LimbHealthComponent, UpdateMobStateEvent>(OnUpdateMobState,
+            after: new[] { typeof(MobThresholdSystem) });
         SubscribeLocalEvent<ProjectileComponent, ProjectileHitEvent>(OnProjectileHit);
+    }
+
+    private void OnUpdateMobState(Entity<LimbHealthComponent> ent, ref UpdateMobStateEvent args)
+    {
+        if (ent.Comp.PermanentAsphyxiation)
+            args.State = MobState.Dead;
     }
 
     private void OnProjectileHit(Entity<ProjectileComponent> ent, ref ProjectileHitEvent args)
@@ -60,6 +73,7 @@ public sealed class LimbHealthSystem : EntitySystem
         ent.Comp.ChestCheckStep = 0;
         ent.Comp.ActiveDoses.Clear();
         ent.Comp.NeedledLimbs.Clear();
+        ent.Comp.WeakBleedStopTime.Clear();
         Dirty(ent);
         RaiseLocalEvent(new LimbHealthChangedEvent(ent.Owner));
     }
@@ -164,22 +178,72 @@ public sealed class LimbHealthSystem : EntitySystem
             {
                 st.Effects &= ~LimbEffect.Bleeding;
                 st.Effects |= LimbEffect.HeavyBleeding;
+                ent.Comp.WeakBleedStopTime.Remove(limb);
                 changed = true;
             }
         }
         else if (_random.Prob(ent.Comp.BleedHeavyChance))
         {
             st.Effects |= LimbEffect.HeavyBleeding;
+            ent.Comp.WeakBleedStopTime.Remove(limb);
             changed = true;
         }
         else if (_random.Prob(ent.Comp.BleedLightChance))
         {
             st.Effects |= LimbEffect.Bleeding;
+            ScheduleWeakBleedStop(ent.Comp, limb);
             changed = true;
         }
 
         if (changed)
             Dirty(ent);
+    }
+
+    private void ScheduleWeakBleedStop(LimbHealthComponent comp, LimbType limb)
+    {
+        var dur = _random.NextFloat(comp.WeakBleedMinDuration, comp.WeakBleedMaxDuration);
+        comp.WeakBleedStopTime[limb] = _timing.CurTime + TimeSpan.FromSeconds(dur);
+    }
+
+    public void ApplyBleedTick(EntityUid uid, FixedPoint2 totalBudget, LimbHealthComponent? comp = null)
+    {
+        if (!Resolve(uid, ref comp, false))
+            return;
+        if (totalBudget <= 0)
+            return;
+
+        var alive = GetAliveLimbs(comp);
+        if (alive.Count == 0)
+            return;
+
+        FixedPoint2 totalMax = 0;
+        foreach (var l in alive)
+            totalMax += comp.MaxHealth[l];
+
+        if (totalMax <= 0)
+            return;
+
+        var totalMaxF = totalMax.Float();
+        var budgetF = totalBudget.Float();
+        var destroyedNow = new List<LimbType>();
+
+        foreach (var l in alive)
+        {
+            var share = FixedPoint2.New(budgetF * (comp.MaxHealth[l].Float() / totalMaxF));
+            if (share <= 0)
+                continue;
+
+            var dmg = new DamageSpecifier();
+            dmg.DamageDict["Bloodloss"] = share;
+            AbsorbInto(comp, l, dmg, destroyedNow);
+        }
+
+        RecomputeBody(uid, comp);
+        Dirty(uid, comp);
+
+        foreach (var l in destroyedNow)
+            RaiseLocalEvent(new LimbDestroyedEvent(uid, l));
+        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
     }
 
     private void DistributeDamage(Entity<LimbHealthComponent> ent, DamageSpecifier dmg,
@@ -397,7 +461,8 @@ public sealed class LimbHealthSystem : EntitySystem
         RaiseLocalEvent(new LimbHealthChangedEvent(uid));
     }
 
-    public bool CureBleed(EntityUid uid, LimbType limb, bool includeHeavy, LimbHealthComponent? comp = null)
+    public bool CureBleed(EntityUid uid, LimbType limb, bool curesLight, bool curesHeavy,
+        LimbHealthComponent? comp = null)
     {
         if (!Resolve(uid, ref comp, false))
             return false;
@@ -405,16 +470,28 @@ public sealed class LimbHealthSystem : EntitySystem
         if (!comp.Limbs.TryGetValue(limb, out var st))
             return false;
 
-        var had = st.Effects & (LimbEffect.Bleeding | LimbEffect.HeavyBleeding);
-        if (had == 0)
+        var hasLight = (st.Effects & LimbEffect.Bleeding) != 0;
+        var hasHeavy = (st.Effects & LimbEffect.HeavyBleeding) != 0;
+        if (!hasLight && !hasHeavy)
             return false;
 
-        if ((st.Effects & LimbEffect.HeavyBleeding) != 0 && !includeHeavy)
-            return false;
+        var changed = false;
 
-        st.Effects &= ~LimbEffect.Bleeding;
-        if (includeHeavy)
+        if (hasLight && curesLight)
+        {
+            st.Effects &= ~LimbEffect.Bleeding;
+            comp.WeakBleedStopTime.Remove(limb);
+            changed = true;
+        }
+
+        if (hasHeavy && curesHeavy)
+        {
             st.Effects &= ~LimbEffect.HeavyBleeding;
+            changed = true;
+        }
+
+        if (!changed)
+            return false;
 
         Dirty(uid, comp);
         RaiseLocalEvent(new LimbHealthChangedEvent(uid));
@@ -444,7 +521,8 @@ public sealed class LimbHealthSystem : EntitySystem
 
         st.Destroyed = false;
         st.Damage = new DamageSpecifier();
-        st.Effects &= ~LimbEffect.Fracture;
+        st.Effects &= ~(LimbEffect.Fracture | LimbEffect.Bleeding | LimbEffect.HeavyBleeding);
+        comp.WeakBleedStopTime.Remove(limb);
 
         if (comp.MaxHealth.TryGetValue(limb, out var maxHp) && maxHp > 1)
             st.Damage.DamageDict["Blunt"] = maxHp - 1;

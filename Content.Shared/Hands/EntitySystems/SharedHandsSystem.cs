@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Content.Shared._Session.LimbHealth;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Hands.Components;
@@ -304,7 +305,24 @@ public abstract partial class SharedHandsSystem
 
         if (name != null && !ent.Comp.Hands.ContainsKey(name))
             return false;
+
+        if (name != null && IsHandDisabledByLimb(ent.Owner, ent.Comp, name))
+            return false;
+
         return SetActiveHand(ent, name);
+    }
+
+    private bool IsHandDisabledByLimb(EntityUid uid, HandsComponent hands, string handName)
+    {
+        if (!hands.Hands.TryGetValue(handName, out var hand))
+            return false;
+
+        if (!LimbHandMap.TryGetArmForHand(hand.Location, out var arm))
+            return false;
+
+        return TryComp<LimbHealthComponent>(uid, out var limbs)
+               && limbs.Limbs.TryGetValue(arm, out var st)
+               && st.Destroyed;
     }
 
     /// <summary>

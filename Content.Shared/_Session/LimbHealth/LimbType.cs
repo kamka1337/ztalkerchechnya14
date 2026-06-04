@@ -1,3 +1,4 @@
+using Content.Shared.Hands.Components;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Session.LimbHealth;
@@ -52,4 +53,23 @@ public static class LimbTypeExtensions
         LimbType.LeftLeg or LimbType.RightLeg => 0.55f,
         _ => 0.50f,
     };
+}
+
+public static class LimbHandMap
+{
+    public static bool TryGetArmForHand(HandLocation location, out LimbType arm)
+    {
+        switch (location)
+        {
+            case HandLocation.Left:
+                arm = LimbType.LeftArm;
+                return true;
+            case HandLocation.Right:
+                arm = LimbType.RightArm;
+                return true;
+            default:
+                arm = default;
+                return false;
+        }
+    }
 }

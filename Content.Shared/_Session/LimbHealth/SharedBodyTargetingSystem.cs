@@ -24,6 +24,7 @@ public sealed class SharedBodyTargetingSystem : EntitySystem
 
         var comp = EnsureComp<BodyTargetingComponent>(uid);
         comp.SelectedLimb = ev.Limb;
+        comp.Aiming = ev.Aiming;
         Dirty(uid, comp);
     }
 
@@ -34,6 +35,19 @@ public sealed class SharedBodyTargetingSystem : EntitySystem
             return false;
 
         if (!TryComp<BodyTargetingComponent>(uid, out var comp))
+            return false;
+
+        limb = comp.SelectedLimb;
+        return true;
+    }
+
+    public bool TryGetAimed(EntityUid? attacker, out LimbType limb)
+    {
+        limb = LimbType.Chest;
+        if (attacker is not { } uid)
+            return false;
+
+        if (!TryComp<BodyTargetingComponent>(uid, out var comp) || !comp.Aiming)
             return false;
 
         limb = comp.SelectedLimb;

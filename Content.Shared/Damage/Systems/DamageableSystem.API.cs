@@ -134,7 +134,10 @@ public sealed partial class DamageableSystem
         if (damage.Empty)
             return damageDone;
 
-        var before = new BeforeDamageChangedEvent(damage, origin);
+        var before = new BeforeDamageChangedEvent(damage, origin,
+            IgnoreResistances: ignoreResistances,
+            IgnoreGlobalModifiers: ignoreGlobalModifiers,
+            IgnoreResistors: ignoreResistors); // stalker-changes (limb health)
         RaiseLocalEvent(ent, ref before);
 
         if (before.Cancelled)

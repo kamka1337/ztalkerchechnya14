@@ -35,10 +35,10 @@ public sealed partial class ZoneAnomalyComponent : Component
     [DataField, AutoNetworkedField]
     public TimeSpan ChargingTime;
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public HashSet<EntityUid> Triggers = new();
 
-    [DataField, AutoNetworkedField]
+    [DataField]
     public HashSet<EntityUid> InAnomaly = new();
 
     [DataField, AutoNetworkedField]

@@ -19,6 +19,7 @@ public sealed class KuklaWidget : UIWidget
     private readonly Dictionary<LimbType, TextureRect> _effect = new();
 
     private LimbType _selected = LimbType.Chest;
+    private bool _aiming;
     private LimbType? _hover;
 
     public event Action<LimbType>? LimbClicked;
@@ -87,7 +88,8 @@ public sealed class KuklaWidget : UIWidget
 
     private void UpdateOutlines()
     {
-        _selectionOutline.TexturePath = Base + _selected.SpriteFolder() + "/obvodka.png";
+        var outline = _aiming ? "/obvodka_red.png" : "/obvodka.png";
+        _selectionOutline.TexturePath = Base + _selected.SpriteFolder() + outline;
         _selectionOutline.Visible = true;
 
         if (_hover is { } hv && hv != _selected)
@@ -101,9 +103,10 @@ public sealed class KuklaWidget : UIWidget
         }
     }
 
-    public void UpdateState(LimbHealthComponent comp, LimbType selected)
+    public void UpdateState(LimbHealthComponent comp, LimbType selected, bool aiming)
     {
         _selected = selected;
+        _aiming = aiming;
 
         foreach (var limb in Enum.GetValues<LimbType>())
         {

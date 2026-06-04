@@ -35,6 +35,9 @@ public sealed partial class LimbBleedCureComponent : Component
 
     [DataField]
     public TimeSpan Delay = TimeSpan.FromSeconds(3);
+
+    [DataField]
+    public FixedPoint2 HealBloodloss = 0;
 }
 
 [Serializable, NetSerializable]

@@ -102,7 +102,7 @@
   parent: BaseItem
   id: SessionBandage
   name: бинт
-  description: Останавливает лёгкое кровотечение на любой конечности. Два применения.
+  description: Останавливает лёгкое кровотечение на любой конечности и частично восполняет кровопотерю. Два применения.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/bint.rsi
@@ -112,6 +112,7 @@
   - type: LimbBleedCure
     curesHeavy: false
     armsLegsOnly: false
+    healBloodloss: 10
   - type: LimitedCharges
     maxCharges: 2
 
@@ -129,6 +130,7 @@
     curesHeavy: true
     curesLight: true
     armsLegsOnly: true
+    healBloodloss: 25
   - type: LimitedCharges
     maxCharges: 1
 
@@ -156,6 +158,7 @@
     curesHeavy: true
     curesLight: true
     armsLegsOnly: false
+    healBloodloss: 40
 
 - type: entity
   parent: BaseStorageItem

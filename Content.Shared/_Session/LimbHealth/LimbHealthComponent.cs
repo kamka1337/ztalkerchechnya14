@@ -25,7 +25,7 @@ public sealed partial class LimbHealthComponent : Component
     public Dictionary<LimbType, LimbState> Limbs = new();
 
     [DataField]
-    public float OldDamageMultiplier = 4.4f;
+    public float OldDamageMultiplier = 1.0f;
 
     [DataField]
     public float BleedLightChance = 0.25f;

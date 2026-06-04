@@ -1,5 +1,6 @@
 using System.Linq;
-using Content.Shared.Armor;
+using Content.Shared._Stalker.ZoneAnomaly.Components;
+using Content.Shared.Traits.Assorted;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
@@ -7,9 +8,11 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared.Rejuvenate;
 using Robust.Shared.Network;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
@@ -18,11 +21,12 @@ namespace Content.Shared._Session.LimbHealth;
 public sealed class LimbHealthSystem : EntitySystem
 {
     [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly InventorySystem _inventory = default!;
     [Dependency] private readonly SharedBodyTargetingSystem _targeting = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     private bool _syncing;
 
@@ -39,6 +43,31 @@ public sealed class LimbHealthSystem : EntitySystem
         SubscribeLocalEvent<LimbHealthComponent, UpdateMobStateEvent>(OnUpdateMobState,
             after: new[] { typeof(MobThresholdSystem) });
         SubscribeLocalEvent<ProjectileComponent, ProjectileHitEvent>(OnProjectileHit);
+
+        SubscribeLocalEvent<ZoneAnomalyComponent, ZoneAnomalyEntityAddEvent>(OnAnomalyEntityAdd);
+        SubscribeLocalEvent<ZoneAnomalyComponent, ZoneAnomalyEntityRemoveEvent>(OnAnomalyEntityRemove);
+    }
+
+    private void OnAnomalyEntityAdd(Entity<ZoneAnomalyComponent> ent, ref ZoneAnomalyEntityAddEvent args)
+    {
+        if (!_net.IsServer)
+            return;
+        if (!HasComp<LimbHealthComponent>(args.Entity))
+            return;
+
+        EnsureComp<STInZoneAnomalyComponent>(args.Entity).Sources.Add(ent.Owner);
+    }
+
+    private void OnAnomalyEntityRemove(Entity<ZoneAnomalyComponent> ent, ref ZoneAnomalyEntityRemoveEvent args)
+    {
+        if (!_net.IsServer)
+            return;
+        if (!TryComp<STInZoneAnomalyComponent>(args.Entity, out var marker))
+            return;
+
+        marker.Sources.Remove(ent.Owner);
+        if (marker.Sources.Count == 0)
+            RemComp<STInZoneAnomalyComponent>(args.Entity);
     }
 
     private void OnUpdateMobState(Entity<LimbHealthComponent> ent, ref UpdateMobStateEvent args)
@@ -68,6 +97,9 @@ public sealed class LimbHealthSystem : EntitySystem
 
     private void OnRejuvenate(Entity<LimbHealthComponent> ent, ref RejuvenateEvent args)
     {
+        if (ent.Comp.PermanentAsphyxiation)
+            RemComp<UnrevivableComponent>(ent.Owner);
+
         InitLimbs(ent.Comp);
         ent.Comp.PermanentAsphyxiation = false;
         ent.Comp.ChestCheckStep = 0;
@@ -75,7 +107,7 @@ public sealed class LimbHealthSystem : EntitySystem
         ent.Comp.NeedledLimbs.Clear();
         ent.Comp.WeakBleedStopTime.Clear();
         Dirty(ent);
-        RaiseLocalEvent(new LimbHealthChangedEvent(ent.Owner));
+        RefreshVitalsActive(ent.Owner, ent.Comp);
     }
 
     private void OnBeforeDamage(Entity<LimbHealthComponent> ent, ref BeforeDamageChangedEvent args)
@@ -94,53 +126,129 @@ public sealed class LimbHealthSystem : EntitySystem
         var isBullet = _bulletHitTarget == ent.Owner;
         _bulletHitTarget = null;
 
-        var dmg = new DamageSpecifier(args.Damage);
-        var total = dmg.GetTotal();
-        if (total == 0)
+        var raw = new DamageSpecifier(args.Damage);
+
+        if (TryComp<DamageableComponent>(ent.Owner, out var damageable))
+        {
+            foreach (var type in raw.DamageDict.Keys.ToList())
+            {
+                if (!damageable.Damage.DamageDict.ContainsKey(type))
+                    raw.DamageDict.Remove(type);
+            }
+        }
+
+        if (raw.Empty)
             return;
 
-        var bleedTrigger = isBullet || HasSharpDamage(dmg);
+        var positive = new DamageSpecifier();
+        var negative = new DamageSpecifier();
+        foreach (var (type, val) in raw.DamageDict)
+        {
+            if (val > 0)
+                positive.DamageDict[type] = val;
+            else if (val < 0)
+                negative.DamageDict[type] = val;
+        }
+
         var destroyedNow = new List<LimbType>();
 
-        if (total > 0)
-            RouteDamage(ent, dmg, args.Origin, destroyedNow, bleedTrigger);
-        else
-            DistributeHeal(ent.Comp, dmg);
+        var dealt = positive.GetTotal() > 0;
+        if (dealt)
+            RouteDamage(ent, positive, args.Origin, args.IgnoreResistances, args.IgnoreGlobalModifiers,
+                args.IgnoreResistors, isBullet, destroyedNow);
 
-        RecomputeBody(ent.Owner, ent.Comp);
+        if (!negative.Empty)
+            DistributeHeal(ent.Comp, negative);
+
+        RecomputeBody(ent.Owner, ent.Comp, notify: dealt, origin: args.Origin, interruptsDoAfters: true);
         Dirty(ent);
 
         foreach (var limb in destroyedNow)
             RaiseLocalEvent(new LimbDestroyedEvent(ent.Owner, limb));
 
-        RaiseLocalEvent(new LimbHealthChangedEvent(ent.Owner));
+        RefreshVitalsActive(ent.Owner, ent.Comp);
     }
 
-    private void RouteDamage(Entity<LimbHealthComponent> ent, DamageSpecifier dmg, EntityUid? origin,
-        List<LimbType> destroyedNow, bool bleedTrigger)
+    private void RouteDamage(Entity<LimbHealthComponent> ent, DamageSpecifier raw, EntityUid? origin,
+        bool ignoreResistances, bool ignoreGlobal, List<EntityUid>? ignoreResistors, bool isBullet,
+        List<LimbType> destroyedNow)
     {
-        if (origin is { } attacker && attacker != ent.Owner && _targeting.TryGetSelected(attacker, out var selected))
+        var bleedTrigger = isBullet || HasSharpDamage(raw);
+
+        if (origin is { } attacker && _targeting.TryGetAimed(attacker, out var selected))
         {
             if (IsDestroyedState(ent.Comp, selected))
             {
-                DistributeDamage(ent, dmg, destroyedNow, applyArmor: true);
+                var spread = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
+                    ~SlotFlags.POCKET, ignoreResistances, ignoreGlobal, ignoreResistors);
+                DistributeDamage(ent, spread, destroyedNow);
                 return;
             }
 
-            LimbType target;
-            if (_random.Prob(selected.HitChance()))
-                target = selected;
-            else
-                target = PickOtherAlive(ent.Comp, selected);
+            var connected = _random.Prob(selected.HitChance());
+            var target = connected ? selected : PickOtherAlive(ent.Comp, selected);
 
-            ApplyToLimb(ent, target, dmg, destroyedNow);
+            var incoming = new DamageSpecifier(raw);
+            if (connected)
+            {
+                var mult = target.AimedMultiplier();
+                if (mult != 1f)
+                    incoming *= mult;
+            }
 
-            if (bleedTrigger)
-                RollBleed(ent, target);
+            var dmg = RunVanillaModifiers(ent.Owner, incoming, origin,
+                SlotsForLimb(target), ignoreResistances, ignoreGlobal, ignoreResistors);
+
+            if (dmg.GetTotal() > 0)
+            {
+                ApplyToLimb(ent, target, dmg, destroyedNow);
+                if (bleedTrigger)
+                    RollBleed(ent, target);
+            }
             return;
         }
 
-        DistributeDamage(ent, dmg * ent.Comp.OldDamageMultiplier, destroyedNow, applyArmor: true);
+        if (origin == null)
+        {
+            if (IsStandingInHazard(ent.Owner) && PickAliveLeg(ent.Comp) is { } leg)
+            {
+                var legDmg = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
+                    SlotsForLimb(leg), ignoreResistances, ignoreGlobal, ignoreResistors);
+
+                if (legDmg.GetTotal() > 0)
+                {
+                    ApplyToLimb(ent, leg, legDmg, destroyedNow);
+                    if (bleedTrigger)
+                        RollBleed(ent, leg);
+                }
+                return;
+            }
+
+            if (!HasImpactDamage(raw))
+            {
+                var bodyDmg = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
+                    ~SlotFlags.POCKET, ignoreResistances, ignoreGlobal, ignoreResistors);
+                DistributeDamage(ent, bodyDmg, destroyedNow);
+                return;
+            }
+        }
+
+        if (PickWeightedRandomAlive(ent.Comp) is { } limb)
+        {
+            var incoming = HasSharpDamage(raw)
+                ? new DamageSpecifier(raw)
+                : raw * ent.Comp.OldDamageMultiplier;
+
+            var dmg = RunVanillaModifiers(ent.Owner, incoming, origin,
+                SlotsForLimb(limb), ignoreResistances, ignoreGlobal, ignoreResistors);
+
+            if (dmg.GetTotal() > 0)
+            {
+                ApplyToLimb(ent, limb, dmg, destroyedNow);
+                if (bleedTrigger)
+                    RollBleed(ent, limb);
+            }
+        }
     }
 
     private static bool HasSharpDamage(DamageSpecifier dmg)
@@ -152,14 +260,24 @@ public sealed class LimbHealthSystem : EntitySystem
         return false;
     }
 
+    private static bool HasImpactDamage(DamageSpecifier dmg)
+    {
+        if (dmg.DamageDict.TryGetValue("Blunt", out var b) && b > 0)
+            return true;
+        if (dmg.DamageDict.TryGetValue("Slash", out var s) && s > 0)
+            return true;
+        if (dmg.DamageDict.TryGetValue("Piercing", out var p) && p > 0)
+            return true;
+        return false;
+    }
+
     private void ApplyToLimb(Entity<LimbHealthComponent> ent, LimbType limb, DamageSpecifier dmg,
         List<LimbType> destroyedNow)
     {
-        var armored = ApplyLimbArmor(ent.Owner, limb, dmg);
-        var leftover = AbsorbInto(ent.Comp, limb, armored, destroyedNow);
+        var leftover = AbsorbInto(ent.Comp, limb, dmg, destroyedNow);
 
         if (!leftover.Empty && leftover.GetTotal() > 0)
-            DistributeDamage(ent, leftover, destroyedNow, applyArmor: false, exclude: limb);
+            DistributeDamage(ent, leftover, destroyedNow, exclude: limb);
     }
 
     private void RollBleed(Entity<LimbHealthComponent> ent, LimbType limb)
@@ -168,6 +286,7 @@ public sealed class LimbHealthSystem : EntitySystem
             return;
 
         var changed = false;
+        var heavyOnset = false;
 
         if ((st.Effects & LimbEffect.HeavyBleeding) != 0)
         {
@@ -180,6 +299,7 @@ public sealed class LimbHealthSystem : EntitySystem
                 st.Effects |= LimbEffect.HeavyBleeding;
                 ent.Comp.WeakBleedStopTime.Remove(limb);
                 changed = true;
+                heavyOnset = true;
             }
         }
         else if (_random.Prob(ent.Comp.BleedHeavyChance))
@@ -187,6 +307,7 @@ public sealed class LimbHealthSystem : EntitySystem
             st.Effects |= LimbEffect.HeavyBleeding;
             ent.Comp.WeakBleedStopTime.Remove(limb);
             changed = true;
+            heavyOnset = true;
         }
         else if (_random.Prob(ent.Comp.BleedLightChance))
         {
@@ -197,6 +318,9 @@ public sealed class LimbHealthSystem : EntitySystem
 
         if (changed)
             Dirty(ent);
+
+        if (heavyOnset)
+            _popup.PopupEntity($"Сильное кровотечение: {limb.DisplayName()}!", ent.Owner, ent.Owner, PopupType.MediumCaution);
     }
 
     private void ScheduleWeakBleedStop(LimbHealthComponent comp, LimbType limb)
@@ -243,30 +367,41 @@ public sealed class LimbHealthSystem : EntitySystem
 
         foreach (var l in destroyedNow)
             RaiseLocalEvent(new LimbDestroyedEvent(uid, l));
-        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
+        RefreshVitalsActive(uid, comp);
     }
 
     private void DistributeDamage(Entity<LimbHealthComponent> ent, DamageSpecifier dmg,
-        List<LimbType> destroyedNow, bool applyArmor, LimbType? exclude = null)
+        List<LimbType> destroyedNow, LimbType? exclude = null)
     {
-        var alive = GetAliveLimbs(ent.Comp, exclude);
-        if (alive.Count == 0)
-            return;
-
-        FixedPoint2 totalMax = 0;
-        foreach (var l in alive)
-            totalMax += ent.Comp.MaxHealth[l];
-
-        if (totalMax <= 0)
-            return;
-
-        var totalMaxF = totalMax.Float();
-        foreach (var l in alive)
+        var remaining = new DamageSpecifier(dmg);
+        while (remaining.GetTotal() > 0)
         {
-            var w = ent.Comp.MaxHealth[l].Float() / totalMaxF;
-            var portion = dmg * w;
-            var armored = applyArmor ? ApplyLimbArmor(ent.Owner, l, portion) : portion;
-            AbsorbInto(ent.Comp, l, armored, destroyedNow);
+            var alive = GetAliveLimbs(ent.Comp, exclude);
+            if (alive.Count == 0)
+                return;
+
+            FixedPoint2 totalMax = 0;
+            foreach (var l in alive)
+                totalMax += ent.Comp.MaxHealth[l];
+
+            if (totalMax <= 0)
+                return;
+
+            var before = remaining.GetTotal();
+            var totalMaxF = totalMax.Float();
+            var leftover = new DamageSpecifier();
+
+            foreach (var l in alive)
+            {
+                var w = ent.Comp.MaxHealth[l].Float() / totalMaxF;
+                var lo = AbsorbInto(ent.Comp, l, remaining * w, destroyedNow);
+                if (!lo.Empty && lo.GetTotal() > 0)
+                    leftover += lo;
+            }
+
+            remaining = leftover;
+            if (remaining.GetTotal() >= before)
+                return;
         }
     }
 
@@ -346,29 +481,37 @@ public sealed class LimbHealthSystem : EntitySystem
         }
     }
 
-    private DamageSpecifier ApplyLimbArmor(EntityUid uid, LimbType limb, DamageSpecifier dmg)
+    private static SlotFlags SlotsForLimb(LimbType limb) => (limb switch
     {
-        string? slot = limb switch
+        LimbType.Head => SlotFlags.HEAD | SlotFlags.MASK | SlotFlags.EYES | SlotFlags.EARS,
+        LimbType.Chest => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.TORSO | SlotFlags.NECK,
+        LimbType.Abdomen => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.TORSO | SlotFlags.BELT,
+        LimbType.LeftArm or LimbType.RightArm => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.GLOVES,
+        LimbType.LeftLeg or LimbType.RightLeg => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.LEGS | SlotFlags.FEET,
+        _ => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING,
+    }) & ~SlotFlags.POCKET;
+
+    private DamageSpecifier RunVanillaModifiers(EntityUid body, DamageSpecifier dmg, EntityUid? origin,
+        SlotFlags slots, bool ignoreResistances, bool ignoreGlobal, List<EntityUid>? ignoreResistors)
+    {
+        if (!ignoreResistances)
         {
-            LimbType.Head => "head",
-            LimbType.Chest or LimbType.Abdomen => "outerClothing",
-            _ => null,
-        };
+            if (TryComp<DamageableComponent>(body, out var dmgbl)
+                && dmgbl.DamageModifierSetId != null
+                && _proto.Resolve(dmgbl.DamageModifierSetId, out var innate))
+            {
+                dmg = DamageSpecifier.ApplyModifierSet(dmg, innate);
+            }
 
-        if (slot == null)
-            return dmg;
+            var ev = new DamageModifyEvent(dmg, origin, ignoreResistors) { OverrideSlots = slots };
+            RaiseLocalEvent(body, ev);
+            dmg = ev.Damage;
+        }
 
-        if (!_inventory.TryGetSlotEntity(uid, slot, out var item))
-            return dmg;
+        if (!ignoreGlobal)
+            dmg = _damageable.ApplyUniversalAllModifiers(dmg);
 
-        if (!TryComp<ArmorComponent>(item, out var armor))
-            return dmg;
-
-        var set = armor.Modifiers ?? armor.BaseModifiers;
-        if (set == null)
-            return dmg;
-
-        return DamageSpecifier.ApplyModifierSet(dmg, set);
+        return dmg;
     }
 
     public FixedPoint2 HealLimbTypes(EntityUid uid, LimbType limb, FixedPoint2 amount, bool allTypes,
@@ -418,7 +561,30 @@ public sealed class LimbHealthSystem : EntitySystem
 
         RecomputeBody(uid, comp);
         Dirty(uid, comp);
-        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
+        return heal;
+    }
+
+    public FixedPoint2 HealLimbDamageType(EntityUid uid, LimbType limb, string type, FixedPoint2 amount,
+        LimbHealthComponent? comp = null)
+    {
+        if (!Resolve(uid, ref comp, false))
+            return 0;
+        if (amount <= 0)
+            return 0;
+        if (!comp.Limbs.TryGetValue(limb, out var st) || st.Destroyed)
+            return 0;
+        if (!st.Damage.DamageDict.TryGetValue(type, out var d) || d <= 0)
+            return 0;
+
+        var heal = FixedPoint2.Min(amount, d);
+        var nv = d - heal;
+        if (nv <= 0)
+            st.Damage.DamageDict.Remove(type);
+        else
+            st.Damage.DamageDict[type] = nv;
+
+        RecomputeBody(uid, comp);
+        Dirty(uid, comp);
         return heal;
     }
 
@@ -434,6 +600,17 @@ public sealed class LimbHealthSystem : EntitySystem
         if (!LimbReagents.All.ContainsKey(reagent))
             return;
 
+        foreach (var existing in comp.ActiveDoses)
+        {
+            if (existing.Limb != limb || existing.Reagent != reagent)
+                continue;
+
+            existing.Healed = 0;
+            Dirty(uid, comp);
+            RefreshVitalsActive(uid, comp);
+            return;
+        }
+
         comp.ActiveDoses.Add(new LimbReagentDose
         {
             Limb = limb,
@@ -441,6 +618,7 @@ public sealed class LimbHealthSystem : EntitySystem
             Healed = 0,
         });
         Dirty(uid, comp);
+        RefreshVitalsActive(uid, comp);
     }
 
     public void ApplyLimbDamage(EntityUid uid, LimbType limb, DamageSpecifier dmg,
@@ -458,7 +636,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
         foreach (var l in destroyedNow)
             RaiseLocalEvent(new LimbDestroyedEvent(uid, l));
-        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
+        RefreshVitalsActive(uid, comp);
     }
 
     public bool CureBleed(EntityUid uid, LimbType limb, bool curesLight, bool curesHeavy,
@@ -494,7 +672,7 @@ public sealed class LimbHealthSystem : EntitySystem
             return false;
 
         Dirty(uid, comp);
-        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
+        RefreshVitalsActive(uid, comp);
         return true;
     }
 
@@ -530,7 +708,7 @@ public sealed class LimbHealthSystem : EntitySystem
         RecomputeBody(uid, comp);
         Dirty(uid, comp);
         RaiseLocalEvent(new LimbRestoredEvent(uid, limb));
-        RaiseLocalEvent(new LimbHealthChangedEvent(uid));
+        RefreshVitalsActive(uid, comp);
         return true;
     }
 
@@ -577,10 +755,83 @@ public sealed class LimbHealthSystem : EntitySystem
     private LimbType PickOtherAlive(LimbHealthComponent comp, LimbType selected)
     {
         var others = GetAliveLimbs(comp, selected);
-        return others.Count > 0 ? _random.Pick(others) : selected;
+        if (others.Count == 0)
+            return selected;
+
+        FixedPoint2 totalMax = 0;
+        foreach (var l in others)
+            totalMax += comp.MaxHealth[l];
+
+        if (totalMax <= 0)
+            return _random.Pick(others);
+
+        var roll = _random.NextFloat() * totalMax.Float();
+        foreach (var l in others)
+        {
+            roll -= comp.MaxHealth[l].Float();
+            if (roll <= 0)
+                return l;
+        }
+
+        return others[^1];
     }
 
-    private void RecomputeBody(EntityUid uid, LimbHealthComponent comp)
+    private LimbType? PickWeightedRandomAlive(LimbHealthComponent comp)
+    {
+        var alive = GetAliveLimbs(comp);
+        if (alive.Count == 0)
+            return null;
+
+        FixedPoint2 totalMax = 0;
+        foreach (var l in alive)
+            totalMax += comp.MaxHealth[l];
+
+        if (totalMax <= 0)
+            return _random.Pick(alive);
+
+        var roll = _random.NextFloat() * totalMax.Float();
+        foreach (var l in alive)
+        {
+            roll -= comp.MaxHealth[l].Float();
+            if (roll <= 0)
+                return l;
+        }
+
+        return alive[^1];
+    }
+
+    private bool IsStandingInHazard(EntityUid victim)
+    {
+        if (!TryComp<STInZoneAnomalyComponent>(victim, out var marker))
+            return false;
+
+        foreach (var src in marker.Sources.ToList())
+        {
+            if (!TryComp<ZoneAnomalyComponent>(src, out var anomaly) || !anomaly.InAnomaly.Contains(victim))
+                marker.Sources.Remove(src);
+        }
+
+        if (marker.Sources.Count == 0)
+        {
+            RemComp<STInZoneAnomalyComponent>(victim);
+            return false;
+        }
+
+        return true;
+    }
+
+    private LimbType? PickAliveLeg(LimbHealthComponent comp)
+    {
+        var legs = new List<LimbType>();
+        if (comp.Limbs.TryGetValue(LimbType.LeftLeg, out var l) && !l.Destroyed)
+            legs.Add(LimbType.LeftLeg);
+        if (comp.Limbs.TryGetValue(LimbType.RightLeg, out var r) && !r.Destroyed)
+            legs.Add(LimbType.RightLeg);
+        return legs.Count > 0 ? _random.Pick(legs) : (LimbType?) null;
+    }
+
+    private void RecomputeBody(EntityUid uid, LimbHealthComponent comp, bool notify = false,
+        EntityUid? origin = null, bool interruptsDoAfters = false)
     {
         if (!TryComp<DamageableComponent>(uid, out var dmgbl))
             return;
@@ -589,8 +840,43 @@ public sealed class LimbHealthSystem : EntitySystem
         foreach (var st in comp.Limbs.Values)
             sum += st.Damage;
 
+        var old = notify ? new DamageSpecifier(dmgbl.Damage) : null;
+
         _syncing = true;
         _damageable.SetDamage((uid, dmgbl), sum);
         _syncing = false;
+
+        if (notify && old != null)
+        {
+            var delta = sum - old;
+            RaiseLocalEvent(uid, new DamageChangedEvent(dmgbl, delta, interruptsDoAfters, origin));
+        }
+    }
+
+    public void RefreshVitalsActive(EntityUid uid, LimbHealthComponent comp)
+    {
+        var need = NeedsVitals(comp);
+        var has = HasComp<LimbVitalsActiveComponent>(uid);
+
+        if (need && !has)
+            AddComp<LimbVitalsActiveComponent>(uid);
+        else if (!need && has)
+            RemComp<LimbVitalsActiveComponent>(uid);
+    }
+
+    private static bool NeedsVitals(LimbHealthComponent comp)
+    {
+        if (comp.ActiveDoses.Count > 0)
+            return true;
+
+        foreach (var (limb, st) in comp.Limbs)
+        {
+            if ((st.Effects & (LimbEffect.Bleeding | LimbEffect.HeavyBleeding)) != 0)
+                return true;
+            if (st.Destroyed && limb is LimbType.Abdomen or LimbType.Chest)
+                return true;
+        }
+
+        return false;
     }
 }

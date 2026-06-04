@@ -32,6 +32,18 @@ public static class LimbTypeExtensions
     public static bool IsLeg(this LimbType limb) => limb is LimbType.LeftLeg or LimbType.RightLeg;
     public static bool IsArm(this LimbType limb) => limb is LimbType.LeftArm or LimbType.RightArm;
 
+    public static string DisplayName(this LimbType limb) => limb switch
+    {
+        LimbType.Head => "голова",
+        LimbType.Chest => "грудь",
+        LimbType.Abdomen => "живот",
+        LimbType.LeftArm => "левая рука",
+        LimbType.RightArm => "правая рука",
+        LimbType.LeftLeg => "левая нога",
+        LimbType.RightLeg => "правая нога",
+        _ => limb.ToString(),
+    };
+
     public static string SpriteFolder(this LimbType limb) => limb switch
     {
         LimbType.Head => "head",
@@ -46,12 +58,19 @@ public static class LimbTypeExtensions
 
     public static float HitChance(this LimbType limb) => limb switch
     {
-        LimbType.Head => 0.40f,
+        LimbType.Head => 0.22f,
         LimbType.Chest => 0.75f,
         LimbType.Abdomen => 0.75f,
         LimbType.LeftArm or LimbType.RightArm => 0.50f,
         LimbType.LeftLeg or LimbType.RightLeg => 0.55f,
         _ => 0.50f,
+    };
+
+    public static float AimedMultiplier(this LimbType limb) => limb switch
+    {
+        LimbType.Head => 1.6f,
+        LimbType.Abdomen => 1.25f,
+        _ => 1.0f,
     };
 }
 

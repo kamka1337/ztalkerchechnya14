@@ -7,6 +7,10 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Nutrition.EntitySystems;
+using Content.Shared.Popups;
+using Content.Shared.Traits.Assorted;
+using Robust.Shared.Audio;
+using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
@@ -22,6 +26,8 @@ public sealed class LimbVitalsSystem : EntitySystem
     [Dependency] private readonly PuddleSystem _puddle = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
@@ -35,6 +41,10 @@ public sealed class LimbVitalsSystem : EntitySystem
         if (!TryComp<LimbHealthComponent>(args.Owner, out var comp))
             return;
         Entity<LimbHealthComponent> ent = (args.Owner, comp);
+
+        _popup.PopupEntity($"Конечность выведена из строя: {args.Limb.DisplayName()}!",
+            ent.Owner, ent.Owner, PopupType.LargeCaution);
+        _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/bone_rattle.ogg"), ent.Owner);
 
         if (ent.Comp.ActiveDoses.RemoveAll(d => d.Limb == args.Limb) > 0)
             Dirty(ent);
@@ -54,6 +64,8 @@ public sealed class LimbVitalsSystem : EntitySystem
 
         if (_limbs.CountDestroyed(ent.Comp) >= ent.Comp.MaxHealth.Count)
             _mobState.ChangeMobState(ent.Owner, MobState.Dead);
+
+        _limbs.RefreshVitalsActive(ent.Owner, ent.Comp);
     }
 
     private void TickDoses(Entity<LimbHealthComponent> ent)
@@ -106,7 +118,10 @@ public sealed class LimbVitalsSystem : EntitySystem
         }
 
         if (changed)
+        {
             Dirty(ent);
+            _limbs.RefreshVitalsActive(ent.Owner, ent.Comp);
+        }
     }
 
     private void TickBleed(Entity<LimbHealthComponent> ent, bool heavy)
@@ -164,7 +179,7 @@ public sealed class LimbVitalsSystem : EntitySystem
         if (changed)
         {
             Dirty(ent);
-            RaiseLocalEvent(new LimbHealthChangedEvent(ent.Owner));
+            _limbs.RefreshVitalsActive(ent.Owner, ent.Comp);
         }
     }
 
@@ -184,6 +199,10 @@ public sealed class LimbVitalsSystem : EntitySystem
         Dirty(ent);
         _mobState.ChangeMobState(ent.Owner, MobState.Dead);
         _threshold.SetAllowRevives(ent.Owner, false);
+
+        var unrev = EnsureComp<UnrevivableComponent>(ent.Owner);
+        unrev.ReasonMessage = "stalker-limb-unrevivable";
+        Dirty(ent.Owner, unrev);
     }
 
     public override void Update(float frameTime)
@@ -191,8 +210,8 @@ public sealed class LimbVitalsSystem : EntitySystem
         base.Update(frameTime);
 
         var now = _timing.CurTime;
-        var query = EntityQueryEnumerator<LimbHealthComponent>();
-        while (query.MoveNext(out var uid, out var comp))
+        var query = EntityQueryEnumerator<LimbVitalsActiveComponent, LimbHealthComponent>();
+        while (query.MoveNext(out var uid, out _, out var comp))
         {
             if (!_mobState.IsAlive(uid))
                 continue;

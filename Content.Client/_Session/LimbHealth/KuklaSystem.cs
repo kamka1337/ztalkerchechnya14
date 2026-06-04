@@ -45,12 +45,28 @@ public sealed class KuklaSystem : EntitySystem
 
     public void SelectLimb(LimbType limb)
     {
+        var aiming = true;
         if (_player.LocalEntity is { } uid && TryComp<BodyTargetingComponent>(uid, out var comp))
         {
+            aiming = !(comp.Aiming && comp.SelectedLimb == limb);
+            comp.SelectedLimb = limb;
+            comp.Aiming = aiming;
+            Updated?.Invoke();
+        }
+
+        RaiseNetworkEvent(new SelectLimbEvent(limb, aiming));
+    }
+
+    public void SetSelectedLimb(LimbType limb)
+    {
+        var aiming = false;
+        if (_player.LocalEntity is { } uid && TryComp<BodyTargetingComponent>(uid, out var comp))
+        {
+            aiming = comp.Aiming;
             comp.SelectedLimb = limb;
             Updated?.Invoke();
         }
 
-        RaiseNetworkEvent(new SelectLimbEvent(limb));
+        RaiseNetworkEvent(new SelectLimbEvent(limb, aiming));
     }
 }

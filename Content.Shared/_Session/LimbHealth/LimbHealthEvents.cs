@@ -23,13 +23,3 @@ public sealed class LimbRestoredEvent : EntityEventArgs
         Limb = limb;
     }
 }
-
-public sealed class LimbHealthChangedEvent : EntityEventArgs
-{
-    public readonly EntityUid Owner;
-
-    public LimbHealthChangedEvent(EntityUid owner)
-    {
-        Owner = owner;
-    }
-}

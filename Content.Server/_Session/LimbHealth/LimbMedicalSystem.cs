@@ -186,6 +186,9 @@ public sealed class LimbMedicalSystem : EntitySystem
         if (!_limbs.CureBleed(target, args.Limb, ent.Comp.CuresLight, ent.Comp.CuresHeavy))
             return;
 
+        if (ent.Comp.HealBloodloss > 0)
+            _limbs.HealLimbDamageType(target, args.Limb, "Bloodloss", ent.Comp.HealBloodloss);
+
         if (TryComp<LimitedChargesComponent>(ent.Owner, out _))
         {
             _charges.TryUseCharge(ent.Owner);

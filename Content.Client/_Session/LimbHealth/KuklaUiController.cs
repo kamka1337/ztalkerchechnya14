@@ -75,10 +75,14 @@ public sealed class KuklaUiController : UIController, IOnStateEntered<GameplaySt
 
         ui.Visible = true;
 
-        var selected = EntityManager.TryGetComponent<BodyTargetingComponent>(uid, out var targeting)
-            ? targeting.SelectedLimb
-            : LimbType.Chest;
+        var selected = LimbType.Chest;
+        var aiming = false;
+        if (EntityManager.TryGetComponent<BodyTargetingComponent>(uid, out var targeting))
+        {
+            selected = targeting.SelectedLimb;
+            aiming = targeting.Aiming;
+        }
 
-        ui.UpdateState(comp, selected);
+        ui.UpdateState(comp, selected, aiming);
     }
 }

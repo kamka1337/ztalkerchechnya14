@@ -207,7 +207,15 @@ public sealed partial class DamageableSystem
 ///     Raised before damage is done, so stuff can cancel it if necessary.
 /// </summary>
 [ByRefEvent]
-public record struct BeforeDamageChangedEvent(DamageSpecifier Damage, EntityUid? Origin = null, bool Cancelled = false);
+public record struct BeforeDamageChangedEvent(
+    DamageSpecifier Damage,
+    EntityUid? Origin = null,
+    bool Cancelled = false,
+    // stalker-changes (limb health): expose the pipeline flags so a subscriber that re-routes damage
+    // (e.g. the limb system) can faithfully replay the same modifier order ChangeDamage would have used.
+    bool IgnoreResistances = false,
+    bool IgnoreGlobalModifiers = false,
+    List<EntityUid>? IgnoreResistors = null);
 
 /// <summary>
 ///     Raised on an entity when damage is about to be dealt,
@@ -220,7 +228,9 @@ public sealed class DamageModifyEvent(DamageSpecifier damage, EntityUid? origin 
     : EntityEventArgs, IInventoryRelayEvent
 {
     // Whenever locational damage is a thing, this should just check only that bit of armour.
-    public SlotFlags TargetSlots => ~SlotFlags.POCKET;
+    // stalker-changes (limb health): a raiser can scope the inventory relay to a hit limb's slots.
+    public SlotFlags? OverrideSlots;
+    public SlotFlags TargetSlots => OverrideSlots ?? ~SlotFlags.POCKET;
 
     public readonly DamageSpecifier OriginalDamage = damage;
     public DamageSpecifier Damage = damage;

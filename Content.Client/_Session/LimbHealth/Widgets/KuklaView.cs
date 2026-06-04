@@ -14,7 +14,9 @@ public sealed class KuklaView : Control
     private readonly Dictionary<LimbType, TextureRect> _color = new();
     private readonly Dictionary<LimbType, TextureRect> _effect = new();
 
-    public KuklaView()
+    public event Action<LimbType>? LimbClicked;
+
+    public KuklaView(bool interactive = false)
     {
         var w = KuklaLayout.Width * Scale;
         var h = KuklaLayout.Height * Scale;
@@ -41,6 +43,14 @@ public sealed class KuklaView : Control
             _root.AddChild(icon);
             LayoutContainer.SetPosition(icon, new Vector2(center.X * w - iconSize / 2f, center.Y * h - iconSize / 2f));
             _effect[limb] = icon;
+        }
+
+        if (interactive)
+        {
+            var input = new KuklaInputArea { MinSize = new Vector2(w, h) };
+            input.Clicked += limb => LimbClicked?.Invoke(limb);
+            _root.AddChild(input);
+            LayoutContainer.SetPosition(input, Vector2.Zero);
         }
     }
 

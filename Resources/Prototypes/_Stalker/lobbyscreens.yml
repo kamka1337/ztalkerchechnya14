@@ -1,3 +1,28 @@
 ﻿- type: lobbyBackground
-  id: sesia
-  background: /Textures/_Stalker/LobbyScreens/sesia.png
+  id: stalker_bg_1
+  background: /Textures/_Stalker/LobbyScreens/chechnya.png
+
+- type: lobbyBackground
+  id: stalker_bg_2
+  background: /Textures/_Stalker/LobbyScreens/chechnya2.png
+
+- type: lobbyBackground
+  id: stalker_bg_3
+  background: /Textures/_Stalker/LobbyScreens/chechnya3.png
+
+- type: lobbyBackground
+  id: stalker_bg_4
+  background: /Textures/_Stalker/LobbyScreens/chechnya4.png
+
+- type: lobbyBackground
+  id: stalker_bg_5
+  background: /Textures/_Stalker/LobbyScreens/chechnya5.png
+
+- type: lobbyBackground
+  id: stalker_bg_6
+  background: /Textures/_Stalker/LobbyScreens/chechnya6.png
+
+- type: lobbyBackground
+  id: stalker_bg_7
+  background: /Textures/_Stalker/LobbyScreens/notchechnya.png
+

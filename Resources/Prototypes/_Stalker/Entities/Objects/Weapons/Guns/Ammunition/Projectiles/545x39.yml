@@ -12,7 +12,7 @@
     projectileClass: 2
     damage:
       types:
-        Piercing: 26
+        Piercing: 39
   - type: StaminaDamageOnCollide
     damage: 2
 
@@ -26,7 +26,7 @@
     projectileClass: 3
     damage:
       types:
-        Piercing: 28
+        Piercing: 43
 
 - type: entity
   id: Bullet545HP
@@ -53,7 +53,7 @@
     projectileClass: 4
     damage:
       types:
-        Piercing: 26
+        Piercing: 43
 
 - type: entity
   id: Bullet545BS

@@ -249,3 +249,24 @@
     - type: Clothing
       sprite: _Stalker/Objects/Clothing/Torso/Turtlenecks/matrosska.rsi
 
+- type: entity
+  parent: BaseClothingTorso
+  id: ClothingTorsoTurtlenecksM81
+  name: Китель M81 Woodland
+  description: Армейский китель в лесной камуфляжной расцветке M81 Woodland. Популярный импортный камуфляж среди боевиков ЧРИ.
+  components:
+    - type: Sprite
+      sprite: _Stalker/Objects/Clothing/Torso/Turtlenecks/M81top.rsi
+    - type: Clothing
+      sprite: _Stalker/Objects/Clothing/Torso/Turtlenecks/M81top.rsi
+
+- type: entity
+  parent: BaseClothingTorso
+  id: ClothingTorsoTurtlenecksVSR93
+  name: Китель ВСР-93 Вертикалка
+  description: Уставной камуфляжный китель Вооружённых Сил РФ образца 1993 года. Полевая классика чеченской кампании.
+  components:
+    - type: Sprite
+      sprite: _Stalker/Objects/Clothing/Torso/Turtlenecks/VSR93top.rsi
+    - type: Clothing
+      sprite: _Stalker/Objects/Clothing/Torso/Turtlenecks/VSR93top.rsi

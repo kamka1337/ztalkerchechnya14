@@ -332,3 +332,25 @@
       sprite: _Stalker/Objects/Clothing/Legs/Jeans/russian_number.rsi
     - type: Clothing
       sprite: _Stalker/Objects/Clothing/Legs/Jeans/russian_number.rsi
+
+- type: entity
+  parent: BaseClothingLegs
+  id: ClothingLegsJeansM81
+  name: Брюки M81 Woodland
+  description: Плотные камуфляжные брюки в расцветке M81 Woodland. Практичная полевая форма бойцов ЧРИ.
+  components:
+    - type: Sprite
+      sprite: _Stalker/Objects/Clothing/Legs/Jeans/M81bottom.rsi
+    - type: Clothing
+      sprite: _Stalker/Objects/Clothing/Legs/Jeans/M81bottom.rsi
+
+- type: entity
+  parent: BaseClothingLegs
+  id: ClothingLegsJeansVSR93
+  name: Брюки ВСР-93 Вертикалка
+  description: Полевые камуфляжные брюки Вооруженных Сил РФ образца 1993 года. Уставная классика первой чеченской кампании.
+  components:
+    - type: Sprite
+      sprite: _Stalker/Objects/Clothing/Legs/Jeans/VSR93bottom.rsi
+    - type: Clothing
+      sprite: _Stalker/Objects/Clothing/Legs/Jeans/VSR93bottom.rsi

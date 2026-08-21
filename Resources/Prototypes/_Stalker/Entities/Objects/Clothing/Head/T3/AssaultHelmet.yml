@@ -18,7 +18,7 @@
   - type: ExplosionResistance
     damageCoefficient: 0.9
   - type: Reflect
-    reflectProb: 0.75
+    reflectProb: 0.9
     spread: 360
     reflects:
       - NonEnergy
@@ -191,3 +191,14 @@
     sprite: _Stalker/Objects/Clothing/hats/freedom_zenit.rsi
   - type: Clothing
     sprite: _Stalker/Objects/Clothing/hats/freedom_zenit.rsi
+
+- type: entity
+  parent: STClothingHeadHelmetCombatT3Base
+  id: ClothingHeadHelmetZsh1
+  name: Шлем ЗШ-1
+  description: Защитный шлем ЗШ-1. Обеспечивает отличную защиту головы от осколков и пистолетных пуль в ближнем бою. Активно используется спецподразделениями.
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/hats/zsh1.rsi
+  - type: Clothing
+    sprite: _Stalker/Objects/Clothing/hats/zsh1.rsi

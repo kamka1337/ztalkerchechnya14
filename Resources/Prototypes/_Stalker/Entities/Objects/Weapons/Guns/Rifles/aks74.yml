@@ -6,9 +6,9 @@
   - type: STWeight
     self: 3.5
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aks-74.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aks-74.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74.rsi
   - type: GunWieldBonus
@@ -269,9 +269,9 @@
   - type: PullDoAfter
     pullTime: 2
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74u.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aks-74u.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74u.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aks-74u.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/aks74u.rsi
   - type: GunWieldBonus

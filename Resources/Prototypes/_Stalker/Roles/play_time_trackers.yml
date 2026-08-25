@@ -203,3 +203,36 @@
 
 - type: playTimeTracker
   id: JobEvolverSymbioteArchon
+
+############
+- type: playTimeTracker
+  id: JobRFRPK
+
+- type: playTimeTracker
+  id: JobRFAKC
+
+- type: playTimeTracker
+  id: JobRFAKCY
+
+- type: playTimeTracker
+  id: JobRFMedic
+
+- type: playTimeTracker
+  id: JobRFSpec
+
+#######
+
+- type: playTimeTracker
+  id: JobCRIRPK
+
+- type: playTimeTracker
+  id: JobCRIAKC
+
+- type: playTimeTracker
+  id: JobCRIAKCY
+
+- type: playTimeTracker
+  id: JobCRIMedic
+
+- type: playTimeTracker
+  id: JobCRISpec

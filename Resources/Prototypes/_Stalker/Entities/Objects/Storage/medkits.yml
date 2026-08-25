@@ -132,6 +132,54 @@
         - Healing
 
 - type: entity
+  parent: ClothingBackpackDuffelGreenStalker
+  id: ClothingBackpackDuffelMedicalStalkerFilled
+  name: медицинская сумка
+  description: Переносная сумка, используемая для переноски различных лекарств.
+  suffix: Stalker
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/backpacks/Medical/medical.rsi
+    scale: 0.8, 0.8
+  - type: Dumpable
+  - type: Storage
+    maxItemSize: Large
+    quickInsert: true
+    areaInsert: true
+    grid:
+    - 0,0,4,4
+    whitelist:
+      tags:
+      - Wrench
+      - Bottle
+      - Spray
+      - Brutepack
+      - Bloodpack
+      - Gauze
+      - Ointment
+      - CigPack
+      - PillCanister
+      - Radio
+      - DiscreteHealthAnalyzer
+      components:
+      - Hypospray
+      - Injector
+      - Pill
+      - Healing
+  - type: StorageFill
+    contents:
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitCMS
+    - id: SessionMedkitCMS
+    - id: SessionMedkitCMS
+    - id: SessionMedkitCMS
+
+- type: entity
   parent: BaseStorageMedkitItem
   id: MedkitCMSStalker
   name: аптечка CMS

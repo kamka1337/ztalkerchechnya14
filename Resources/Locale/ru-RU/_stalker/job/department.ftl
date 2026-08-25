@@ -7,3 +7,5 @@ department-StalkerOfficials = Пограничники
 department-StalkerReligius = Фанатики
 department-Evolver = Разумные мутанты
 department-StalkerAnomalists = Техники
+department-rf = ВС РФ
+department-cri = ВС ЧРИ

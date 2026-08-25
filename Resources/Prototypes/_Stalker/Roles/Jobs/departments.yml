@@ -1,133 +1,25 @@
 - type: department
-  id: Stalker
+  id: StalkerRF
   color: "#9FED58"
-  name: department-Stalker
+  name: department-rf
   description: department-Stalker-description
   weight: 10
   roles:
-  - Stalker
-  - StalkerRookie
-  - StalkerAtom
-  - StalkerVeteran
-  - StalkerGuide
-  - StalkerNoviceFreedom
-  - StalkerNoviceDolg
-  - StalkerMonolithFree
-
-# - type: department
-#   id: StalkerDisabled
-#   description: "department-StalkerAdvanced-description"
-#   color: "#9FED58"
-#   roles:
-#   # - MilitaryStalker
-#   #- PoliceOfficer
-#   # - MayorCity
-#   # - Prokuror
-#   # - Magistrate
-#   # - Priest
-#   # - Bartender
-#   # - Doctor
-#   # - HeadDoctor
-#   # - Police
-#   # - StalkerUN
-#   # - StalkerSBU
-#   # - StalkerZavet
+  - ChechnyaRFRPK
+  - ChechnyaRFAKC
+  - ChechnyaRFAKCY
+  - ChechnyaRFMedic
+  - ChechnyaRFSpec
 
 - type: department
-  id: StalkerAdvanced
-  name: department-StalkerAdvanced
-  description: department-StalkerAdvanced-description
-  color: "#9FED58"
-  weight: 9
-  roles:
-  - StalkerDolg
-  - StalkerDutyNCO # Zona14: new NCO clone for the Duty rank structure
-  - StalkerHeadDolg
-  - StalkerFreedom
-  - StalkerScout # Zona14: new Scout clone for the Freedom rank structure
-  - StalkerHeadFreedom
-  - StalkerClearSkyHead
-  - StalkerClearSky
-  #- StalkerClearSky # Stalker-TODO: Jobs cannot have multiple primary departments!
-  - StalkerNeutral
-  - StalkerPoisk
-  - StalkerJournalist
-  - StalkerMilitia
-  - StalkerMilitiaCommander
-  - StalkerProjectOrchestrator
-  - StalkerProjectPawn
-  - StalkerProjectSCI
-
-- type: department
-  id: StalkerBrigands
-  name: department-StalkerBrigands
+  id: StalkerCRI
+  name: department-cri
   description: department-StalkerBrigands-description
   color: "#111111"
   weight: 8
   roles:
-  - StalkerBandit
-  - StalkerCutthroat # Zona14: new Cutthroat clone for the Criminal rank structure
-  - StalkerHeadBandit
-  - StalkerMercenary
-  - StalkerHeadMercenary
-  - StalkerJaba
-  - StalkerJabaAce
-  - StalkerDeserter
-  - StalkerDeserterHead
-  - StalkerRene
-
-- type: department
-  id: StalkerOfficials
-  name: department-StalkerOfficials
-  description: department-StalkerOfficials-description
-  color: "#0000FF"
-  weight: 7
-  roles:
-  - Military
-  - MilitaryOfficer
-  - MilitaryHead
-  # Zona14: sci / sci_decan / sci_rector moved to the new StalkerScience department
-  - MilitaryStalker
-  - StalkerUN
-  - StalkerClown
-  - StalkerEcologist
-  - StalkerHeadEcologist
-
-- type: department
-  id: StalkerReligius
-  name: department-StalkerReligius
-  description: department-StalkerReligius-description
-  color: "#C0C0C0"
-  weight: 6
-  roles:
-  - StalkerMonolith
-  - StalkerPostulant
-  - StalkerBishop
-  - StalkerGreh
-  - Seraphim
-  - SeraphimHead
-  - SeraphimCherubim
-  - StalkerZavet
-  - StalkerZavetHead
-
-- type: department
-  id: Evolver
-  name: department-Evolver
-  description: department-Evolver-description
-  color: "#1070C0"
-  weight: -10
-  roles:
-  - EvolverPackFang
-  - EvolverPackAlpha
-  - EvolverSymbioteMedium
-  - EvolverSymbioteArchon
-  - Evolver
-
-- type: department
-  id: StalkerAnomalists
-  name: department-StalkerAnomalists
-  description: department-StalkerAnomalists-description
-  color: "#9FED58"
-  roles:
-  - StalkerAnomalist
-  - StalkerAnomalistGuardian
+  - ChechnyaCRIRPK
+  - ChechnyaCRIAKC
+  - ChechnyaCRIAKCY
+  - ChechnyaCRIMedic
+  - ChechnyaCRISpec

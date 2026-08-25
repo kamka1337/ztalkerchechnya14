@@ -833,3 +833,25 @@
         layer:
         - GlassLayer
   - type: Airtight
+
+- type: entity
+  parent: BaseWall
+  id: WallTentChechnya
+  name: Стена палатки
+  suffix: ST, Mapping, wall
+  components:
+  - type: Tag
+    tags:
+    - Wall
+  - type: Sprite
+    sprite: _Stalker/Structures/Walls/tent.rsi
+    drawdepth: WallTops
+  - type: SpriteFade
+  - type: Icon
+    sprite: _Stalker/Structures/Walls/tent.rsi
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: FlimsyMetallic
+  - type: IconSmooth
+    key: walls
+    base: brick

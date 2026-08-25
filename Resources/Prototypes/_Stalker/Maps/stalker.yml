@@ -8,27 +8,17 @@
       stationProto: StandardStalkerStation
       components:
         - type: StationNameSetup
-          mapNameTemplate: "Юпитер"
+          mapNameTemplate: "Чечня"
         - type: StationJobs
-          # Zona14: roster curated to 18 selectable jobs across 5 faction groups
-          # (Stalkers / Criminals / Stalker Clans / Science / Border Guards).
-          # Off-roster prototypes (StalkerAtom, StalkerGuide, Seraphim*,
-          # StalkerNovice*, StalkerProject*, StalkerClearSky*, StalkerMonolithFree,
-          # StalkerRene, StalkerJournalist, StalkerMercenary*) still exist and can
-          # be spawned by events, ghost roles, or admin tools.
           availableJobs:
-            # Stalkers
-            # Stalker: [ 0, -1 ]
-            # StalkerVeteran: [ 0, -1 ]
-            # Criminals
-            # StalkerBandit: [ 0, -1 ]
-            # StalkerHeadBandit: [ 0, -1 ]
-            # Stalker Clans — Freedom
-            StalkerFreedom: [ 0, -1 ]
-            StalkerHeadFreedom: [ 0, -1 ]
-            # Stalker Clans — Duty
-            StalkerDolg: [ 0, -1 ]
-            StalkerHeadDolg: [ 0, -1 ]
-            # Science
-            # sci: [ 0, -1 ]
-            # sci_rector: [ 0, -1 ]
+            ChechnyaRFRPK: [ 0, 5 ]
+            ChechnyaRFAKC: [ 0, 60 ]
+            ChechnyaRFAKCY: [ 0, 20 ]
+            ChechnyaRFMedic: [ 0, 10 ]
+            ChechnyaRFSpec: [ 0, 10 ]
+            ##
+            ChechnyaCRIRPK: [ 0, 5 ]
+            ChechnyaCRIAKC: [ 0, 60 ]
+            ChechnyaCRIAKCY: [ 0, 20 ]
+            ChechnyaCRIMedic: [ 0, 10 ]
+            ChechnyaCRISpec: [ 0, 10 ]

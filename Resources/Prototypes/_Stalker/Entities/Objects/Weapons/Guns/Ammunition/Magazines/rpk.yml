@@ -42,3 +42,14 @@
     steps: 2
     zeroVisible: false
   - type: Appearance
+
+- type: entity
+  id: Chechnya545MagRPK
+  name: магазин РПК
+  description: Магазин 5.45х39 для РПК.
+  parent: Base545MagRPK
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge545PC
+    capacity: 75

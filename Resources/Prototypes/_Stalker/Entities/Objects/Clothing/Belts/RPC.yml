@@ -45,6 +45,27 @@
 
 - type: entity
   parent: ClothingBeltTarzanBlack
+  id: ClothingBeltTarzanGreenFilled
+  name: РПС "Тарзан"
+  description: Очень полезная зелёная РПС для переноски любых вещей, от рации до магазинов. Пользуется особой популярностью среди сталкерского сообщества.
+  suffix: ST
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/belt/tarzan_green.rsi
+  - type: Clothing
+    sprite: _Stalker/Objects/Clothing/belt/tarzan_green.rsi
+  - type: StorageFill
+    contents:
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+
+- type: entity
+  parent: ClothingBeltTarzanBlack
   id: ClothingBeltTarzanOrange
   name: РПС "Тарзан"
   description: Очень полезная оранжевая РПС для переноски любых вещей, от рации до магазинов. Пользуется особой популярностью среди сталкерского сообщества.
@@ -138,6 +159,36 @@
       state: icon
     - type: Clothing
       sprite: _Stalker/Objects/Clothing/belt/belt_green.rsi
+
+- type: entity
+  parent: ClothingBeltStorageStalkerBase
+  id: ClothingBeltGreenWebbingStalkerFilled
+  name: поясная сумка ПСЗ
+  description: Набор подсумков и поясная сумка старого зелёного варианта комплекта персональной системы защиты, не предназаченного для местности ЧЗО.
+  suffix: ST
+  components:
+  - type: STWeightInsideReduction
+    reductionFraction: 0.20
+  - type: STWeight
+    self: 3
+  - type: Storage
+    maxItemSize: Large
+    grid:
+    - 2,0,7,3
+    - 0,4,0,2
+    - 1,0,0,2
+    - 0,0,0,0
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/belt/belt_green.rsi
+    state: icon
+  - type: Clothing
+    sprite: _Stalker/Objects/Clothing/belt/belt_green.rsi
+  - type: StorageFill
+    contents:
+    - id: Chechnya545MagRPK
+    - id: Chechnya545MagRPK
+    - id: Chechnya545MagRPK
+    - id: Chechnya545MagRPK
 
 - type: entity
   parent: ClothingBeltStorageStalkerBase

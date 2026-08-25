@@ -157,6 +157,31 @@
   - type: STWeightInsideReduction
     reductionFraction: 0.50
 
+- type: entity
+  parent: STClothingBackBase
+  id: ClothingBackpackStalkerZaryaGreenFilled
+  name: сталкерский рюкзак «Заря»
+  description: Вместительный сталкерский рюкзак оливового цвета из комплекта «Заря», частенько используется в качестве заначки.
+  suffix: ST
+  components:
+  - type: Storage #41 клеток (1 ппшка или 14 стоп внутрь)
+    grid:
+    - 0,0,5,4
+    - 0,5,1,7
+    quickInsert: true
+    areaInsert: true
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/backpacks/stalker.rsi
+  - type: STWeightInsideReduction
+    reductionFraction: 0.50
+  - type: StorageFill
+    contents:
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitAFAK
+    - id: SessionMedkitCMS
+    - id: SessionMedkitCMS
+
 
 - type: entity
   parent: ClothingBackpackStalkerZaryaGreen

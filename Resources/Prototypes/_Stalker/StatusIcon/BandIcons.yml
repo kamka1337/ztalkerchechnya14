@@ -389,6 +389,22 @@
     state: rus
 
 - type: jobIcon
+  id: cri
+  locationPreference: Right
+  icon:
+    sprite: /Textures/_Stalker/Icons/Patches/band.rsi
+    hideOnStealth: true
+    state: cri
+
+- type: jobIcon
+  id: roz
+  locationPreference: Right
+  icon:
+    sprite: /Textures/_Stalker/Icons/Patches/band.rsi
+    hideOnStealth: true
+    state: roz
+
+- type: jobIcon
   id: de
   locationPreference: Right
   icon:

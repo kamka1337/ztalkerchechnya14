@@ -439,3 +439,32 @@
     damageModifierSet: Wood
   - type: IconSmooth
     enabled: false
+
+- type: entity
+  id: TentDoorChechnya
+  name: Вход в палатку
+  suffix: ST, Mapping
+  parent: STBaseMaterialDoor
+  description: Вход в палатку.
+  components:
+  - type: Sprite
+    sprite: _Stalker/Structures/Doors/Chechnya/Tent/door.rsi
+    layers:
+    - state: closed
+      map: ["enum.DoorVisualLayers.Base"]
+  - type: Door
+    bumpOpen: false
+    clickOpen: true
+    closeTimeOne: 0
+    closeTimeTwo: 0
+    openTimeOne: 0
+    openTimeTwo: 0
+    openSound:
+      path: /Audio/Effects/door_open.ogg
+    closeSound:
+      path: /Audio/Effects/door_close.ogg
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Wood
+  - type: IconSmooth
+    enabled: false

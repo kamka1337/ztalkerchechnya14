@@ -233,3 +233,26 @@ job-evolver-symbiote-medium-supervisor = Изучасть и развивать 
 job-evolver-symbiote-archon = Архон Симбиот
 job-evolver-symbiote-archon-desc = Высший симбиот, обладающий абсолютной властью над пси-энергией и пространством.
 job-evolver-symbiote-archon-supervisor = Защищать Зону, контролируя пси-пространство и управляя симбиотами.
+
+# Chechnya
+
+
+# RF
+
+job-rf-rpk = Пулеметчик ВС РФ
+job-rf-akc74 = Штурмовик ВС РФ АКС-74
+job-rf-akc74y = Штурмовик ВС РФ АКС-74У
+job-rf-medic = Медик ВС РФ АКС-74У
+job-rf-spec = 7-й ОСН Росич
+job-rf-desc = Защитник z zov.
+job-rf-supervisor = Еби чурок.
+
+# CRI
+
+job-cri-rpk = Пулеметчик ВС ЧРИ
+job-cri-akc74 = Штурмовик ВС ЧРИ АКС-74
+job-cri-akc74y = Штурмовик ВС ЧРИ АКС-74У
+job-cri-medic = Медик ВС ЧРИ АКС-74У
+job-cri-spec = ПСН Борз
+job-cri-desc = Защитник барашков.
+job-cri-supervisor = Еби баранов.

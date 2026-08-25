@@ -266,17 +266,17 @@
 - type: entity
   id: WarZoneEntity_DutyBase
   parent: BaseStructure
-  name: Флагшток Долга
+  name: Флагшток ВС РФ
   components:
   - type: Transform
     anchored: true
   - type: WarZone
     proto: DutyBase
-    portalName: DutyBase
-    defendingBandProtoId: STDolgBand
+    portalName: RFBase
+    defendingBandProtoId: RFBand
   - type: WarZoneFlag
   - type: Sprite
-    sprite: _Session/Objects/Decoration/Flags/duty.rsi
+    sprite: _Session/Objects/Decoration/Flags/rf.rsi
     layers:
     - state: flag3
   - type: Appearance
@@ -312,14 +312,14 @@
 - type: entity
   id: WarZoneEntity_FreedomBase
   parent: BaseStructure
-  name: Флагшток Свободы
+  name: Флагшток ВС ЧРИ
   components:
   - type: Transform
     anchored: true
   - type: WarZone
     proto: FreedomBase
-    portalName: FreedomBase
-    defendingBandProtoId: STFreedomBand
+    portalName: CRIBase
+    defendingBandProtoId: CRIBand
   - type: WarZoneFlag
   - type: Sprite
     sprite: _Session/Objects/Decoration/Flags/freedom.rsi

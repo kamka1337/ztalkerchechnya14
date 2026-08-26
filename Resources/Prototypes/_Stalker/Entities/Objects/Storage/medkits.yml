@@ -147,7 +147,7 @@
     quickInsert: true
     areaInsert: true
     grid:
-    - 0,0,4,4
+    - 0,0,9,3
     whitelist:
       tags:
       - Wrench
@@ -162,6 +162,7 @@
       - Radio
       - DiscreteHealthAnalyzer
       components:
+      - Storage
       - Hypospray
       - Injector
       - Pill

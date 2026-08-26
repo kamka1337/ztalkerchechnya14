@@ -48,8 +48,11 @@ public sealed class EmbedTest : InteractionTest
 
         // Disconnect the client
         var cNetMgr = Client.ResolveDependency<IClientNetManager>();
-        await Client.WaitPost(Client.EntMan.FlushEntities);
-        await Pair.RunTicksSync(1);
+        await Pair.Disconnect("Testing cleanup with an embedded entity");
+        Assert.That(cNetMgr.IsConnected, Is.False);
+
+        // Restore the connection so the pooled pair can be cleaned up normally.
+        await Pair.Connect();
     }
 
     /// <summary>

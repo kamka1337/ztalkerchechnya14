@@ -800,7 +800,8 @@ public sealed partial class WarZoneSystem : EntitySystem
     {
         try
         {
-            if (!_prototypeManager.TryIndex<STWarZonePrototype>(component.ZoneProto, out var wzProto))
+            if (component.ZoneProto == default ||
+                !_prototypeManager.TryIndex<STWarZonePrototype>(component.ZoneProto, out var wzProto))
             {
                 Logger.ErrorS("warzone", $"Could not find STWarZonePrototype with ID '{component.ZoneProto}' during async state load for zone {zoneUid}.");
                 component.InitialLoadComplete = true;

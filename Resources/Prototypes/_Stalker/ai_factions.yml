@@ -1,4 +1,22 @@
 - type: npcFaction
+  id: RF
+  hostile:
+  - CRI
+  - Mutated
+  - MutatedHunter
+  - Hostile
+  - Meat
+
+- type: npcFaction
+  id: CRI
+  hostile:
+  - RF
+  - Mutated
+  - MutatedHunter
+  - Hostile
+  - Meat
+
+- type: npcFaction
   id: MutatedHunter
   hostile:
     - Passive

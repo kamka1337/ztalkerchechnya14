@@ -406,7 +406,7 @@
   name: job-cri-spec
   icon: cri
   description: job-cri-desc
-  playTimeTracker: CRIBorzGear
+  playTimeTracker: JobCRISpec
   whitelisted: false
   requirements:
   - !type:SpeciesRequirement

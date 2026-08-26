@@ -1,4 +1,117 @@
 - type: department
+  id: Stalker
+  color: "#9FED58"
+  name: department-Stalker
+  description: department-Stalker-description
+  weight: 10
+  roles:
+  - Stalker
+  - StalkerRookie
+  - StalkerAtom
+  - StalkerVeteran
+  - StalkerGuide
+  - StalkerNoviceFreedom
+  - StalkerNoviceDolg
+  - StalkerMonolithFree
+
+- type: department
+  id: StalkerAdvanced
+  name: department-StalkerAdvanced
+  description: department-StalkerAdvanced-description
+  color: "#9FED58"
+  weight: 9
+  roles:
+  - StalkerDolg
+  - StalkerDutyNCO
+  - StalkerHeadDolg
+  - StalkerFreedom
+  - StalkerScout
+  - StalkerHeadFreedom
+  - StalkerClearSkyHead
+  - StalkerClearSky
+  - StalkerNeutral
+  - StalkerPoisk
+  - StalkerJournalist
+  - StalkerMilitia
+  - StalkerMilitiaCommander
+  - StalkerProjectOrchestrator
+  - StalkerProjectPawn
+  - StalkerProjectSCI
+
+- type: department
+  id: StalkerBrigands
+  name: department-StalkerBrigands
+  description: department-StalkerBrigands-description
+  color: "#111111"
+  weight: 8
+  roles:
+  - StalkerBandit
+  - StalkerCutthroat
+  - StalkerHeadBandit
+  - StalkerMercenary
+  - StalkerHeadMercenary
+  - StalkerJaba
+  - StalkerJabaAce
+  - StalkerDeserter
+  - StalkerDeserterHead
+  - StalkerRene
+
+- type: department
+  id: StalkerOfficials
+  name: department-StalkerOfficials
+  description: department-StalkerOfficials-description
+  color: "#0000FF"
+  weight: 7
+  roles:
+  - Military
+  - MilitaryOfficer
+  - MilitaryHead
+  - MilitaryStalker
+  - StalkerUN
+  - StalkerClown
+  - StalkerEcologist
+  - StalkerHeadEcologist
+
+- type: department
+  id: StalkerReligius
+  name: department-StalkerReligius
+  description: department-StalkerReligius-description
+  color: "#C0C0C0"
+  weight: 6
+  roles:
+  - StalkerMonolith
+  - StalkerPostulant
+  - StalkerBishop
+  - StalkerGreh
+  - Seraphim
+  - SeraphimHead
+  - SeraphimCherubim
+  - StalkerZavet
+  - StalkerZavetHead
+
+- type: department
+  id: Evolver
+  name: department-Evolver
+  description: department-Evolver-description
+  color: "#1070C0"
+  weight: -10
+  roles:
+  - EvolverPackFang
+  - EvolverPackAlpha
+  - EvolverSymbioteMedium
+  - EvolverSymbioteArchon
+  - Evolver
+
+- type: department
+  id: StalkerAnomalists
+  name: department-StalkerAnomalists
+  description: department-StalkerAnomalists-description
+  color: "#9FED58"
+  roles:
+  - StalkerAnomalist
+  - StalkerAnomalistGuardian
+
+- type: department
   id: StalkerRF
   color: "#9FED58"
   name: department-rf

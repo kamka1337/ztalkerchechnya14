@@ -17,7 +17,7 @@
     layers:
     - state: 300BPZ_FMJ
       map: ["enum.GunVisualLayers.Base"]
-    - state: 300ammo
+    - state: 300ammo-1
       map: ["enum.GunVisualLayers.Mag"]
 
 - type: entity
@@ -28,12 +28,12 @@
   suffix: Stalker
   components:
   - type: BallisticAmmoProvider
-    proto: 300ammo
+    proto: STCartridge300VMAX
   - type: Sprite
     layers:
     - state: 300VMAX
       map: ["enum.GunVisualLayers.Base"]
-    - state: 300ammo
+    - state: 300ammo-1
       map: ["enum.GunVisualLayers.Mag"]
 
 

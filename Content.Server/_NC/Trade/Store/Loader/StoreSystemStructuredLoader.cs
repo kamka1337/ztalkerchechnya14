@@ -7,17 +7,18 @@ namespace Content.Server._NC.Trade;
 
 public sealed class StoreSystemStructuredLoader : EntitySystem
 {
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-loader");
-
     [Dependency] private readonly NcContractSystem _contracts = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
 
     private readonly HashSet<EntityUid> _contractsInitialized = new();
     private readonly HashSet<EntityUid> _loadedStores = new();
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
         base.Initialize();
+        _sawmill = _logManager.GetSawmill("ncstore-loader");
         SubscribeLocalEvent<NcStoreComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NcStoreComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<NcStoreComponent, EntityTerminatingEvent>(OnTerminating);
@@ -73,7 +74,7 @@ public sealed class StoreSystemStructuredLoader : EntitySystem
     {
         if (comp.BuyPresets.Count == 0 && comp.SellPresets.Count == 0)
         {
-            Sawmill.Warning($"[NcStore] {ToPrettyString(uid)}: нет ни одного пресета (reason={reason})");
+            _sawmill.Warning($"[NcStore] {ToPrettyString(uid)}: нет ни одного пресета (reason={reason})");
             return;
         }
 
@@ -94,11 +95,11 @@ public sealed class StoreSystemStructuredLoader : EntitySystem
 
         if (total == 0)
         {
-            Sawmill.Warning($"[NcStore] {ToPrettyString(uid)}: ни одного лота не загружено (reason={reason})");
+            _sawmill.Warning($"[NcStore] {ToPrettyString(uid)}: ни одного лота не загружено (reason={reason})");
             return;
         }
 
-        Sawmill.Info(
+        _sawmill.Info(
             $"[NcStore] {ToPrettyString(uid)}: загружено {total} лотов. " +
             $"BuyPresets=[{string.Join(", ", comp.BuyPresets)}], " +
             $"SellPresets=[{string.Join(", ", comp.SellPresets)}], reason={reason}");
@@ -108,7 +109,7 @@ public sealed class StoreSystemStructuredLoader : EntitySystem
     {
         if (!_prototypes.TryIndex<StorePresetStructuredPrototype>(presetId, out var preset))
         {
-            Sawmill.Error($"[NcStore] Пресет '{presetId}' не найден");
+            _sawmill.Error($"[NcStore] Пресет '{presetId}' не найден");
             return 0;
         }
 
@@ -121,7 +122,7 @@ public sealed class StoreSystemStructuredLoader : EntitySystem
         {
             if (!_prototypes.TryIndex<StoreCategoryStructuredPrototype>(categoryId, out var categoryProto))
             {
-                Sawmill.Error($"[NcStore] Категория '{categoryId}' не найдена (preset='{presetId}')");
+                _sawmill.Error($"[NcStore] Категория '{categoryId}' не найдена (preset='{presetId}')");
                 continue;
             }
 

@@ -8,13 +8,19 @@
   },
   "states": [
     {
-      "name": "closed"
+      "name": "1_Начало"
     },
     {
-      "name": "open"
+      "name": "2"
     },
     {
-      "name": "close"
+      "name": "3"
+    },
+    {
+      "name": "4"
+    },
+    {
+      "name": "5_Конец"
     }
   ]
 }

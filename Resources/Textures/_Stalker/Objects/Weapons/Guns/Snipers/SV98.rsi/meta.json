@@ -24,6 +24,12 @@
     },
     {
       "name": "muzzle"
+    },
+    {
+      "name": "base-bipod"
+    },
+    {
+      "name": "base-bipod-open"
     }
   ]
 }

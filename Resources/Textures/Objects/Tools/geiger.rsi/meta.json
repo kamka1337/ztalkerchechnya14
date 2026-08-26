@@ -38,6 +38,9 @@
     {
       "name": "inhand-right",
       "directions": 4
+    },
+    {
+      "name": "geiger-on-low"
     }
   ]
 }

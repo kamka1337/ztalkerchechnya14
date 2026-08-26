@@ -26,10 +26,14 @@
       "directions": 4
     },
     {
-      "name": "icon_straight_windowed"   
+      "name": "icon_straight_windowed"
     },
     {
       "name": "straight_desktop",
+      "directions": 4
+    },
+    {
+      "name": "straight_dekstop",
       "directions": 4
     }
   ]

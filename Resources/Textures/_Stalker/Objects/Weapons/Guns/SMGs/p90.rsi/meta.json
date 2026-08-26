@@ -44,6 +44,10 @@
     },
     {
       "name": "mag-0"
+    },
+    {
+      "name": "equipped-SUITSTORAGE",
+      "directions": 4
     }
   ]
 }

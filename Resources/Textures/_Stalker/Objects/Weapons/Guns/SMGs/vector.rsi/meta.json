@@ -32,8 +32,8 @@
       "directions": 4
     },
     {
-    "name": "equipped-SUITSTORAGE",
-    "directions": 4
+      "name": "equipped-SUITSTORAGE",
+      "directions": 4
     },
     {
       "name": "icon"
@@ -48,6 +48,9 @@
     },
     {
       "name": "mag-0"
+    },
+    {
+      "name": "sight"
     }
   ]
 }

@@ -24,6 +24,15 @@
     },
     {
       "name": "muzzle"
+    },
+    {
+      "name": "base-carryhandle"
+    },
+    {
+      "name": "base-grip"
+    },
+    {
+      "name": "M203"
     }
   ]
 }

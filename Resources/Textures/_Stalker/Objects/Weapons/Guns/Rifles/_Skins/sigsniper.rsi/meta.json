@@ -48,6 +48,9 @@
     {
       "name": "wielded-inhand-right",
       "directions": 4
+    },
+    {
+      "name": "baseNoSight"
     }
   ]
 }

@@ -39,8 +39,15 @@
     {
       "name": "mag-0"
     },
-	{
+    {
       "name": "base-scope"
+    },
+    {
+      "name": "muzzle"
+    },
+    {
+      "name": "equipped-SUITSTORAGE",
+      "directions": 4
     }
   ]
 }

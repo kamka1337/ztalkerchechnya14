@@ -20,6 +20,10 @@
     },
     {
       "name": "icon-flash"
+    },
+    {
+      "name": "equipped-HELMET",
+      "directions": 4
     }
   ]
 }

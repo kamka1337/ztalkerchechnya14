@@ -3,12 +3,18 @@
   "license": "CC-BY-SA-3.0",
   "copyright": "Unknown",
   "size": {
-    "x": 32,
-    "y": 32
+    "x": 96,
+    "y": 96
   },
   "states": [
     {
-      "name": "icon"
+      "name": "green1"
+    },
+    {
+      "name": "green2"
+    },
+    {
+      "name": "green3"
     }
   ]
 }

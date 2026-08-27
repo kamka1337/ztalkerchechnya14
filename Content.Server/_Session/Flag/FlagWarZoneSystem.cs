@@ -22,6 +22,8 @@ public sealed class FlagWarZoneSystem : EntitySystem
 
 
     private const float UpdateInterval = 1f;
+    private const string FreedomBaseInitialOwner = "CRIBand";
+    private const string DutyBaseInitialOwner = "RFBand";
     private float _timer;
     private readonly Dictionary<EntityUid, float> _prevProgress = new();
 
@@ -61,17 +63,32 @@ public sealed class FlagWarZoneSystem : EntitySystem
             var freedomZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "FreedomBase");
             var dutyZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "DutyBase");
 
-            if (freedomZone != default && freedomZone.Component.DefendingBandProtoId != "STFreedomBand")
+            if (freedomZone != default && BaseWasCaptured(freedomZone.Component, FreedomBaseInitialOwner))
             {
                 level = 4;
                 _roundEndSystem.EndRound();
             }
-            else if (dutyZone != default && dutyZone.Component.DefendingBandProtoId != "STDolgBand")
+            else if (dutyZone != default && BaseWasCaptured(dutyZone.Component, DutyBaseInitialOwner))
             {
                 level = 4;
                 _roundEndSystem.EndRound();
             }
             _appearance.SetData(uid, WarZoneFlagVisuals.Level, level, app);
         }
+    }
+
+    private static bool BaseWasCaptured(WarZoneComponent zone, string initialOwner)
+    {
+        if (!zone.InitialLoadComplete)
+            return false;
+
+        // A missing database record means the base is neutral/uninitialized, not captured.
+        if (string.IsNullOrEmpty(zone.DefendingBandProtoId) &&
+            string.IsNullOrEmpty(zone.DefendingFactionProtoId))
+        {
+            return false;
+        }
+
+        return zone.DefendingBandProtoId != initialOwner;
     }
 }

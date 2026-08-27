@@ -76,6 +76,14 @@ public sealed class DoorSystem : SharedDoorSystem
                 },
             },
         };
+
+        // AirlockSystem replaces this with the proper light animation on startup.
+        // Keep a no-op fallback for doors without AirlockComponent and for appearance
+        // updates that arrive before the airlock component has finished starting.
+        comp.DenyingAnimation = new Animation
+        {
+            Length = comp.DenyDuration,
+        };
     }
 
     private void OnAppearanceChange(Entity<DoorComponent> entity, ref AppearanceChangeEvent args)
@@ -134,7 +142,8 @@ public sealed class DoorSystem : SharedDoorSystem
 
                 return;
             case DoorState.Denying:
-                _animationSystem.Play(entity, (Animation)entity.Comp.DenyingAnimation, DoorComponent.AnimationKey);
+                if (entity.Comp.DenyingAnimation is Animation denyingAnimation)
+                    _animationSystem.Play(entity, denyingAnimation, DoorComponent.AnimationKey);
 
                 return;
             case DoorState.Emagging:

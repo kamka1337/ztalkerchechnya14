@@ -116,6 +116,13 @@ namespace Content.Client.MainMenu
             try
             {
                 ParseAddress(address, out var ip, out var port);
+
+                // Connecting to localhost resolves both IPv6 and IPv4. The pinned
+                // engine can race the two loopback attempts and abort the handshake,
+                // so use the IPv4 loopback explicitly for local direct connections.
+                if (ip.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+                    ip = "127.0.0.1";
+
                 _client.ConnectToServer(ip, port);
             }
             catch (ArgumentException e)

@@ -43,9 +43,14 @@ public sealed class UserDbDataManager : IPostInjectInit
 
     public void ClientDisconnected(ICommonSession session)
     {
-        _users.Remove(session.UserId, out var data);
-        if (data == null)
-            throw new InvalidOperationException("Did not have cached data in ClientDisconnect!");
+        if (!_users.Remove(session.UserId, out var data))
+        {
+            // A connection can close before PlayerStatusChanged reaches ClientConnected,
+            // for example when the network/serializer handshake fails. There is no user
+            // data task to cancel in that case.
+            _sawmill.Debug($"Ignoring disconnect for user without cached data: {session}");
+            return;
+        }
 
         data.Cancel.Cancel();
         data.Cancel.Dispose();

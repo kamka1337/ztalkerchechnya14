@@ -304,7 +304,7 @@
 - type: stWarZone
   id: FreedomBase
   captureCooldownHours: 0
-  captureTime: 180
+  captureTime: 10
   requirements:
   - !type:ZoneOwnershipRequirenment
     requiredZones: []
@@ -322,7 +322,7 @@
     defendingBandProtoId: CRIBand
   - type: WarZoneFlag
   - type: Sprite
-    sprite: _Session/Objects/Decoration/Flags/freedom.rsi
+    sprite: _Session/Objects/Decoration/Flags/cri.rsi
     layers:
     - state: flag3
   - type: Appearance

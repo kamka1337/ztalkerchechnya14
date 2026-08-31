@@ -46,8 +46,8 @@ public sealed class FlagWarZoneSystem : EntitySystem
             if (_prevProgress.TryGetValue(uid, out var prev) && prev >= 0.8f && progress <= 0f)
             {
                 var audioPath = (string)wz.ZoneProto == "RFBase"
-                    ? "/Audio/_Session/RFpobeda.ogg"
-                    : "/Audio/_Session/CRIpobeda.ogg";
+                    ? "/Audio/_Session/CRIpobeda.ogg"
+                    : "/Audio/_Session/RFpobeda.ogg";
                 _audio.PlayGlobal(audioPath, Filter.Broadcast(), true);
             }
             _prevProgress[uid] = progress;
@@ -60,8 +60,8 @@ public sealed class FlagWarZoneSystem : EntitySystem
 
             var zonesList = _warSys.GetAllWarZones().ToList();
 
-            var freedomZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "CRIBase");
-            var dutyZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "RFBase");
+            var freedomZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "FreedomBase");
+            var dutyZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "DutyBase");
 
             if (freedomZone != default && BaseWasCaptured(freedomZone.Component, FreedomBaseInitialOwner))
             {

@@ -3,6 +3,8 @@ using Content.Client.Animations;
 using Content.Client.Gameplay;
 using Content.Client.Items;
 using Content.Client.Weapons.Ranged.Components;
+using Content.Client.UserInterface.Systems.Actions;
+using Robust.Client.UserInterface;
 using Content.Shared.Camera;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
@@ -31,6 +33,7 @@ namespace Content.Client.Weapons.Ranged.Systems;
 
 public sealed partial class GunSystem : SharedGunSystem
 {
+    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [Dependency] private readonly IEyeManager _eyeManager = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
@@ -169,6 +172,14 @@ public sealed partial class GunSystem : SharedGunSystem
 
         if (!TryGetGun(entity, out var gunUid, out var gun))
         {
+            return;
+        }
+
+        var actionUi = _uiManager.GetUIController<ActionUIController>();
+        if (actionUi.SelectingTargetFor != null || Timing.CurTime < actionUi.LastTargetedActionTime + TimeSpan.FromSeconds(0.25f))
+        {
+            if (gun.ShotCounter != 0)
+                RaisePredictiveEvent(new RequestStopShootEvent { Gun = GetNetEntity(gunUid) });
             return;
         }
 

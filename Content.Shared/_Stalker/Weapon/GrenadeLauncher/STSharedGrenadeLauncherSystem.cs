@@ -1,9 +1,6 @@
 using Content.Shared.Actions;
 using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Hands;
 using Content.Shared.Weapons.Ranged.Components;
-using Content.Shared.Weapons.Ranged.Events;
-using Content.Shared.Wieldable;
 using Robust.Shared.Containers;
 
 namespace Content.Shared._Stalker.Weapon.GrenadeLauncher;
@@ -23,13 +20,6 @@ public abstract class STSharedGrenadeLauncherSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<GunComponent, GetItemActionsEvent>(OnGetActions);
-
-        // Cancel the host gun's normal fire if aiming mode was used.
-        SubscribeLocalEvent<STGrenadeLauncherAimingComponent, ShotAttemptedEvent>(OnShotAttempted);
-        SubscribeLocalEvent<STGrenadeLauncherAimingComponent, GotUnequippedHandEvent>(OnUnequippedHand);
-        SubscribeLocalEvent<STGrenadeLauncherAimingComponent, HandDeselectedEvent>(OnHandDeselected);
-        SubscribeLocalEvent<STGrenadeLauncherAimingComponent, EntRemovedFromContainerMessage>(OnRemovedFromContainer);
-        SubscribeLocalEvent<STGrenadeLauncherAimingComponent, ItemUnwieldedEvent>(OnItemUnwielded);
     }
 
     private void OnGetActions(Entity<GunComponent> gun, ref GetItemActionsEvent args)
@@ -41,30 +31,5 @@ public abstract class STSharedGrenadeLauncherSystem : EntitySystem
             return;
 
         args.AddAction(ref launcherComp.FireActionEntity, launcherComp.FireAction);
-    }
-
-    protected virtual void OnShotAttempted(Entity<STGrenadeLauncherAimingComponent> ent, ref ShotAttemptedEvent args)
-    {
-        args.Cancel();
-    }
-
-    private void OnUnequippedHand(Entity<STGrenadeLauncherAimingComponent> ent, ref GotUnequippedHandEvent args)
-    {
-        RemCompDeferred<STGrenadeLauncherAimingComponent>(ent);
-    }
-
-    private void OnHandDeselected(Entity<STGrenadeLauncherAimingComponent> ent, ref HandDeselectedEvent args)
-    {
-        RemCompDeferred<STGrenadeLauncherAimingComponent>(ent);
-    }
-
-    private void OnRemovedFromContainer(Entity<STGrenadeLauncherAimingComponent> ent, ref EntRemovedFromContainerMessage args)
-    {
-        RemCompDeferred<STGrenadeLauncherAimingComponent>(ent);
-    }
-
-    private void OnItemUnwielded(Entity<STGrenadeLauncherAimingComponent> ent, ref ItemUnwieldedEvent args)
-    {
-        RemCompDeferred<STGrenadeLauncherAimingComponent>(ent);
     }
 }

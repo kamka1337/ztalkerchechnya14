@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Server.Weapons.Ranged.Systems;
@@ -17,6 +19,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Stalker.Weapon.GrenadeLauncher;
 
@@ -34,14 +37,18 @@ public sealed class STGrenadeLauncherSystem : STSharedGrenadeLauncherSystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly TagSystem _tagSystem = default!;
+    [Dependency] private readonly IGameTiming _gameTiming = default!;
 
     private static readonly ProtoId<TagPrototype> VogTag = "Vog25grenade";
+    private readonly Dictionary<EntityUid, TimeSpan> _blockedShootUntil = new();
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<GunComponent, STFireGP25ActionEvent>(OnFireAction);
+        SubscribeLocalEvent<GunComponent, ShotAttemptedEvent>(OnGunShotAttempted);
+        
         SubscribeLocalEvent<GetVerbsEvent<AlternativeVerb>>(OnGetAlternativeVerbs);
         SubscribeLocalEvent<GetVerbsEvent<Verb>>(OnGetVerbs);
         SubscribeLocalEvent<GunComponent, InteractUsingEvent>(OnInteractUsing);
@@ -55,30 +62,58 @@ public sealed class STGrenadeLauncherSystem : STSharedGrenadeLauncherSystem
         if (args.Handled)
             return;
 
+        // Block the host gun from firing regular bullets on this click/tick
+        var blockUntil = _gameTiming.CurTime + TimeSpan.FromSeconds(0.75f);
+        _blockedShootUntil[gun.Owner] = blockUntil;
+        _blockedShootUntil[args.Performer] = blockUntil;
+
         if (TryComp<WieldableComponent>(gun, out var wieldable) && !wieldable.Wielded)
         {
             _popup.PopupEntity(Loc.GetString("st-grenade-launcher-must-wield"), gun, args.Performer);
+            args.Handled = true;
             return;
         }
 
         if (HasComp<PacifiedComponent>(args.Performer))
         {
             _popup.PopupEntity(Loc.GetString("pacified-cannot-fire-gun", ("entity", gun)), gun, args.Performer);
+            args.Handled = true;
             return;
         }
 
         if (!TryGetAttachedLauncher(gun, out var launcher, out var launcherComp))
+        {
+            args.Handled = true;
             return;
+        }
 
         if (!_itemSlots.TryGetSlot(launcher, launcherComp.ChamberSlotId, out var slot) || slot.Item is not { } grenadeEnt)
         {
             _popup.PopupEntity(Loc.GetString("st-grenade-launcher-empty"), gun, args.Performer);
+            args.Handled = true;
             return;
         }
 
         FireGrenade(gun, launcher, launcherComp, grenadeEnt, args.Target, args.Performer);
         args.Handled = true;
     }
+
+    private void OnGunShotAttempted(Entity<GunComponent> gun, ref ShotAttemptedEvent args)
+    {
+        if (_blockedShootUntil.TryGetValue(gun.Owner, out var until) && _gameTiming.CurTime < until)
+        {
+            args.Cancel();
+            return;
+        }
+
+        if (_blockedShootUntil.TryGetValue(args.User, out var userUntil) && _gameTiming.CurTime < userUntil)
+        {
+            args.Cancel();
+            return;
+        }
+    }
+
+
 
     private void OnGunContainerRemoved(Entity<GunComponent> gun, ref EntRemovedFromContainerMessage args)
     {
@@ -200,51 +235,6 @@ public sealed class STGrenadeLauncherSystem : STSharedGrenadeLauncherSystem
     }
 
     // ─── Fire ─────────────────────────────────────────────────────────────────
-
-    protected override void OnShotAttempted(Entity<STGrenadeLauncherAimingComponent> ent, ref ShotAttemptedEvent args)
-    {
-        base.OnShotAttempted(ent, ref args);
-
-        var gun = ent.Owner;
-        var aiming = ent.Comp;
-
-        if (TryComp<WieldableComponent>(gun, out var wieldable) && !wieldable.Wielded)
-        {
-            _popup.PopupEntity(Loc.GetString("st-grenade-launcher-must-wield"), gun, args.User);
-            RemComp<STGrenadeLauncherAimingComponent>(gun);
-            return;
-        }
-
-        if (HasComp<PacifiedComponent>(args.User))
-        {
-            _popup.PopupEntity(Loc.GetString("pacified-cannot-fire-gun", ("entity", gun)), gun, args.User);
-            RemComp<STGrenadeLauncherAimingComponent>(gun);
-            return;
-        }
-
-        if (aiming.LauncherEntity is not { } launcherEnt || !TryComp<STGrenadeLauncherModuleComponent>(launcherEnt, out var launcherComp))
-        {
-            RemComp<STGrenadeLauncherAimingComponent>(gun);
-            return;
-        }
-
-        var targetCoords = args.Used.Comp.ShootCoordinates;
-        if (targetCoords == null)
-            return;
-
-        if (!_itemSlots.TryGetSlot(launcherEnt, launcherComp.ChamberSlotId, out var slot) || slot.Item is not { } grenadeEnt)
-        {
-            _popup.PopupEntity(
-                Loc.GetString("st-grenade-launcher-empty"),
-                gun,
-                aiming.User ?? args.User);
-            RemComp<STGrenadeLauncherAimingComponent>(gun);
-            return;
-        }
-
-        FireGrenade(gun, launcherEnt, launcherComp, grenadeEnt, targetCoords.Value, args.User);
-        RemComp<STGrenadeLauncherAimingComponent>(gun);
-    }
 
     private void FireGrenade(
         EntityUid gun,

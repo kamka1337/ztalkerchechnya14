@@ -65,7 +65,13 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
     /// <summary>
     /// Action slot we are currently selecting a target for.
     /// </summary>
-    public EntityUid? SelectingTargetFor { get; private set; }
+        public EntityUid? SelectingTargetFor { get; private set; }
+
+    /// <summary>
+    /// The last game time when a targeted action was clicked or used.
+    /// Can be checked to prevent weapons from firing regular shots on the same click.
+    /// </summary>
+    public TimeSpan LastTargetedActionTime { get; private set; }
 
     public ActionUIController()
     {
@@ -159,6 +165,7 @@ public sealed class ActionUIController : UIController, IOnStateChanged<GameplayS
     {
         if (!_timing.IsFirstTimePredicted || _actionsSystem == null || SelectingTargetFor is not { } actionId)
             return false;
+        LastTargetedActionTime = _timing.CurTime;
 
         if (_playerManager.LocalEntity is not { } user)
             return false;

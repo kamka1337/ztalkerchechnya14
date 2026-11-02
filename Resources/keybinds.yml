@@ -1,4 +1,4 @@
-﻿version: 1 # Not used right now, whatever.
+version: 1 # Not used right now, whatever.
 binds:
 - function: UIClick
   type: State
@@ -75,16 +75,29 @@ binds:
   key: NumpadNum9
 - function: CameraReset
   type: State
+  key: Home
+# Stalker Limb Selection
+- function: SelectLimbHead
+  type: State
   key: NumpadNum8
-- function: ZoomOut
-  type: State
-  key: NumpadNum4
-- function: ZoomIn
-  type: State
-  key: NumpadNum6
-- function: ResetZoom
+- function: SelectLimbChest
   type: State
   key: NumpadNum5
+- function: SelectLimbAbdomen
+  type: State
+  key: NumpadNum2
+- function: SelectLimbLeftArm
+  type: State
+  key: NumpadNum4
+- function: SelectLimbRightArm
+  type: State
+  key: NumpadNum6
+- function: SelectLimbLeftLeg
+  type: State
+  key: NumpadNum1
+- function: SelectLimbRightLeg
+  type: State
+  key: NumpadNum3
 # Misc
 - function: ShowEscapeMenu
   type: State

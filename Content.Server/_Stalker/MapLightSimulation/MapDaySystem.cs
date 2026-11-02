@@ -1,4 +1,4 @@
-﻿using Robust.Shared.Map;
+using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
 
@@ -9,22 +9,29 @@ public sealed class MapDaySystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
 
     private bool _enabled = true;
+    private TimeSpan _nextUpdate;
+    private static readonly TimeSpan UpdateInterval = TimeSpan.FromSeconds(1.5f);
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
+        if (!_enabled || _timing.CurTime < _nextUpdate)
+            return;
+
+        _nextUpdate = _timing.CurTime + UpdateInterval;
+
         var query = EntityQueryEnumerator<MapDayComponent, MapLightComponent>();
         while (query.MoveNext(out var uid, out var day, out var light))
         {
-            if (!_enabled)
-                return;
-
             var time = _timing.CurTime.TotalSeconds % day.DayTime;
             var amount = time / day.DayTime;
-            var color = InterpolateColor(day.Colors, (float)amount);
-            light.AmbientLightColor = color;
-            Dirty(uid, light);
+            var color = day.Colors[0];
+            if (light.AmbientLightColor != color)
+            {
+                light.AmbientLightColor = color;
+                Dirty(uid, light);
+            }
         }
     }
 

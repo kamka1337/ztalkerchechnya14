@@ -14,9 +14,6 @@ public sealed class LightCycleSystem : SharedLightCycleSystem
     {
         base.OnCycleMapInit(ent, ref args);
 
-        if (ent.Comp.InitialOffset)
-        {
-            SetOffset(ent, _random.Next(ent.Comp.Duration));
-        }
+        SetOffset(ent, TimeSpan.FromSeconds(ent.Comp.Duration.TotalSeconds * 0.5));
     }
 }

@@ -1,4 +1,12 @@
-ui-options-header-stalker = Stalker 14
+ui-options-header-stalker = Chechnya 14
 ui-options-function-smart-equip-outer-clothing = Smart equip outer clothing
 ui-options-function-lay = Lie down
 ui-options-function-st-quick-equip-bolt = Quick equip bolt
+ui-options-header-limbs = Limb Selection (Doll)
+ui-options-function-select-limb-head = Select head
+ui-options-function-select-limb-chest = Select chest
+ui-options-function-select-limb-abdomen = Select abdomen
+ui-options-function-select-limb-left-arm = Select left arm
+ui-options-function-select-limb-right-arm = Select right arm
+ui-options-function-select-limb-left-leg = Select left leg
+ui-options-function-select-limb-right-leg = Select right leg

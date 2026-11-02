@@ -201,7 +201,7 @@ public sealed partial class GunSystem : SharedGunSystem
         if (_state.CurrentState is GameplayStateBase screen)
             target = GetNetEntity(screen.GetClickedEntity(mousePos));
 
-        Log.Debug($"Sending shoot request tick {Timing.CurTick} / {Timing.CurTime}");
+// Log.Debug($"Sending shoot request tick {Timing.CurTick} / {Timing.CurTime}");
 
         RaisePredictiveEvent(new RequestShootEvent
         {
@@ -331,9 +331,9 @@ public sealed partial class GunSystem : SharedGunSystem
             track.Offset = Vector2.UnitX / 2f;
         }
 
-        var lifetime = 0.4f;
+        var lifetime = 0.05f;
 
-        if (TryComp<TimedDespawnComponent>(gunUid, out var despawn))
+        if (TryComp<TimedDespawnComponent>(ent, out var despawn))
         {
             lifetime = despawn.Lifetime;
         }
@@ -358,52 +358,11 @@ public sealed partial class GunSystem : SharedGunSystem
         };
 
         _animPlayer.Play(ent, anim, "muzzle-flash");
-        if (!TryComp(gunUid, out PointLightComponent? light))
+
+        if (TryComp<PointLightComponent>(gunUid, out var light))
         {
-            light = Factory.GetComponent<PointLightComponent>();
-            light.NetSyncEnabled = false;
-            AddComp(gunUid, light);
+            RemComp(gunUid, light);
         }
-
-        Lights.SetEnabled(gunUid, true, light);
-        Lights.SetRadius(gunUid, 2f, light);
-        Lights.SetColor(gunUid, Color.FromHex("#cc8e2b"), light);
-        Lights.SetEnergy(gunUid, 5f, light);
-
-        var animTwo = new Animation()
-        {
-            Length = TimeSpan.FromSeconds(lifetime),
-            AnimationTracks =
-            {
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(PointLightComponent),
-                    Property = nameof(PointLightComponent.Energy),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(5f, 0),
-                        new AnimationTrackProperty.KeyFrame(0f, lifetime)
-                    }
-                },
-                new AnimationTrackComponentProperty
-                {
-                    ComponentType = typeof(PointLightComponent),
-                    Property = nameof(PointLightComponent.AnimatedEnable),
-                    InterpolationMode = AnimationInterpolationMode.Linear,
-                    KeyFrames =
-                    {
-                        new AnimationTrackProperty.KeyFrame(true, 0),
-                        new AnimationTrackProperty.KeyFrame(false, lifetime)
-                    }
-                }
-            }
-        };
-
-        var uidPlayer = EnsureComp<AnimationPlayerComponent>(gunUid);
-
-        _animPlayer.Stop(gunUid, uidPlayer, "muzzle-flash-light");
-        _animPlayer.Play((gunUid, uidPlayer), animTwo, "muzzle-flash-light");
     }
 
     // TODO: Move RangedDamageSoundComponent to shared so this can be predicted.

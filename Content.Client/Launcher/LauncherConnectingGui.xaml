@@ -1,9 +1,11 @@
 <Control xmlns="https://spacestation14.io"
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-         xmlns:parallax="clr-namespace:Content.Client.Parallax"
          xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls">
-    <parallax:ParallaxControl SpeedX="20"/>
+    <!-- Connecting Screen Background -->
+    <TextureRect Access="Public" VerticalExpand="True" HorizontalExpand="True"
+                 TexturePath="/Textures/_Stalker/Logo/zagruzzka.png"
+                 Stretch="KeepAspectCovered" />
     <Control HorizontalAlignment="Center" VerticalAlignment="Center">
         <PanelContainer StyleClasses="BackgroundPanel" />
         <BoxContainer Orientation="Vertical" MinSize="300 200">

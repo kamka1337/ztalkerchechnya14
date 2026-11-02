@@ -256,6 +256,11 @@ namespace Content.Server.GameTicking
                 return;
             }
 
+            if (_chechnyaCharacters.IsChechnyaJob(jobId))
+            {
+                character = _chechnyaCharacters.GenerateFactionProfile(jobId, character);
+            }
+
             DoSpawn(player, character, station, jobId, silent, out var mob, out var jobPrototype, out var jobName);
 
             // stalker-changes-start

@@ -137,5 +137,14 @@ namespace Content.Shared.Input
         public static readonly BoundKeyFunction MappingRemoveDecal = "MappingRemoveDecal";
         public static readonly BoundKeyFunction MappingCancelEraseDecal = "MappingCancelEraseDecal";
         public static readonly BoundKeyFunction MappingOpenContextMenu = "MappingOpenContextMenu";
+
+        // Stalker Limb Selection
+        public static readonly BoundKeyFunction SelectLimbHead = "SelectLimbHead";
+        public static readonly BoundKeyFunction SelectLimbChest = "SelectLimbChest";
+        public static readonly BoundKeyFunction SelectLimbAbdomen = "SelectLimbAbdomen";
+        public static readonly BoundKeyFunction SelectLimbLeftArm = "SelectLimbLeftArm";
+        public static readonly BoundKeyFunction SelectLimbRightArm = "SelectLimbRightArm";
+        public static readonly BoundKeyFunction SelectLimbLeftLeg = "SelectLimbLeftLeg";
+        public static readonly BoundKeyFunction SelectLimbRightLeg = "SelectLimbRightLeg";
     }
 }

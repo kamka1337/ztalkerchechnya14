@@ -1,0 +1,23 @@
+- type: entity
+  id: STActionFireGP25
+  name: st-action-fire-gp25-name
+  description: st-action-fire-gp25-desc
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    icon:
+      sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Explosives/vog25.rsi
+      state: vog25
+    iconOn:
+      sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Explosives/vog25.rsi
+      state: vog25
+  - type: TargetAction
+    checkCanAccess: false
+    range: 0
+    repeat: false
+    deselectOnMiss: false
+  - type: WorldTargetAction
+    rotateOnUse: true
+    event: !type:STFireGP25ActionEvent

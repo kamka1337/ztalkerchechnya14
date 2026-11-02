@@ -2,12 +2,12 @@
 hostname = "☢️ S.T.A.L.K.E.R. ☢️ Debug."
 desc = "In devlopment."
 
-map = "STDev"
+# map = "STDev"
 map_pool = "STDefaultMapPool"
 
 map_rotation = false
 
-lobbyenabled = false
+lobbyenabled = true
 
 maxplayers = 80
 soft_max_players = 60

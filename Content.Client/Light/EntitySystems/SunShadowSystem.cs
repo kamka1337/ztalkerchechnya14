@@ -35,7 +35,8 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
                 .Subtract(pausedTime)
                 .TotalSeconds % cycle.Duration.TotalSeconds);
 
-            var (direction, alpha) = GetShadow((uid, cycle), time);
+            var peakTime = (float) cycle.Duration.TotalSeconds * 0.5f;
+            var (direction, alpha) = GetShadow((uid, cycle), peakTime);
             shadow.Direction = direction;
             shadow.Alpha = alpha;
         }

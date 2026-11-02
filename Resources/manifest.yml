@@ -1,9 +1,9 @@
-﻿# stalker-changes-start
+# stalker-changes-start
 # defaultWindowTitle: Space Station 14
 # windowIconSet: /Textures/Logo/icon
 # splashLogo: /Textures/Logo/logo.png
 
-defaultWindowTitle: Stalker 14
+defaultWindowTitle: chechnya14
 windowIconSet: /Textures/_Stalker/Logo/icon-stalker # Stalker-Theme
 splashLogo: /Textures/_Stalker/Logo/zagruzzka.png # Stalker-Theme
 # stalker-changes-end

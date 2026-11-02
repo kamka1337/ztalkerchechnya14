@@ -11,6 +11,8 @@
   id: STWeaponModuleRifleSilencerNato
 - type: Tag
   id: STWeaponModuleRifleSilencerRu
+- type: Tag
+  id: STWeaponModuleLauncherRu
 
 # Shotguns
 - type: Tag

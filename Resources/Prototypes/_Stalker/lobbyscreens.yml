@@ -1,28 +1,27 @@
-﻿- type: lobbyBackground
+- type: lobbyBackground
   id: stalker_bg_1
-  background: /Textures/_Stalker/LobbyScreens/chechnya.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_2
-  background: /Textures/_Stalker/LobbyScreens/chechnya2.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_3
-  background: /Textures/_Stalker/LobbyScreens/chechnya3.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_4
-  background: /Textures/_Stalker/LobbyScreens/chechnya4.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_5
-  background: /Textures/_Stalker/LobbyScreens/chechnya5.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_6
-  background: /Textures/_Stalker/LobbyScreens/chechnya6.png
+  background: /Textures/_Stalker/Logo/zagruzzka.png
 
 - type: lobbyBackground
   id: stalker_bg_7
-  background: /Textures/_Stalker/LobbyScreens/notchechnya.png
-
+  background: /Textures/_Stalker/Logo/zagruzzka.png

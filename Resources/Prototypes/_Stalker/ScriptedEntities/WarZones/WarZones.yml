@@ -256,6 +256,22 @@
 
 #SESSION-STALKER START
 - type: stWarZone
+  id: RFBASE
+  captureTime: 180
+  captureCooldownHours: 0
+  requirements:
+  - !type:ZoneOwnershipRequirenment
+    requiredZones: []
+
+- type: stWarZone
+  id: CRIBASE
+  captureCooldownHours: 0
+  captureTime: 180
+  requirements:
+  - !type:ZoneOwnershipRequirenment
+    requiredZones: []
+
+- type: stWarZone
   id: DutyBase
   captureTime: 180
   captureCooldownHours: 0
@@ -271,8 +287,8 @@
   - type: Transform
     anchored: true
   - type: WarZone
-    proto: DutyBase
-    portalName: RFBase
+    proto: RFBASE
+    portalName: RFBASE
     defendingBandProtoId: RFBand
   - type: WarZoneFlag
   - type: Sprite
@@ -317,8 +333,8 @@
   - type: Transform
     anchored: true
   - type: WarZone
-    proto: FreedomBase
-    portalName: CRIBase
+    proto: CRIBASE
+    portalName: CRIBASE
     defendingBandProtoId: CRIBand
   - type: WarZoneFlag
   - type: Sprite

@@ -784,6 +784,18 @@ public sealed partial class WarZoneSystem : EntitySystem
         var mapCoords = _transformSystem.GetMapCoordinates(zoneUid);
         var filter = Filter.Empty().AddInRange(mapCoords, ChatSystem.VoiceRange);
         _chatManager.ChatMessageToManyFiltered(filter, ChatChannel.Emotes, message, message, zoneUid, false, true, colorOverride: null);
+
+        var isRfBase = wzComp.ZoneProto == "DutyBase" || wzComp.ZoneProto == "RFBASE" || wzComp.PortalName == "RFBase" || wzComp.PortalName == "RFBASE" || wzComp.DefendingBandProtoId == "RFBand";
+        var isCriBase = wzComp.ZoneProto == "FreedomBase" || wzComp.ZoneProto == "CRIBASE" || wzComp.PortalName == "CRIBase" || wzComp.PortalName == "CRIBASE" || wzComp.DefendingBandProtoId == "CRIBand";
+
+        if (isRfBase && (wzComp.CurrentAttackerBandProtoId == "CRIBand" || attackerName.Contains("CRI", StringComparison.OrdinalIgnoreCase) || attackerName.Contains("\u0427\u0420\u0418", StringComparison.OrdinalIgnoreCase)))
+        {
+            _chatManager.DispatchServerAnnouncement("\u0412\u0421 \u0427\u0420\u0418 \u043D\u0430\u0447\u0430\u043B\u0430 \u0437\u0430\u0445\u0432\u0430\u0442 \u0431\u0430\u0437\u044B \u0412\u0421 \u0420\u0424", Color.Red);
+        }
+        else if (isCriBase && (wzComp.CurrentAttackerBandProtoId == "RFBand" || attackerName.Contains("RF", StringComparison.OrdinalIgnoreCase) || attackerName.Contains("\u0420\u0424", StringComparison.OrdinalIgnoreCase)))
+        {
+            _chatManager.DispatchServerAnnouncement("\u0412\u0421 \u0420\u0424 \u043D\u0430\u0447\u0430\u043B\u0430 \u0437\u0430\u0445\u0432\u0430\u0442 \u0431\u0430\u0437\u044B \u0412\u0421 \u0427\u0420\u0418", Color.Red);
+        }
     }
 
 

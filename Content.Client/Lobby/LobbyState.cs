@@ -63,8 +63,9 @@ namespace Content.Client.Lobby
                 ? Loc.GetString("ui-lobby-title", ("serverName", serverName))
                 : lobbyNameCvar;
 
-            var width = _cfg.GetCVar(CCVars.ServerLobbyRightPanelWidth);
+            var width = Math.Min(480, _cfg.GetCVar(CCVars.ServerLobbyRightPanelWidth));
             Lobby.RightSide.SetWidth = width;
+            Lobby.UpdateRightPanelLayout(width);
 
             UpdateLobbyUi();
 
@@ -180,7 +181,7 @@ namespace Content.Client.Lobby
         {
             if (_gameTicker.IsGameStarted)
             {
-                Lobby!.ReadyButton.Text = Loc.GetString("lobby-state-ready-button-join-state");
+                Lobby!.ReadyButton.Text = Loc.GetString("lobby-state-play-button-join");
                 Lobby!.ReadyButton.ToggleMode = false;
                 Lobby!.ReadyButton.Pressed = false;
                 Lobby!.ObserveButton.Disabled = false;
@@ -189,7 +190,7 @@ namespace Content.Client.Lobby
             {
                 Lobby!.StartTime.Text = string.Empty;
                 Lobby!.ReadyButton.Pressed = _gameTicker.AreWeReady;
-                Lobby!.ReadyButton.Text = Loc.GetString(Lobby!.ReadyButton.Pressed ? "lobby-state-player-status-ready": "lobby-state-player-status-not-ready");
+                Lobby!.ReadyButton.Text = Loc.GetString(Lobby!.ReadyButton.Pressed ? "lobby-state-play-button-ready": "lobby-state-play-button-not-ready");
                 Lobby!.ReadyButton.ToggleMode = true;
                 Lobby!.ReadyButton.Disabled = false;
                 Lobby!.ObserveButton.Disabled = true;
@@ -264,7 +265,7 @@ namespace Content.Client.Lobby
             }
             else
             {
-                Lobby!.Background.Texture = null;
+                Lobby!.Background.Texture = _resourceCache.GetResource<TextureResource>("/Textures/_Stalker/Logo/zagruzzka.png");
 
                 Lobby!.LobbyBackground.SetMarkup(Loc.GetString("lobby-state-background-no-background-text"));
             }

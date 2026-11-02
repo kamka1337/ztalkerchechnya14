@@ -57,6 +57,10 @@ public static class StyleClass
     public const string ButtonSquare = "ButtonSquare";
     public const string ButtonSmall = "ButtonSmall";
     public const string ButtonBig = "ButtonBig";
+    public const string LobbyMenuButton = "LobbyMenuButton";
+    public const string LobbyPlayButton = "LobbyPlayButton";
+    public const string LobbyButtonCard = "LobbyButtonCard";
+    public const string LobbyChatPanel = "LobbyChatPanel";
 
     public const string CrossButtonRed = "CrossButtonRed";
     public const string RefreshButton = "RefreshButton";

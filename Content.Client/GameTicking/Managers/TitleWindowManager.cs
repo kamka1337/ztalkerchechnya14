@@ -1,4 +1,4 @@
-﻿using Content.Shared.CCVar;
+using Content.Shared.CCVar;
 using Robust.Client;
 using Robust.Client.Graphics;
 using Robust.Shared;
@@ -23,7 +23,7 @@ public sealed class TitleWindowManager
 
     private void OnHostnameChange()
     {
-        var defaultWindowTitle = _gameController.GameTitle();
+        var defaultWindowTitle = "chechnya14";
 
         // When the client starts connecting, it will be using either the default hostname, or whatever hostname
         // is set in its config file (aka the last server they connected to) until it receives the latest cvars.

@@ -8,12 +8,16 @@
     sprite: Objects/Weapons/Guns/Projectiles/projectiles2.rsi
     layers:
       - state: grenade
+  - type: Projectile
+    damage:
+      types:
+        Piercing: 279
   - type: ExplodeOnTrigger
   - type: Explosive
     explosionType: Default
-    totalIntensity: 100
+    totalIntensity: 35
     intensitySlope: 5
-    maxIntensity: 240
+    maxIntensity: 279
 
 - type: entity
   id: BulletGrenadeVOG25P

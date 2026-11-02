@@ -1,9 +1,12 @@
-<Control xmlns="https://spacestation14.io"
-         xmlns:pllax="clr-namespace:Content.Client.Parallax">
-    <pllax:ParallaxControl SpeedX="20"/>
+<Control xmlns="https://spacestation14.io">
+    <!-- Replay Loading Background -->
+    <TextureRect VerticalExpand="True" HorizontalExpand="True"
+                 TexturePath="/Textures/_Stalker/Logo/zagruzzka.png"
+                 Stretch="KeepAspectCovered" />
     <PanelContainer Name="Background"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    Margin="0 180 0 0">
         <BoxContainer Orientation="Vertical"
                       Align="Center">
             <BoxContainer

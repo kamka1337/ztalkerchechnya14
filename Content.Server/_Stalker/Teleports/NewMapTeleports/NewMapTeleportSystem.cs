@@ -27,6 +27,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Content.Shared.Players.PlayTimeTracking;
+using Content.Server.Station.Systems;
+using Content.Shared.Station.Components;
 
 namespace Content.Server._Stalker.Teleports.NewMapTeleports;
 // TODO: Rename this system
@@ -46,6 +48,7 @@ public sealed class NewMapTeleportSystem : SharedTeleportSystem
     [Dependency] private readonly PlayTimeTrackingManager _playTimeTrackingManager = default!;
     [Dependency] private readonly MindSystem _mindSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly StationSystem _stationSystem = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -57,20 +60,22 @@ public sealed class NewMapTeleportSystem : SharedTeleportSystem
         SubscribeLocalEvent<NewMapTeleportComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<NewMapTeleportComponent, EndCollideEvent>(OnEndCollide);
         //SubscribeLocalEvent<RoundStartedEvent>(OnRoundStart);
-        SubscribeLocalEvent<PostGameMapLoad>(OnPostGameMapLoad);
+        SubscribeLocalEvent<PostGameMapLoad>(OnPostGameMapLoad, after: new[] { typeof(StationSystem) });
     }
     private void OnPostGameMapLoad(PostGameMapLoad args)
     {
-#if !DEBUG
+// Load all maps defined in MapLoader prototypes (runs in Debug and Release)
         var prototypes = _protoMan.EnumeratePrototypes<MapLoaderPrototype>();
         foreach (var prototype in prototypes)
         {
             foreach (var path in prototype.MapPaths.Values)
             {
+                if (args.GameMap.MapPath.ToString().Equals(path, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 LoadMap(path);
             }
         }
-#endif
 
         UpdateLinks();
         var ev = new MapsLoadedEvent();
@@ -121,7 +126,32 @@ public sealed class NewMapTeleportSystem : SharedTeleportSystem
 
     private void LoadMap(string path)
     {
-        _mapLoader.TryLoadMap(new ResPath(path), out _, out _, DeserializationOptions.Default with { InitializeMaps = true });
+        var resPath = new ResPath(path);
+        if (!_mapLoader.TryLoadMap(resPath, out var map, out var grids, DeserializationOptions.Default with { InitializeMaps = true }))
+        {
+            _sawmill.Error($"Failed to load map from path: {path}");
+            return;
+        }
+
+        _sawmill.Info($"Successfully loaded map '{path}' with {grids.Count} grids");
+
+        if (map != null)
+        {
+            _mapManager.SetMapPaused(map.Value.Comp.MapId, false);
+        }
+
+        var station = _stationSystem.GetStations().FirstOrDefault();
+        if (station != default)
+        {
+            foreach (var grid in grids)
+            {
+                if (!HasComp<StationMemberComponent>(grid.Owner))
+                {
+                    _stationSystem.AddGridToStation(station, grid.Owner);
+                    _sawmill.Info($"Added grid {grid.Owner} from {path} to station {station}");
+                }
+            }
+        }
     }
     private void OnStartCollide(EntityUid uid, NewMapTeleportComponent component, ref StartCollideEvent args)
     {

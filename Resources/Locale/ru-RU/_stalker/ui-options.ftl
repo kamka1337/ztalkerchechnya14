@@ -1,2 +1,10 @@
 ui-options-function-smart-equip-outer-clothing = Умная экипировка на торс
 ui-options-function-lay = Лечь
+ui-options-header-limbs = Выбор конечностей (Кукла)
+ui-options-function-select-limb-head = Выбрать голову
+ui-options-function-select-limb-chest = Выбрать грудь
+ui-options-function-select-limb-abdomen = Выбрать живот
+ui-options-function-select-limb-left-arm = Выбрать левую руку
+ui-options-function-select-limb-right-arm = Выбрать правую руку
+ui-options-function-select-limb-left-leg = Выбрать левую ногу
+ui-options-function-select-limb-right-leg = Выбрать правую ногу

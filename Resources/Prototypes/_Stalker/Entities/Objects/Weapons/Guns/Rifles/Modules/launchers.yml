@@ -1,0 +1,53 @@
+- type: entity
+  abstract: true
+  parent: STBaseWeaponModule
+  id: STBaseModuleLauncherRifles
+  name: underslung grenade launcher
+  suffix: ST, launcher, RU
+  components:
+    - type: Sprite
+      sprite: _Stalker/Objects/Weapons/Guns/Rifles/Modules/gp25.rsi
+      state: icon
+    - type: Icon
+      sprite: _Stalker/Objects/Weapons/Guns/Rifles/Modules/gp25.rsi
+      state: icon
+    - type: STWeaponModule
+      layer: launcher
+      statePostfix: launcher
+    - type: STGrenadeLauncherModule
+      chamberSlotId: gun_gl_chamber
+      projectileSpeed: 30
+      soundShot:
+        path: /Audio/_Stalker/Effects/Guns/grenade_launcher.ogg
+      soundLoad:
+        path: /Audio/Weapons/Guns/Cock/revolver_cock.ogg
+    - type: ItemSlots
+      slots:
+        gun_gl_chamber:
+          name: Патронник ГП-25
+          ejectVerbText: st-grenade-launcher-verb-unload
+          priority: 1
+          whitelist:
+            tags:
+              - Vog25grenade
+    - type: ContainerContainer
+      containers:
+        gun_gl_chamber: !type:ContainerSlot {}
+
+- type: entity
+  parent: STBaseModuleLauncherRifles
+  id: STModuleLauncherGP25
+  name: ГП-25 "Костёр"
+  description: 40-мм подствольный гранатомет, предназначенный для использования в комплексе с автоматом АКС-74. Стреляет выстрелами типа ВОГ-25.
+  suffix: ST, GP-25, RU
+  components:
+    - type: Tag
+      tags:
+        - STWeaponModuleLauncherRu
+    - type: STWeight
+      self: 1.5
+    - type: STWeaponModule
+      layer: launcher
+      statePostfix: launcher
+      effect:
+        minAngleModifier: 1.05

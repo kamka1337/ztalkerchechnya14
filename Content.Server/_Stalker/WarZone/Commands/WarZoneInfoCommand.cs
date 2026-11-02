@@ -61,7 +61,11 @@ public sealed class WarZoneInfoCommand : IConsoleCommand
         sb.AppendLine("=== Warzones ===");
         foreach (var (uid, wzComp) in warZoneSystem.GetAllWarZones())
         {
-            var zoneId = wzComp.ZoneProto;
+            var zoneId = wzComp.ZoneProto.Id;
+            if (zoneId.Equals("DutyBase", StringComparison.OrdinalIgnoreCase) || zoneId.Equals("RFBase", StringComparison.OrdinalIgnoreCase))
+                zoneId = "RFBASE";
+            else if (zoneId.Equals("FreedomBase", StringComparison.OrdinalIgnoreCase) || zoneId.Equals("CRIBase", StringComparison.OrdinalIgnoreCase))
+                zoneId = "CRIBASE";
             var owner = "None";
             if (!string.IsNullOrEmpty(wzComp.DefendingBandProtoId))
                 owner = $"Band {wzComp.DefendingBandProtoId}";

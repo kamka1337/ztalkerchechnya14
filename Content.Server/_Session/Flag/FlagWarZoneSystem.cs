@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
 using Content.Server._Stalker.WarZone;
 using Content.Shared._Session.Flag;
-using Content.Server._Stalker.StalkerDB;
-using Content.Server._Stalker.Storage;
 using Content.Shared._Stalker.WarZone;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Content.Server.RoundEnd;
-using System.Linq;
+using Content.Shared.GameTicking;
 
 namespace Content.Server._Session.Flag;
 
@@ -18,14 +18,23 @@ public sealed class FlagWarZoneSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly WarZoneSystem _warSys = default!;
     [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
-    [Dependency] private readonly StalkerStorageSystem _stalkerStorageSystem = default!;
 
-
-    private const float UpdateInterval = 1f;
-    private const string FreedomBaseInitialOwner = "CRIBand";
-    private const string DutyBaseInitialOwner = "RFBand";
+    private const float UpdateInterval = 0.25f;
     private float _timer;
-    private readonly Dictionary<EntityUid, float> _prevProgress = new();
+    private bool _roundEnded;
+    private readonly HashSet<EntityUid> _capturedBases = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        _roundEnded = false;
+        _capturedBases.Clear();
+    }
 
     public override void Update(float frameTime)
     {
@@ -40,55 +49,161 @@ public sealed class FlagWarZoneSystem : EntitySystem
             if (!_proto.TryIndex<STWarZonePrototype>(wz.ZoneProto, out var wzProto) || wzProto.CaptureTime <= 0f)
                 continue;
 
-            var progress = wz.CaptureProgress;
-
-            // Detect capture completion: was progressing, now reset to 0
-            if (_prevProgress.TryGetValue(uid, out var prev) && prev >= 0.8f && progress <= 0f)
-            {
-                var audioPath = (string)wz.ZoneProto == "RFBase"
-                    ? "/Audio/_Session/CRIpobeda.ogg"
-                    : "/Audio/_Session/RFpobeda.ogg";
-                _audio.PlayGlobal(audioPath, Filter.Broadcast(), true);
-            }
-            _prevProgress[uid] = progress;
-
             int level;
-            if (progress <= 0f)      level = 3;
-            else if (progress >= 0.8f) level = 1;
-            else if (progress >= 0.5f) level = 2;
-            else level = 3;
 
-            var zonesList = _warSys.GetAllWarZones().ToList();
-
-            var freedomZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "FreedomBase");
-            var dutyZone = zonesList.FirstOrDefault(z => z.Component.ZoneProto == "DutyBase");
-
-            if (freedomZone != default && BaseWasCaptured(freedomZone.Component, FreedomBaseInitialOwner))
+            if (_capturedBases.Contains(uid))
             {
                 level = 4;
-                _roundEndSystem.EndRound();
             }
-            else if (dutyZone != default && BaseWasCaptured(dutyZone.Component, DutyBaseInitialOwner))
+            else if (IsRfBase(uid, wz))
             {
-                level = 4;
-                _roundEndSystem.EndRound();
+                if (IsRfBaseCaptured(wz))
+                {
+                    _capturedBases.Add(uid);
+                    level = 4;
+
+                    if (!_roundEnded)
+                    {
+                        _roundEnded = true;
+                        _audio.PlayGlobal("/Audio/_Session/CRIpobeda.ogg", Filter.Broadcast(), true);
+                        _roundEndSystem.EndRound();
+                    }
+                }
+                else
+                {
+                    level = GetCaptureProgressLevel(wz.CaptureProgress);
+                }
             }
+            else if (IsCriBase(uid, wz))
+            {
+                if (IsCriBaseCaptured(wz))
+                {
+                    _capturedBases.Add(uid);
+                    level = 4;
+
+                    if (!_roundEnded)
+                    {
+                        _roundEnded = true;
+                        _audio.PlayGlobal("/Audio/_Session/RFpobeda.ogg", Filter.Broadcast(), true);
+                        _roundEndSystem.EndRound();
+                    }
+                }
+                else
+                {
+                    level = GetCaptureProgressLevel(wz.CaptureProgress);
+                }
+            }
+            else
+            {
+                level = GetCaptureProgressLevel(wz.CaptureProgress);
+            }
+
             _appearance.SetData(uid, WarZoneFlagVisuals.Level, level, app);
         }
     }
 
-    private static bool BaseWasCaptured(WarZoneComponent zone, string initialOwner)
+    private static int GetCaptureProgressLevel(float progress)
     {
-        if (!zone.InitialLoadComplete)
-            return false;
+        if (progress >= 0.8f)
+            return 1;
+        if (progress >= 0.5f)
+            return 2;
+        return 3;
+    }
 
-        // A missing database record means the base is neutral/uninitialized, not captured.
-        if (string.IsNullOrEmpty(zone.DefendingBandProtoId) &&
-            string.IsNullOrEmpty(zone.DefendingFactionProtoId))
+    private bool IsRfBase(EntityUid uid, WarZoneComponent wz)
+    {
+        if (MetaData(uid).EntityPrototype?.ID.Equals("WarZoneEntity_DutyBase", StringComparison.OrdinalIgnoreCase) == true)
+            return true;
+
+        var proto = wz.ZoneProto.Id;
+        if (proto.Equals("DutyBase", StringComparison.OrdinalIgnoreCase) ||
+            proto.Equals("RFBASE", StringComparison.OrdinalIgnoreCase) ||
+            proto.Equals("RFBase", StringComparison.OrdinalIgnoreCase))
         {
-            return false;
+            return true;
         }
 
-        return zone.DefendingBandProtoId != initialOwner;
+        if (wz.PortalName != null &&
+            (wz.PortalName.Equals("DutyBase", StringComparison.OrdinalIgnoreCase) ||
+             wz.PortalName.Equals("RFBASE", StringComparison.OrdinalIgnoreCase) ||
+             wz.PortalName.Equals("RFBase", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsCriBase(EntityUid uid, WarZoneComponent wz)
+    {
+        if (MetaData(uid).EntityPrototype?.ID.Equals("WarZoneEntity_FreedomBase", StringComparison.OrdinalIgnoreCase) == true)
+            return true;
+
+        var proto = wz.ZoneProto.Id;
+        if (proto.Equals("FreedomBase", StringComparison.OrdinalIgnoreCase) ||
+            proto.Equals("CRIBASE", StringComparison.OrdinalIgnoreCase) ||
+            proto.Equals("CRIBase", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (wz.PortalName != null &&
+            (wz.PortalName.Equals("FreedomBase", StringComparison.OrdinalIgnoreCase) ||
+             wz.PortalName.Equals("CRIBASE", StringComparison.OrdinalIgnoreCase) ||
+             wz.PortalName.Equals("CRIBase", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsRfBaseCaptured(WarZoneComponent wz)
+    {
+        if (!wz.InitialLoadComplete)
+            return false;
+
+        if (string.IsNullOrEmpty(wz.DefendingBandProtoId) && string.IsNullOrEmpty(wz.DefendingFactionProtoId))
+            return false;
+
+        if (!string.IsNullOrEmpty(wz.DefendingBandProtoId) &&
+            !wz.DefendingBandProtoId.Equals("RFBand", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (wz.CaptureProgress >= 0.999f &&
+            !string.IsNullOrEmpty(wz.CurrentAttackerBandProtoId) &&
+            !wz.CurrentAttackerBandProtoId.Equals("RFBand", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsCriBaseCaptured(WarZoneComponent wz)
+    {
+        if (!wz.InitialLoadComplete)
+            return false;
+
+        if (string.IsNullOrEmpty(wz.DefendingBandProtoId) && string.IsNullOrEmpty(wz.DefendingFactionProtoId))
+            return false;
+
+        if (!string.IsNullOrEmpty(wz.DefendingBandProtoId) &&
+            !wz.DefendingBandProtoId.Equals("CRIBand", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (wz.CaptureProgress >= 0.999f &&
+            !string.IsNullOrEmpty(wz.CurrentAttackerBandProtoId) &&
+            !wz.CurrentAttackerBandProtoId.Equals("CRIBand", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

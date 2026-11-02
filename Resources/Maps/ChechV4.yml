@@ -31,6 +31,8 @@ entities:
     - type: Transform
     - type: Map
       mapPaused: True
+    - type: BecomesStation
+      id: Stalker
     - type: GridTree
     - type: Broadphase
     - type: OccluderTree

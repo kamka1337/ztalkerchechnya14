@@ -510,3 +510,23 @@
       state: icon
     - type: Clothing
       sprite: _Stalker/Objects/Clothing/belt/belt_deserter_holster.rsi
+
+
+- type: entity
+  parent: ClothingBeltTarzanGreen
+  id: ClothingBeltTarzanGreenGrenadierFilled
+  components:
+  - type: StorageFill
+    contents:
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: Chechnya545Mag30
+    - id: GrenadeVOG25
+    - id: GrenadeVOG25
+    - id: GrenadeVOG25
+    - id: GrenadeVOG25
+    - id: GrenadeVOG25

@@ -1,4 +1,4 @@
-﻿using Content.Server.GameTicking;
+using Content.Server.GameTicking;
 using Content.Server.Spawners.Components;
 using Content.Server.Station.Systems;
 using Robust.Shared.Map;
@@ -47,13 +47,25 @@ public sealed class SpawnPointSystem : EntitySystem
 
         if (possiblePositions.Count == 0)
         {
-            // Ok we've still not returned, but we need to put them /somewhere/.
-            // TODO: Refactor gameticker spawning code so we don't have to do this!
+            // Fallback 1: check if there are any spawn points on the station
+            var stationPoints = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
+            while (stationPoints.MoveNext(out var uid, out _, out var xform))
+            {
+                if (args.Station != null && _stationSystem.GetOwningStation(uid, xform) != args.Station)
+                    continue;
+
+                possiblePositions.Add(xform.Coordinates);
+            }
+        }
+
+        if (possiblePositions.Count == 0)
+        {
+            // Fallback 2: pick random spawner as a backup
             var points2 = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
 
             if (points2.MoveNext(out _, out var xform))
             {
-                Log.Error($"Unable to pick a valid spawn point, picking random spawner as a backup.\nRunLevel: {_gameTicker.RunLevel} Station: {ToPrettyString(args.Station)} Job: {args.Job}");
+                Log.Warning($"Unable to pick a valid spawn point on station, picking random spawner as a backup.\nRunLevel: {_gameTicker.RunLevel} Station: {ToPrettyString(args.Station)} Job: {args.Job}");
                 possiblePositions.Add(xform.Coordinates);
             }
             else

@@ -204,6 +204,15 @@ namespace Content.Client.Options.UI.Tabs
             AddButton(ContentKeyFunctions.RotateObjectCounterclockwise);
             AddButton(ContentKeyFunctions.FlipObject);
 
+            AddHeader("ui-options-header-limbs");
+            AddButton(ContentKeyFunctions.SelectLimbHead);
+            AddButton(ContentKeyFunctions.SelectLimbChest);
+            AddButton(ContentKeyFunctions.SelectLimbAbdomen);
+            AddButton(ContentKeyFunctions.SelectLimbLeftArm);
+            AddButton(ContentKeyFunctions.SelectLimbRightArm);
+            AddButton(ContentKeyFunctions.SelectLimbLeftLeg);
+            AddButton(ContentKeyFunctions.SelectLimbRightLeg);
+
             AddHeader("ui-options-header-ui");
             AddButton(ContentKeyFunctions.FocusChat);
             AddButton(ContentKeyFunctions.FocusLocalChat);

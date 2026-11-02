@@ -3,6 +3,10 @@ lobby-state-soon = Round starting soon
 lobby-state-right-now-question = Right Now?
 lobby-state-right-now-confirmation = Right Now
 lobby-state-round-start-countdown-text = Round starts In: {$timeLeft}
+lobby-state-play-button = PLAY
+lobby-state-play-button-join = JOIN GAME
+lobby-state-play-button-ready = READY
+lobby-state-play-button-not-ready = PLAY
 lobby-state-ready-button-join-state = Join
 lobby-state-ready-button-ready-up-state = Ready Up
 lobby-state-player-status-not-ready = Not Ready
@@ -29,7 +33,19 @@ lobby-state-playtime-comment-normal =
     You've spent {$hours} {$hours ->
     [1]hour
     *[other]hours
-    } ingame today. Remember to take breaks!
-lobby-state-playtime-comment-concerning = You've played for {$hours} hours today. Please take a break.
-lobby-state-playtime-comment-grasstouchless = {$hours} hours. Consider logging off to attend to your needs.
-lobby-state-playtime-comment-selfdestructive = {$hours} hours. Really?
+    } playing SS14 today.
+lobby-state-playtime-comment-concerning =
+    You've spent {$hours} {$hours ->
+    [1]hour
+    *[other]hours
+    } playing SS14 today. Don't forget to take a break!
+lobby-state-playtime-comment-grasstouchless =
+    You've spent {$hours} {$hours ->
+    [1]hour
+    *[other]hours
+    } playing SS14 today. Touch some grass!
+lobby-state-playtime-comment-selfdestructive =
+    You've spent {$hours} {$hours ->
+    [1]hour
+    *[other]hours
+    } playing SS14 today. Are you okay?

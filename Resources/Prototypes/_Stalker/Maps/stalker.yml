@@ -1,7 +1,7 @@
 - type: gameMap
   id: STWorld
   mapName: 'StalkerMap'
-  mapPath: "/Maps/_ST/World/KordonV1490.yml"
+  mapPath: "/Maps/ChechV6.yml"
   minPlayers: 0
   stations:
     Stalker:
@@ -16,9 +16,11 @@
             ChechnyaRFAKCY: [ 0, 20 ]
             ChechnyaRFMedic: [ 0, 10 ]
             ChechnyaRFSpec: [ 0, 10 ]
+            ChechnyaRFGrenadier: [ 0, 6 ]
             ##
             ChechnyaCRIRPK: [ 0, 5 ]
             ChechnyaCRIAKC: [ 0, 60 ]
             ChechnyaCRIAKCY: [ 0, 20 ]
             ChechnyaCRIMedic: [ 0, 10 ]
             ChechnyaCRISpec: [ 0, 10 ]
+            ChechnyaCRIGrenadier: [ 0, 6 ]

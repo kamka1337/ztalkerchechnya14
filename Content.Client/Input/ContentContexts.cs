@@ -92,6 +92,13 @@ namespace Content.Client.Input
             human.AddFunction(ContentKeyFunctions.Arcade1);
             human.AddFunction(ContentKeyFunctions.Arcade2);
             human.AddFunction(ContentKeyFunctions.Arcade3);
+            human.AddFunction(ContentKeyFunctions.SelectLimbHead);
+            human.AddFunction(ContentKeyFunctions.SelectLimbChest);
+            human.AddFunction(ContentKeyFunctions.SelectLimbAbdomen);
+            human.AddFunction(ContentKeyFunctions.SelectLimbLeftArm);
+            human.AddFunction(ContentKeyFunctions.SelectLimbRightArm);
+            human.AddFunction(ContentKeyFunctions.SelectLimbLeftLeg);
+            human.AddFunction(ContentKeyFunctions.SelectLimbRightLeg);
 
             // actions should be common (for ghosts, mobs, etc)
             common.AddFunction(ContentKeyFunctions.OpenActionsMenu);

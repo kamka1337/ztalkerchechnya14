@@ -236,3 +236,10 @@
 
 - type: playTimeTracker
   id: JobCRISpec
+
+
+- type: playTimeTracker
+  id: JobRFGrenadier
+
+- type: playTimeTracker
+  id: JobCRIGrenadier

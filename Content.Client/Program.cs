@@ -7,7 +7,10 @@ namespace Content.Client
         [STAThread]
         public static void Main(string[] args)
         {
-            ContentStart.Start(args);
+            ContentStart.StartLibrary(args, new GameControllerOptions
+            {
+                DefaultWindowTitle = "chechnya14"
+            });
         }
     }
 }

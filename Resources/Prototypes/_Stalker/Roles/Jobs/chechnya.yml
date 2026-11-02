@@ -225,6 +225,7 @@
     outerClothing: ClothingOuterArmor6B2
     suitstorage: STWeaponRifleAKS74U
     belt: ClothingBeltTarzanGreenFilled
+    back: ClothingBackpackStalkerZaryaGreenFilled
 
 - type: startingGear
   id: RFRosichGear
@@ -250,6 +251,7 @@
     3: ChechnyaRFAKCY
     4: ChechnyaRFMedic
     5: ChechnyaRFSpec
+    6: ChechnyaRFGrenadier
 
 
 # ВС ЧРИ
@@ -485,6 +487,7 @@
     outerClothing: ClothingOuterArmor6B2
     suitstorage: STWeaponRifleAKS74U
     belt: ClothingBeltTarzanGreenFilled
+    back: ClothingBackpackStalkerZaryaGreenFilled
 
 - type: startingGear
   id: CRIBorzGear
@@ -510,3 +513,102 @@
     3: ChechnyaCRIAKCY
     4: ChechnyaCRIMedic
     5: ChechnyaCRISpec
+    6: ChechnyaCRIGrenadier
+
+
+- type: job
+  id: ChechnyaRFGrenadier
+  name: job-rf-grenadier
+  icon: rus
+  description: job-rf-desc
+  playTimeTracker: JobRFGrenadier
+  whitelisted: false
+  requirements:
+  - !type:SpeciesRequirement
+    species:
+    - Human
+    - Dwarf
+  startingGear: RFGrenadierGear
+  supervisors: job-rf-supervisor
+  canBeAntag: false
+  special:
+  - !type:AddComponentSpecial
+    components:
+    - type: NpcFactionMember
+      factions:
+      - Duty
+    - type: Access
+      tags:
+      - Dolg
+    - type: Bands
+      band: Stalker
+      bandIcon: rus
+      bandProto: RFBand
+      bandRankId: 2
+    - type: BlockTackingHolyItems
+    - type: TeethPull
+      teethProto: ToothStalker
+      pullingItemTag: PliersStalker
+      teethCount: 3
+      initialTeeth: 3
+
+- type: startingGear
+  id: RFGrenadierGear
+  equipment:
+    legs: ClothingLegsJeansVSR93
+    torso: ClothingTorsoTurtlenecksVSR93
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    suitstorage: STWeaponRifleAKS74GP25
+    belt: ClothingBeltTarzanGreenGrenadierFilled
+    back: ClothingBackpackStalkerZaryaGreenFilled
+
+- type: job
+  id: ChechnyaCRIGrenadier
+  name: job-cri-grenadier
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRIGrenadier
+  whitelisted: false
+  requirements:
+  - !type:SpeciesRequirement
+    species:
+    - Human
+    - Dwarf
+  startingGear: CRIGrenadierGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+  - !type:AddComponentSpecial
+    components:
+    - type: NpcFactionMember
+      factions:
+      - BandsUnion
+      - Freedom
+    - type: Access
+      tags:
+      - Freedom
+    - type: Bands
+      band: Stalker
+      bandIcon: cri
+      bandProto: CRIBand
+      bandRankId: 2
+    - type: BlockTackingHolyItems
+    - type: TeethPull
+      teethProto: ToothStalker
+      pullingItemTag: PliersStalker
+      teethCount: 3
+      initialTeeth: 3
+
+- type: startingGear
+  id: CRIGrenadierGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    suitstorage: STWeaponRifleAKS74GP25
+    belt: ClothingBeltTarzanGreenGrenadierFilled
+    back: ClothingBackpackStalkerZaryaGreenFilled

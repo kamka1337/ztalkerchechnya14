@@ -1,4 +1,7 @@
-﻿<Project>
+<Project>
+  <PropertyGroup>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
   <Import Project="RobustToolbox/Directory.Packages.props" />
   <ItemGroup>
     <!--

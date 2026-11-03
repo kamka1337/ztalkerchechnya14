@@ -122,6 +122,7 @@ public sealed partial class DamageVisualsComponent : Component
     public readonly Dictionary<object, bool> DisabledLayers = new();
     public readonly Dictionary<object, string> LayerMapKeyStates = new();
     public readonly Dictionary<string, FixedPoint2> LastThresholdPerGroup = new();
+    public readonly Dictionary<string, FixedPoint2> LastThresholdPerLayerGroup = new();
     public string TopMostLayerKey = default!;
 }
 

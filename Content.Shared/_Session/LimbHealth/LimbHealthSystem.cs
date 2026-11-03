@@ -27,6 +27,7 @@ public sealed class LimbHealthSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPrototypeManager _proto = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
     private bool _syncing;
 
@@ -177,16 +178,18 @@ public sealed class LimbHealthSystem : EntitySystem
 
         if (origin is { } attacker && _targeting.TryGetAimed(attacker, out var selected))
         {
+            var allowHead = selected == LimbType.Head;
+
             if (IsDestroyedState(ent.Comp, selected))
             {
                 var spread = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
                     ~SlotFlags.POCKET, ignoreResistances, ignoreGlobal, ignoreResistors);
-                DistributeDamage(ent, spread, destroyedNow);
+                DistributeDamage(ent, spread, destroyedNow, allowHead: allowHead);
                 return;
             }
 
             var connected = _random.Prob(selected.HitChance());
-            var target = connected ? selected : PickOtherAlive(ent.Comp, selected);
+            var target = connected ? selected : PickOtherAlive(ent.Comp, selected, allowHead: allowHead);
 
             var incoming = new DamageSpecifier(raw);
             if (connected)
@@ -201,7 +204,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
             if (dmg.GetTotal() > 0)
             {
-                ApplyToLimb(ent, target, dmg, destroyedNow);
+                ApplyToLimb(ent, target, dmg, destroyedNow, allowHead: allowHead);
                 if (bleedTrigger)
                     RollBleed(ent, target);
             }
@@ -217,7 +220,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
                 if (legDmg.GetTotal() > 0)
                 {
-                    ApplyToLimb(ent, leg, legDmg, destroyedNow);
+                    ApplyToLimb(ent, leg, legDmg, destroyedNow, allowHead: true);
                     if (bleedTrigger)
                         RollBleed(ent, leg);
                 }
@@ -228,12 +231,13 @@ public sealed class LimbHealthSystem : EntitySystem
             {
                 var bodyDmg = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
                     ~SlotFlags.POCKET, ignoreResistances, ignoreGlobal, ignoreResistors);
-                DistributeDamage(ent, bodyDmg, destroyedNow);
+                DistributeDamage(ent, bodyDmg, destroyedNow, allowHead: true);
                 return;
             }
         }
 
-        if (PickWeightedRandomAlive(ent.Comp) is { } limb)
+        var defaultAllowHead = origin == null;
+        if (PickWeightedRandomAlive(ent.Comp, allowHead: defaultAllowHead) is { } limb)
         {
             var incoming = HasSharpDamage(raw)
                 ? new DamageSpecifier(raw)
@@ -244,7 +248,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
             if (dmg.GetTotal() > 0)
             {
-                ApplyToLimb(ent, limb, dmg, destroyedNow);
+                ApplyToLimb(ent, limb, dmg, destroyedNow, allowHead: defaultAllowHead);
                 if (bleedTrigger)
                     RollBleed(ent, limb);
             }
@@ -272,12 +276,12 @@ public sealed class LimbHealthSystem : EntitySystem
     }
 
     private void ApplyToLimb(Entity<LimbHealthComponent> ent, LimbType limb, DamageSpecifier dmg,
-        List<LimbType> destroyedNow)
+        List<LimbType> destroyedNow, bool allowHead = true)
     {
         var leftover = AbsorbInto(ent.Comp, limb, dmg, destroyedNow);
 
         if (!leftover.Empty && leftover.GetTotal() > 0)
-            DistributeDamage(ent, leftover, destroyedNow, exclude: limb);
+            DistributeDamage(ent, leftover, destroyedNow, exclude: limb, allowHead: allowHead);
     }
 
     private void RollBleed(Entity<LimbHealthComponent> ent, LimbType limb)
@@ -371,12 +375,12 @@ public sealed class LimbHealthSystem : EntitySystem
     }
 
     private void DistributeDamage(Entity<LimbHealthComponent> ent, DamageSpecifier dmg,
-        List<LimbType> destroyedNow, LimbType? exclude = null)
+        List<LimbType> destroyedNow, LimbType? exclude = null, bool allowHead = true)
     {
         var remaining = new DamageSpecifier(dmg);
         while (remaining.GetTotal() > 0)
         {
-            var alive = GetAliveLimbs(ent.Comp, exclude);
+            var alive = GetAliveLimbs(ent.Comp, exclude, allowHead: allowHead);
             if (alive.Count == 0)
                 return;
 
@@ -741,20 +745,20 @@ public sealed class LimbHealthSystem : EntitySystem
         return total;
     }
 
-    private List<LimbType> GetAliveLimbs(LimbHealthComponent comp, LimbType? exclude = null)
+    private List<LimbType> GetAliveLimbs(LimbHealthComponent comp, LimbType? exclude = null, bool allowHead = true)
     {
         var list = new List<LimbType>();
         foreach (var (limb, st) in comp.Limbs)
         {
-            if (!st.Destroyed && limb != exclude)
+            if (!st.Destroyed && limb != exclude && (allowHead || limb != LimbType.Head))
                 list.Add(limb);
         }
         return list;
     }
 
-    private LimbType PickOtherAlive(LimbHealthComponent comp, LimbType selected)
+    private LimbType PickOtherAlive(LimbHealthComponent comp, LimbType selected, bool allowHead = true)
     {
-        var others = GetAliveLimbs(comp, selected);
+        var others = GetAliveLimbs(comp, selected, allowHead: allowHead);
         if (others.Count == 0)
             return selected;
 
@@ -776,9 +780,9 @@ public sealed class LimbHealthSystem : EntitySystem
         return others[^1];
     }
 
-    private LimbType? PickWeightedRandomAlive(LimbHealthComponent comp)
+    private LimbType? PickWeightedRandomAlive(LimbHealthComponent comp, bool allowHead = true)
     {
-        var alive = GetAliveLimbs(comp);
+        var alive = GetAliveLimbs(comp, allowHead: allowHead);
         if (alive.Count == 0)
             return null;
 
@@ -845,6 +849,12 @@ public sealed class LimbHealthSystem : EntitySystem
         _syncing = true;
         _damageable.SetDamage((uid, dmgbl), sum);
         _syncing = false;
+
+        if (TryComp<AppearanceComponent>(uid, out var appearance))
+        {
+            _appearance.SetData(uid, DamageVisualizerKeys.DamageUpdateGroups,
+                new DamageVisualizerGroupData(dmgbl.DamagePerGroup.Keys.ToList()), appearance);
+        }
 
         if (notify && old != null)
         {

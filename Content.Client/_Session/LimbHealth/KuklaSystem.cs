@@ -1,3 +1,4 @@
+using Content.Client.Damage;
 using Content.Shared._Session.LimbHealth;
 using Robust.Client.Player;
 using Robust.Shared.GameObjects;
@@ -8,6 +9,7 @@ namespace Content.Client._Session.LimbHealth;
 public sealed class KuklaSystem : EntitySystem
 {
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly DamageVisualsSystem _damageVisuals = default!;
 
     public event Action? Updated;
 
@@ -23,6 +25,8 @@ public sealed class KuklaSystem : EntitySystem
 
     private void OnLimbState(Entity<LimbHealthComponent> ent, ref AfterAutoHandleStateEvent args)
     {
+        _damageVisuals.UpdateLimbVisuals(ent.Owner);
+
         if (ent.Owner == _player.LocalEntity)
             Updated?.Invoke();
     }

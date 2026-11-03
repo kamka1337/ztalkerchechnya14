@@ -58,12 +58,12 @@ public static class LimbTypeExtensions
 
     public static float HitChance(this LimbType limb) => limb switch
     {
-        LimbType.Head => 0.22f,
-        LimbType.Chest => 0.75f,
-        LimbType.Abdomen => 0.75f,
-        LimbType.LeftArm or LimbType.RightArm => 0.50f,
-        LimbType.LeftLeg or LimbType.RightLeg => 0.55f,
-        _ => 0.50f,
+        LimbType.Head => 0.65f,
+        LimbType.Chest => 0.90f,
+        LimbType.Abdomen => 0.85f,
+        LimbType.LeftArm or LimbType.RightArm => 0.80f,
+        LimbType.LeftLeg or LimbType.RightLeg => 0.80f,
+        _ => 0.80f,
     };
 
     public static float AimedMultiplier(this LimbType limb) => limb switch

@@ -4,6 +4,9 @@ using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
 using Robust.Client.GameObjects;
+using Content.Shared._Session.LimbHealth;
+using Content.Shared.Humanoid;
+using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
@@ -34,6 +37,16 @@ public sealed class DamageVisualsSystem : VisualizerSystem<DamageVisualsComponen
         base.Initialize();
 
         SubscribeLocalEvent<DamageVisualsComponent, ComponentInit>(InitializeEntity);
+    }
+
+    public void UpdateLimbVisuals(EntityUid uid)
+    {
+        if (TryComp<DamageVisualsComponent>(uid, out var damageVisComp)
+            && TryComp<SpriteComponent>(uid, out var spriteComponent)
+            && TryComp<DamageableComponent>(uid, out var damageComponent))
+        {
+            ForceUpdateLayers((uid, damageComponent, spriteComponent, damageVisComp));
+        }
     }
 
     private void InitializeEntity(EntityUid entity, DamageVisualsComponent comp, ComponentInit args)
@@ -318,6 +331,11 @@ public sealed class DamageVisualsSystem : VisualizerSystem<DamageVisualsComponen
                 damageVisComp.TopMostLayerKey = $"DamageOverlay";
             }
         }
+
+        if (damageComponent != null && spriteComponent != null)
+        {
+            ForceUpdateLayers((entity, damageComponent, spriteComponent, damageVisComp));
+        }
     }
 
     /// <summary>
@@ -490,20 +508,39 @@ public sealed class DamageVisualsSystem : VisualizerSystem<DamageVisualsComponen
         var spriteComponent = entity.Comp2;
         var damageVisComp = entity.Comp3;
 
-        if (!CheckThresholdBoundary(damageComponent.TotalDamage, damageVisComp.LastDamageThreshold, damageVisComp, out var threshold))
-            return;
-
-        damageVisComp.LastDamageThreshold = threshold;
-
         if (damageVisComp.TargetLayers != null)
         {
+            TryComp<LimbHealthComponent>(entity.Owner, out var limbComp);
+
             foreach (var layerMapKey in damageVisComp.TargetLayerMapKeys)
             {
+                FixedPoint2 damageTotal;
+                if (limbComp != null && TryGetLimbTotalDamage(limbComp, layerMapKey, out var limbDmg))
+                {
+                    damageTotal = limbDmg;
+                }
+                else
+                {
+                    damageTotal = damageComponent.TotalDamage;
+                }
+
+                var key = $"{layerMapKey}_all";
+                damageVisComp.LastThresholdPerLayerGroup.TryGetValue(key, out var lastThreshold);
+
+                if (!CheckThresholdBoundary(damageTotal, lastThreshold, damageVisComp, out var threshold))
+                    continue;
+
+                damageVisComp.LastThresholdPerLayerGroup[key] = threshold;
+
                 UpdateTargetLayer((entity, spriteComponent), damageVisComp, layerMapKey, threshold);
             }
         }
         else
         {
+            if (!CheckThresholdBoundary(damageComponent.TotalDamage, damageVisComp.LastDamageThreshold, damageVisComp, out var threshold))
+                return;
+
+            damageVisComp.LastDamageThreshold = threshold;
             UpdateOverlay((entity, spriteComponent), threshold);
         }
     }
@@ -524,29 +561,238 @@ public sealed class DamageVisualsSystem : VisualizerSystem<DamageVisualsComponen
             if (!damageVisComp.Overlay && damageGroup != damageVisComp.DamageGroup)
                 continue;
 
-            if (!_prototypeManager.TryIndex<DamageGroupPrototype>(damageGroup, out var damageGroupPrototype)
-                || !damageComponent.Damage.TryGetDamageInGroup(damageGroupPrototype, out var damageTotal))
+            if (!_prototypeManager.TryIndex<DamageGroupPrototype>(damageGroup, out var damageGroupPrototype))
                 continue;
-
-            if (!damageVisComp.LastThresholdPerGroup.TryGetValue(damageGroup, out var lastThreshold)
-                || !CheckThresholdBoundary(damageTotal, lastThreshold, damageVisComp, out var threshold))
-                continue;
-
-            damageVisComp.LastThresholdPerGroup[damageGroup] = threshold;
 
             if (damageVisComp.TargetLayers != null)
             {
+                TryComp<LimbHealthComponent>(entity.Owner, out var limbComp);
+
                 foreach (var layerMapKey in damageVisComp.TargetLayerMapKeys)
                 {
+                    FixedPoint2 damageTotal;
+                    if (limbComp != null && TryGetLimbDamage(limbComp, layerMapKey, damageGroupPrototype, out var limbDmg))
+                    {
+                        damageTotal = limbDmg;
+                    }
+                    else if (!damageComponent.Damage.TryGetDamageInGroup(damageGroupPrototype, out damageTotal))
+                    {
+                        continue;
+                    }
+
+                    var key = $"{layerMapKey}_{damageGroup}";
+                    damageVisComp.LastThresholdPerLayerGroup.TryGetValue(key, out var lastThreshold);
+
+                    if (!CheckThresholdBoundary(damageTotal, lastThreshold, damageVisComp, out var threshold))
+                        continue;
+
+                    damageVisComp.LastThresholdPerLayerGroup[key] = threshold;
+
                     UpdateTargetLayer((entity, spriteComponent, damageVisComp), layerMapKey, damageGroup, threshold);
                 }
             }
             else
             {
+                if (!damageComponent.Damage.TryGetDamageInGroup(damageGroupPrototype, out var damageTotal))
+                    continue;
+
+                if (!damageVisComp.LastThresholdPerGroup.TryGetValue(damageGroup, out var lastThreshold)
+                    || !CheckThresholdBoundary(damageTotal, lastThreshold, damageVisComp, out var threshold))
+                    continue;
+
+                damageVisComp.LastThresholdPerGroup[damageGroup] = threshold;
+
                 UpdateOverlay((entity, spriteComponent, damageVisComp), damageGroup, threshold);
             }
         }
+    }
 
+    private bool TryGetLimbDamage(LimbHealthComponent limbComp, object layerMapKey, DamageGroupPrototype groupProto, out FixedPoint2 damage)
+    {
+        damage = FixedPoint2.Zero;
+
+        if (layerMapKey is HumanoidVisualLayers humanoidLayer)
+        {
+            switch (humanoidLayer)
+            {
+                case HumanoidVisualLayers.Head:
+                    if (limbComp.Limbs.TryGetValue(LimbType.Head, out var headState))
+                        headState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                    return true;
+
+                case HumanoidVisualLayers.Chest:
+                    FixedPoint2 chestDmg = FixedPoint2.Zero;
+                    FixedPoint2 abdDmg = FixedPoint2.Zero;
+                    if (limbComp.Limbs.TryGetValue(LimbType.Chest, out var chestState))
+                        chestState.Damage.TryGetDamageInGroup(groupProto, out chestDmg);
+                    if (limbComp.Limbs.TryGetValue(LimbType.Abdomen, out var abdState))
+                        abdState.Damage.TryGetDamageInGroup(groupProto, out abdDmg);
+                    damage = chestDmg + abdDmg;
+                    return true;
+
+                case HumanoidVisualLayers.LArm:
+                    if (limbComp.Limbs.TryGetValue(LimbType.LeftArm, out var lArmState))
+                        lArmState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                    return true;
+
+                case HumanoidVisualLayers.RArm:
+                    if (limbComp.Limbs.TryGetValue(LimbType.RightArm, out var rArmState))
+                        rArmState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                    return true;
+
+                case HumanoidVisualLayers.LLeg:
+                    if (limbComp.Limbs.TryGetValue(LimbType.LeftLeg, out var lLegState))
+                        lLegState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                    return true;
+
+                case HumanoidVisualLayers.RLeg:
+                    if (limbComp.Limbs.TryGetValue(LimbType.RightLeg, out var rLegState))
+                        rLegState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                    return true;
+            }
+        }
+
+        var layerStr = layerMapKey.ToString();
+        if (layerStr != null)
+        {
+            if (layerStr.EndsWith("Head"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.Head, out var headState))
+                    headState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                return true;
+            }
+            if (layerStr.EndsWith("Chest"))
+            {
+                FixedPoint2 chestDmg = FixedPoint2.Zero;
+                FixedPoint2 abdDmg = FixedPoint2.Zero;
+                if (limbComp.Limbs.TryGetValue(LimbType.Chest, out var chestState))
+                    chestState.Damage.TryGetDamageInGroup(groupProto, out chestDmg);
+                if (limbComp.Limbs.TryGetValue(LimbType.Abdomen, out var abdState))
+                    abdState.Damage.TryGetDamageInGroup(groupProto, out abdDmg);
+                damage = chestDmg + abdDmg;
+                return true;
+            }
+            if (layerStr.EndsWith("LArm"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.LeftArm, out var lArmState))
+                    lArmState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                return true;
+            }
+            if (layerStr.EndsWith("RArm"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.RightArm, out var rArmState))
+                    rArmState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                return true;
+            }
+            if (layerStr.EndsWith("LLeg"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.LeftLeg, out var lLegState))
+                    lLegState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                return true;
+            }
+            if (layerStr.EndsWith("RLeg"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.RightLeg, out var rLegState))
+                    rLegState.Damage.TryGetDamageInGroup(groupProto, out damage);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryGetLimbTotalDamage(LimbHealthComponent limbComp, object layerMapKey, out FixedPoint2 totalDamage)
+    {
+        totalDamage = FixedPoint2.Zero;
+
+        if (layerMapKey is HumanoidVisualLayers humanoidLayer)
+        {
+            switch (humanoidLayer)
+            {
+                case HumanoidVisualLayers.Head:
+                    if (limbComp.Limbs.TryGetValue(LimbType.Head, out var headState))
+                        totalDamage = headState.TotalDamage;
+                    return true;
+
+                case HumanoidVisualLayers.Chest:
+                    FixedPoint2 chestDmg = FixedPoint2.Zero;
+                    FixedPoint2 abdDmg = FixedPoint2.Zero;
+                    if (limbComp.Limbs.TryGetValue(LimbType.Chest, out var chestState))
+                        chestDmg = chestState.TotalDamage;
+                    if (limbComp.Limbs.TryGetValue(LimbType.Abdomen, out var abdState))
+                        abdDmg = abdState.TotalDamage;
+                    totalDamage = chestDmg + abdDmg;
+                    return true;
+
+                case HumanoidVisualLayers.LArm:
+                    if (limbComp.Limbs.TryGetValue(LimbType.LeftArm, out var lArmState))
+                        totalDamage = lArmState.TotalDamage;
+                    return true;
+
+                case HumanoidVisualLayers.RArm:
+                    if (limbComp.Limbs.TryGetValue(LimbType.RightArm, out var rArmState))
+                        totalDamage = rArmState.TotalDamage;
+                    return true;
+
+                case HumanoidVisualLayers.LLeg:
+                    if (limbComp.Limbs.TryGetValue(LimbType.LeftLeg, out var lLegState))
+                        totalDamage = lLegState.TotalDamage;
+                    return true;
+
+                case HumanoidVisualLayers.RLeg:
+                    if (limbComp.Limbs.TryGetValue(LimbType.RightLeg, out var rLegState))
+                        totalDamage = rLegState.TotalDamage;
+                    return true;
+            }
+        }
+
+        var layerStr = layerMapKey.ToString();
+        if (layerStr != null)
+        {
+            if (layerStr.EndsWith("Head"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.Head, out var headState))
+                    totalDamage = headState.TotalDamage;
+                return true;
+            }
+            if (layerStr.EndsWith("Chest"))
+            {
+                FixedPoint2 chestDmg = FixedPoint2.Zero;
+                FixedPoint2 abdDmg = FixedPoint2.Zero;
+                if (limbComp.Limbs.TryGetValue(LimbType.Chest, out var chestState))
+                    chestDmg = chestState.TotalDamage;
+                if (limbComp.Limbs.TryGetValue(LimbType.Abdomen, out var abdState))
+                    abdDmg = abdState.TotalDamage;
+                totalDamage = chestDmg + abdDmg;
+                return true;
+            }
+            if (layerStr.EndsWith("LArm"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.LeftArm, out var lArmState))
+                    totalDamage = lArmState.TotalDamage;
+                return true;
+            }
+            if (layerStr.EndsWith("RArm"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.RightArm, out var rArmState))
+                    totalDamage = rArmState.TotalDamage;
+                return true;
+            }
+            if (layerStr.EndsWith("LLeg"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.LeftLeg, out var lLegState))
+                    totalDamage = lLegState.TotalDamage;
+                return true;
+            }
+            if (layerStr.EndsWith("RLeg"))
+            {
+                if (limbComp.Limbs.TryGetValue(LimbType.RightLeg, out var rLegState))
+                    totalDamage = rLegState.TotalDamage;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -76,6 +76,13 @@ public sealed partial class WarZoneComponent : Component
     public int LastAnnouncedProgressStep = 0;
 
     /// <summary>
+    /// Tracks if an active capture attempt was recently in progress.
+    /// Prevents repeated abandonment announcements.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadOnly)]
+    public bool CaptureInProgress = false;
+
+    /// <summary>
     /// The next game time when the capture logic should be updated for this zone.
     /// </summary>
     [DataField]

@@ -44,11 +44,6 @@ public sealed class STMessengerMessage
     /// </summary>
     public readonly string? SenderFaction;
 
-    /// <summary>
-    /// JobIcon prototype ID for the sender's rank icon, if known. Null for anonymous or unknown rank.
-    /// </summary>
-    public readonly string? SenderRankIcon;
-
     public STMessengerMessage(
         uint id,
         string sender,
@@ -56,8 +51,7 @@ public sealed class STMessengerMessage
         TimeSpan timestamp,
         uint? replyToId = null,
         string? replySnippet = null,
-        string? senderFaction = null,
-        string? senderRankIcon = null)
+        string? senderFaction = null)
     {
         Id = id;
         Sender = sender;
@@ -66,6 +60,5 @@ public sealed class STMessengerMessage
         ReplyToId = replyToId;
         ReplySnippet = replySnippet;
         SenderFaction = senderFaction;
-        SenderRankIcon = senderRankIcon;
     }
 }

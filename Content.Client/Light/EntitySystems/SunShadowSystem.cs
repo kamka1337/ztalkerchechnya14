@@ -29,14 +29,18 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
 
             var pausedTime = _metadata.GetPauseTime(uid);
 
-            var time = (float)(_timing.CurTime
+            var totalSeconds = (float) cycle.Duration.TotalSeconds;
+            if (totalSeconds <= 0f)
+                continue;
+
+            var rawTime = (float)(_timing.CurTime
                 .Add(cycle.Offset)
                 .Subtract(_ticker.RoundStartTimeSpan)
                 .Subtract(pausedTime)
-                .TotalSeconds % cycle.Duration.TotalSeconds);
+                .TotalSeconds);
+            var time = ((rawTime % totalSeconds) + totalSeconds) % totalSeconds;
 
-            var peakTime = (float) cycle.Duration.TotalSeconds * 0.5f;
-            var (direction, alpha) = GetShadow((uid, cycle), peakTime);
+            var (direction, alpha) = GetShadow((uid, cycle), time);
             shadow.Direction = direction;
             shadow.Alpha = alpha;
         }
@@ -54,7 +58,7 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
         {
             var dir = entity.Comp.Directions[i];
 
-            if (ratio > dir.Ratio)
+            if (ratio >= dir.Ratio)
             {
                 var next = entity.Comp.Directions[(i + 1) % entity.Comp.Directions.Count];
                 float nextRatio;
@@ -88,6 +92,7 @@ public sealed class SunShadowSystem : SharedSunShadowSystem
             }
         }
 
-        throw new InvalidOperationException();
+        var firstDir = entity.Comp.Directions[0];
+        return (firstDir.Direction, firstDir.Alpha);
     }
 }

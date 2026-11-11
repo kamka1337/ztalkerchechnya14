@@ -14,19 +14,21 @@ public sealed partial class MainMenuControl : Control
     public const string StyleIdentifierMainMenu = "mainMenu";
     public const string StyleIdentifierMainMenuVBox = "mainMenuVBox";
 
+    public const string StyleClassMainMenuCard = "mainMenuCard";
+    public const string StyleClassMainMenuAccentBar = "mainMenuAccentBar";
+    public const string StyleClassMainMenuDivider = "mainMenuDivider";
+    public const string StyleClassMainMenuLabel = "mainMenuLabel";
+    public const string StyleClassMainMenuLineEdit = "mainMenuLineEdit";
+
+    public const string StyleClassMainMenuConnectButton = "mainMenuConnectButton";
+    public const string StyleClassMainMenuSecondaryButton = "mainMenuSecondaryButton";
+    public const string StyleClassMainMenuDangerButton = "mainMenuDangerButton";
+
     public MainMenuControl(IResourceCache resCache, IConfigurationManager configMan)
     {
         RobustXamlLoader.Load(this);
 
         LayoutContainer.SetAnchorPreset(this, LayoutContainer.LayoutPreset.Wide);
-
-        LayoutContainer.SetAnchorPreset(VBox, LayoutContainer.LayoutPreset.TopRight);
-        LayoutContainer.SetMarginRight(VBox, -25);
-        LayoutContainer.SetMarginTop(VBox, 30);
-        LayoutContainer.SetGrowHorizontal(VBox, LayoutContainer.GrowDirection.Begin);
-
-        var logoTexture = resCache.GetResource<TextureResource>("/Textures/Logo/logo.png");
-        Logo.Texture = logoTexture;
 
         var currentUserName = configMan.GetCVar(CVars.PlayerName);
         UsernameBox.Text = currentUserName;

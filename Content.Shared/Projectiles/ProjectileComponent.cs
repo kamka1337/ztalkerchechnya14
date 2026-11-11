@@ -2,6 +2,7 @@ using Content.Shared.Damage;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
+using Robust.Shared.Map; // Stalker-Changes
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Projectiles;
@@ -101,4 +102,16 @@ public sealed partial class ProjectileComponent : Component
 
     [DataField("projectileClass")]
     public int? ProjectileClass; // Stalker-Changes
+
+    /// <summary>
+    /// Coordinates where the projectile was spawned/fired from.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public EntityCoordinates? StartCoordinates; // Stalker-Changes
+
+    /// <summary>
+    /// Simulation tick when the projectile was spawned/fired.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public uint StartTick; // Stalker-Changes
 }

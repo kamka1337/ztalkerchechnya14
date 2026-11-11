@@ -3,7 +3,6 @@ using Content.Server.Administration.Logs;
 using Content.Server.CartridgeLoader;
 using Content.Shared._Stalker.Bands;
 using Content.Shared._Stalker_EN.BulletinBoard;
-using Content.Shared._Stalker_EN.CharacterRank;
 using Content.Shared._Stalker_EN.FactionRelations;
 using Content.Shared._Stalker_EN.PdaMessenger;
 using Content.Shared.CartridgeLoader;
@@ -207,7 +206,6 @@ public sealed class STBulletinBoardSystem : EntitySystem
             return;
 
         var posterFaction = ResolveFactionForOwner(server);
-        var posterRankIcon = ResolveRankIconForOwner(server);
         var posterMessengerId = _messenger.GetMessengerId(server.OwnerUserId, server.OwnerCharacterName);
 
         var offer = new STBulletinOffer(
@@ -217,7 +215,6 @@ public sealed class STBulletinBoardSystem : EntitySystem
             server.OwnerCharacterName,
             posterMessengerId,
             posterFaction,
-            posterRankIcon,
             description,
             _timing.CurTime);
 
@@ -610,17 +607,6 @@ public sealed class STBulletinBoardSystem : EntitySystem
     }
 
     /// <summary>
-    /// Resolves the rank icon prototype ID for an entity via STCharacterRankComponent.
-    /// </summary>
-    private string? ResolveRankIcon(EntityUid uid)
-    {
-        if (!TryComp<STCharacterRankComponent>(uid, out var rank))
-            return null;
-
-        return rank.RankIconId;
-    }
-
-    /// <summary>
     /// Resolves the faction name for an entity via BandsComponent.
     /// </summary>
     private string? ResolveFaction(EntityUid uid)
@@ -654,21 +640,6 @@ public sealed class STBulletinBoardSystem : EntitySystem
             return null;
 
         return ResolveFaction(mob);
-    }
-
-    /// <summary>
-    /// Resolves the rank icon for the PDA's original owner via their current session.
-    /// Returns null if the owner is offline.
-    /// </summary>
-    private string? ResolveRankIconForOwner(STBulletinServerComponent server)
-    {
-        if (!_playerManager.TryGetSessionById(new NetUserId(server.OwnerUserId), out var session))
-            return null;
-
-        if (session.AttachedEntity is not { } mob)
-            return null;
-
-        return ResolveRankIcon(mob);
     }
 
     /// <summary>

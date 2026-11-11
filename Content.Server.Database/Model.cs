@@ -60,7 +60,6 @@ namespace Content.Server.Database
         public DbSet<StalkerNewsArticle> StalkerNewsArticles { get; set; } = null!; // stalker-en-changes
         public DbSet<StalkerNewsComment> StalkerNewsComments { get; set; } = null!; // stalker-en-changes
         public DbSet<StalkerNewsReaction> StalkerNewsReactions { get; set; } = null!; // stalker-en-changes
-        public DbSet<StalkerCharacterRank> StalkerCharacterRanks { get; set; } = null!; // stalker-en-changes
         public DbSet<StalkerPersistentCraftProfile> StalkerPersistentCraftProfiles { get; set; } = null!; // stalker-en-changes
         public DbSet<StalkerNewsArticlePhoto> StalkerNewsArticlePhotos { get; set; } = null!; // stalker-en-changes
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -416,9 +415,6 @@ namespace Content.Server.Database
             modelBuilder.Entity<StalkerNewsReaction>()
                 .HasIndex(r => new { r.TargetType, r.TargetId, r.UserId, r.ReactionId })
                 .IsUnique();
-
-            modelBuilder.Entity<StalkerCharacterRank>()
-                .HasKey(r => new { r.UserId, r.CharacterName });
 
             modelBuilder.Entity<StalkerPersistentCraftProfile>()
                 .HasKey(p => new { p.UserId, p.CharacterName });
@@ -1769,24 +1765,7 @@ namespace Content.Server.Database
     }
     // stalker-en-changes-end
 
-    // stalker-en-changes-start: Character rank persistence
-    /// <summary>
-    /// Stores cumulative active playtime for a (user, character name) pair,
-    /// used to derive the character's rank tier.
-    /// Composite key: (UserId, CharacterName).
-    /// </summary>
-    public sealed class StalkerCharacterRank
-    {
-        [Required]
-        public Guid UserId { get; set; }
-
-        [Required]
-        public string CharacterName { get; set; } = default!;
-
-        [Required]
-        public TimeSpan TimeSpent { get; set; }
-    }
-
+    // stalker-en-changes-start: Persistent craft profile persistence
     /// <summary>
     /// Stores a persistent, character-bound progression profile for the separate crafting system.
     /// Composite key: (UserId, CharacterName).

@@ -120,11 +120,15 @@ public sealed class STGrenadeLauncherSystem : STSharedGrenadeLauncherSystem
         if (args.Container.ID != LauncherSlotId)
             return;
 
-        if (TryComp<STGrenadeLauncherModuleComponent>(args.Entity, out var launcherComp) && launcherComp.FireActionEntity != null)
-        {
-            Del(launcherComp.FireActionEntity.Value);
-            launcherComp.FireActionEntity = null;
-        }
+        if (!TryComp<STGrenadeLauncherModuleComponent>(args.Entity, out var launcherComp) || launcherComp.FireActionEntity is not { } actionEnt)
+            return;
+
+        if (!TerminatingOrDeleted(gun) && !TerminatingOrDeleted(actionEnt))
+            Del(actionEnt);
+
+        launcherComp.FireActionEntity = null;
+        if (!TerminatingOrDeleted(args.Entity))
+            Dirty(args.Entity, launcherComp);
     }
 
     // ─── Context Verbs (Unload only; loading is strictly manual) ──────────────

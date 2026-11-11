@@ -161,6 +161,8 @@ public sealed class LimbHealthSystem : EntitySystem
         if (!negative.Empty)
             DistributeHeal(ent.Comp, negative);
 
+        CheckHeadDestruction(ent.Comp, destroyedNow);
+
         RecomputeBody(ent.Owner, ent.Comp, notify: dealt, origin: args.Origin, interruptsDoAfters: true);
         Dirty(ent);
 
@@ -365,6 +367,8 @@ public sealed class LimbHealthSystem : EntitySystem
             dmg.DamageDict["Bloodloss"] = share;
             AbsorbInto(comp, l, dmg, destroyedNow);
         }
+
+        CheckHeadDestruction(comp, destroyedNow);
 
         RecomputeBody(uid, comp);
         Dirty(uid, comp);
@@ -635,6 +639,9 @@ public sealed class LimbHealthSystem : EntitySystem
 
         var destroyedNow = new List<LimbType>();
         AbsorbInto(comp, limb, dmg, destroyedNow);
+
+        CheckHeadDestruction(comp, destroyedNow);
+
         RecomputeBody(uid, comp);
         Dirty(uid, comp);
 
@@ -735,6 +742,42 @@ public sealed class LimbHealthSystem : EntitySystem
                 count++;
         }
         return count;
+    }
+
+    public bool CheckHeadDestruction(LimbHealthComponent comp, List<LimbType> destroyedNow)
+    {
+        if (comp.Limbs.TryGetValue(LimbType.Head, out var head) && !head.Destroyed && CountDestroyed(comp) >= 6)
+        {
+            head.Destroyed = true;
+            if (comp.MaxHealth.TryGetValue(LimbType.Head, out var maxHp))
+            {
+                var remaining = head.Health(maxHp);
+                if (remaining > 0)
+                {
+                    head.Damage.DamageDict.TryGetValue("Blunt", out var existing);
+                    head.Damage.DamageDict["Blunt"] = existing + remaining;
+                }
+            }
+            destroyedNow.Add(LimbType.Head);
+            return true;
+        }
+        return false;
+    }
+
+    public bool TryDestroyHeadOnSixLimbs(EntityUid uid, LimbHealthComponent comp)
+    {
+        var destroyedNow = new List<LimbType>();
+        if (!CheckHeadDestruction(comp, destroyedNow))
+            return false;
+
+        RecomputeBody(uid, comp);
+        Dirty(uid, comp);
+
+        foreach (var l in destroyedNow)
+            RaiseLocalEvent(new LimbDestroyedEvent(uid, l));
+
+        RefreshVitalsActive(uid, comp);
+        return true;
     }
 
     public FixedPoint2 GetTotalHealth(LimbHealthComponent comp)

@@ -13,6 +13,7 @@ using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Serialization;
+using Robust.Shared.Timing; // Stalker-Changes
 using Robust.Shared.Utility;
 
 namespace Content.Shared.Projectiles;
@@ -26,11 +27,13 @@ public abstract partial class SharedProjectileSystem : EntitySystem
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
+    [Dependency] private readonly IGameTiming _timing = default!; // Stalker-Changes
 
     public override void Initialize()
     {
         base.Initialize();
 
+        SubscribeLocalEvent<ProjectileComponent, MapInitEvent>(OnProjectileMapInit); // Stalker-Changes
         SubscribeLocalEvent<ProjectileComponent, PreventCollideEvent>(PreventCollision);
         SubscribeLocalEvent<EmbeddableProjectileComponent, ProjectileHitEvent>(OnEmbedProjectileHit);
         SubscribeLocalEvent<EmbeddableProjectileComponent, ThrowDoHitEvent>(OnEmbedThrowDoHit);
@@ -210,6 +213,21 @@ public abstract partial class SharedProjectileSystem : EntitySystem
         component.Shooter = shooterId;
         Dirty(id, component);
     }
+
+    // Stalker-Changes-Start
+    private void OnProjectileMapInit(Entity<ProjectileComponent> ent, ref MapInitEvent args)
+    {
+        if (ent.Comp.StartCoordinates is null)
+            SetShotOrigin(ent.Owner, ent.Comp);
+    }
+
+    public void SetShotOrigin(EntityUid id, ProjectileComponent component)
+    {
+        component.StartCoordinates = _transform.GetMoverCoordinates(id);
+        component.StartTick = _timing.CurTick.Value;
+        Dirty(id, component);
+    }
+    // Stalker-Changes-End
 
     [Serializable, NetSerializable]
     private sealed partial class RemoveEmbeddedProjectileEvent : DoAfterEvent

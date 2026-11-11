@@ -36,12 +36,6 @@ public sealed class STBulletinOffer
     /// </summary>
     public readonly string? PosterFaction;
 
-    /// <summary>
-    /// JobIcon prototype ID for the poster's rank icon (resolved at post time).
-    /// Null if the poster has no rank.
-    /// </summary>
-    public readonly string? PosterRankIcon;
-
     /// <summary>Free-text description of the offer.</summary>
     public readonly string Description;
 
@@ -55,7 +49,6 @@ public sealed class STBulletinOffer
         string posterName,
         string? posterMessengerId,
         string? posterFaction,
-        string? posterRankIcon,
         string description,
         TimeSpan timestamp)
     {
@@ -65,7 +58,6 @@ public sealed class STBulletinOffer
         PosterName = posterName;
         PosterMessengerId = posterMessengerId;
         PosterFaction = posterFaction;
-        PosterRankIcon = posterRankIcon;
         Description = description;
         Timestamp = timestamp;
     }

@@ -31,7 +31,7 @@ public abstract class SharedSunShadowSystem : EntitySystem
         }
         else
         {
-            ent.Comp.Offset = TimeSpan.FromSeconds(ent.Comp.Duration.TotalSeconds * 0.5);
+            ent.Comp.Offset = _random.Next(ent.Comp.Duration);
         }
 
         Dirty(ent);

@@ -1,0 +1,56 @@
+light_mode unshaded;
+blend_mode mix;
+
+uniform highp float shadowStrength;
+uniform highp float cloudTime;
+uniform highp vec2 windVelocity;
+
+varying highp vec2 worldPos;
+
+void vertex() {
+    worldPos = aPos;
+}
+
+highp float hash21(highp vec2 p) {
+    highp vec3 p3 = fract((p.xyx + vec3(17.13, 41.79, 17.13)) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+highp float fastNoise(highp vec2 p) {
+    highp vec2 i = floor(p);
+    highp vec2 f = fract(p);
+    highp vec2 u = f * f * (3.0 - 2.0 * f);
+
+    highp float a = hash21(i);
+    highp float b = hash21(i + vec2(1.0, 0.0));
+    highp float c = hash21(i + vec2(0.0, 1.0));
+    highp float d = hash21(i + vec2(1.0, 1.0));
+
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+void fragment() {
+    highp float windLen = max(length(windVelocity), 0.0001);
+    highp vec2 windDir = windVelocity / windLen;
+    highp vec2 windPerp = vec2(-windDir.y, windDir.x);
+
+    highp vec2 drifted = worldPos * 0.025 - windVelocity * cloudTime;
+    highp vec2 flow = vec2(dot(drifted, windDir) * 0.65, dot(drifted, windPerp) * 1.12);
+
+    // Sparse macro pockets (~110m intervals) + subtle domain warp
+    highp float macro = fastNoise(flow * 0.55 + vec2(3.1, 7.4));
+    highp float warp = fastNoise(flow * 0.85 + vec2(11.3, 4.9)) - 0.5;
+    highp vec2 warped = flow + vec2(warp * 0.65, -warp * 0.42);
+
+    // Two rotated cumulus octaves for asymmetric organic silhouettes without grid artifacts
+    highp float oct1 = fastNoise(warped * 1.10 + vec2(1.7, 5.2));
+    highp vec2 rot2 = vec2(warped.x * 0.80 - warped.y * 0.60, warped.x * 0.60 + warped.y * 0.80);
+    highp float oct2 = fastNoise(rot2 * 2.25 + vec2(19.3, 37.1));
+    highp float cumulus = oct1 * 0.68 + oct2 * 0.32;
+
+    highp float shape = macro * 0.54 + cumulus * 0.46;
+    highp float density = smoothstep(0.59, 0.70, shape);
+
+    COLOR = vec4(0.02, 0.04, 0.09, density * shadowStrength);
+}

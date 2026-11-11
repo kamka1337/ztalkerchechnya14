@@ -2491,46 +2491,6 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
         }
         // stalker-en-changes-end
 
-        // stalker-en-changes-start: Character rank persistence
-        public async Task<StalkerCharacterRank?> GetStalkerCharacterRankAsync(Guid userId, string characterName)
-        {
-            await using var db = await GetDb();
-            return await db.DbContext.StalkerCharacterRanks
-                .FirstOrDefaultAsync(r => r.UserId == userId && r.CharacterName == characterName);
-        }
-
-        public async Task UpdateStalkerCharacterRankTimesAsync(
-            IReadOnlyCollection<(Guid UserId, string CharacterName, TimeSpan Time)> updates)
-        {
-            await using var db = await GetDb();
-
-            // Bulk-load existing records for all users involved.
-            var userIds = updates.Select(u => u.UserId).Distinct().ToArray();
-            var dbRanks = (await db.DbContext.StalkerCharacterRanks
-                    .Where(r => userIds.Contains(r.UserId))
-                    .ToArrayAsync())
-                .ToDictionary(r => (r.UserId, r.CharacterName), r => r);
-
-            foreach (var (userId, characterName, time) in updates)
-            {
-                if (dbRanks.TryGetValue((userId, characterName), out var existing))
-                {
-                    existing.TimeSpent = time;
-                    continue;
-                }
-
-                db.DbContext.StalkerCharacterRanks.Add(new StalkerCharacterRank
-                {
-                    UserId = userId,
-                    CharacterName = characterName,
-                    TimeSpent = time,
-                });
-            }
-
-            await db.DbContext.SaveChangesAsync();
-        }
-        // stalker-en-changes-end
-
         // stalker-en-changes-start: Persistent craft profile persistence
         public async Task<StalkerPersistentCraftProfile?> GetStalkerPersistentCraftProfileAsync(Guid userId, string characterName)
         {

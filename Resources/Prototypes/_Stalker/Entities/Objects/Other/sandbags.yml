@@ -21,6 +21,12 @@
   - type: Icon
     sprite: _Stalker/Structures/sandbags.rsi
     state: full
+  - type: STProjectilePassThrough
+    pointBlankRange: 1.5
+    pointBlankChance: 1.0
+    referenceRange: 10
+    referenceChance: 0.5
+    minChance: 0.0
   - type: Destructible
     thresholds:
     - trigger:

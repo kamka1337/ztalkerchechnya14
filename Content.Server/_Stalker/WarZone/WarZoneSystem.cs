@@ -12,6 +12,11 @@ using Content.Shared._Stalker.Bands;
 using Content.Shared.NPC.Prototypes;
 using Content.Shared.Chat;
 using Content.Server.Chat.Systems;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Systems;
 using System.Linq;
 
 namespace Content.Server._Stalker.WarZone;
@@ -25,6 +30,8 @@ public sealed partial class WarZoneSystem : EntitySystem
     [Dependency] private readonly IChatManager _chatManager = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     private readonly Dictionary<string, float> _bandPoints = new();
     private readonly Dictionary<string, float> _factionPoints = new();
     private readonly Dictionary<EntityUid, TimeSpan> _lastRewardTimes = new();
@@ -109,6 +116,7 @@ public sealed partial class WarZoneSystem : EntitySystem
         SubscribeLocalEvent<WarZoneComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<WarZoneComponent, EndCollideEvent>(OnEndCollide);
         SubscribeLocalEvent<MetaDataComponent, EntityTerminatingEvent>(OnEntityTerminating);
+        SubscribeLocalEvent<MobStateChangedEvent>(OnMobStateChanged);
     }
 
     private void OnWarZoneInit(EntityUid uid, WarZoneComponent component, ComponentInit args)
@@ -178,6 +186,7 @@ public sealed partial class WarZoneSystem : EntitySystem
         comp.CaptureProgressTime = 0f;
         comp.CaptureProgress = 0f;
         comp.LastAnnouncedProgressStep = 0;
+        comp.CaptureInProgress = false;
     }
 
     private async Task UpdateCaptureAsync(EntityUid zone, WarZoneComponent comp, TimeSpan now, float effectiveFrameTime)
@@ -185,10 +194,38 @@ public sealed partial class WarZoneSystem : EntitySystem
         if (!comp.InitialLoadComplete || !_prototypeManager.TryIndex<STWarZonePrototype>(comp.ZoneProto, out var wzProto))
             return;
 
-        // --- New Capture Logic ---
+        // Clean up any dead, terminating or invalid entities from PresentEntities
+        if (comp.PresentEntities != null && comp.PresentEntities.Count > 0)
+        {
+            List<EntityUid>? invalid = null;
+            foreach (var ent in comp.PresentEntities)
+            {
+                if (!IsEligibleCapturer(ent))
+                {
+                    invalid ??= new();
+                    invalid.Add(ent);
+                }
+            }
 
-        // 0. Determine Present Bands and Factions
-        var presentBands = comp.PresentBandProtoIds; // Use the set populated by collision events
+            if (invalid != null)
+            {
+                foreach (var ent in invalid)
+                {
+                    string? bId = null;
+                    string? fId = null;
+                    if (_entityManager.TryGetComponent(ent, out BandsComponent? b) &&
+                        _prototypeManager.TryIndex<STBandPrototype>(b.BandProto, out var bp))
+                    {
+                        bId = bp.ID;
+                        fId = bp.FactionId;
+                    }
+                    RemoveEntityFromCaptureZone(zone, comp, ent, bId, fId);
+                }
+            }
+        }
+
+        // Determine Present Bands and Factions
+        var presentBands = comp.PresentBandProtoIds;
         var presentFactions = new HashSet<string>();
         if (presentBands != null)
         {
@@ -201,80 +238,118 @@ public sealed partial class WarZoneSystem : EntitySystem
             }
         }
 
-        // Get an entity for popups (doesn't matter which one in cooperative scenarios)
         EntityUid? feedbackEntity = GetFirstEntity(comp.PresentEntities);
-
-        // --- Scenario Handling ---
-
-        string? currentAttackerBand = null;
-        string? currentAttackerFaction = null;
-        bool proceedWithCapture = false;
-        bool awardToFaction = false; // Flag to indicate if ownership should go to faction
 
         // Scenario 1: No Bands Present
         if (presentBands == null || presentBands.Count == 0)
         {
-            if (comp.CurrentAttackerBandProtoId != null || comp.CurrentAttackerFactionProtoId != null)
+            if (comp.CaptureInProgress && (comp.CurrentAttackerBandProtoId != null || comp.CurrentAttackerFactionProtoId != null))
             {
                 AnnounceCaptureAbandonedLocal(zone, comp, "No attackers present");
-                ResetCaptureProgress(comp);
-                comp.CurrentAttackerBandProtoId = null;
-                comp.CurrentAttackerFactionProtoId = null;
+                comp.CaptureInProgress = false;
             }
+            // Capture progress does NOT reset when interrupted.
             return;
         }
-        // Scenario 2: Single Band Present
-        else if (presentBands.Count == 1)
+
+        // Scenario 2: Multiple Factions Present (Conflict / Contested)
+        if (presentFactions.Count > 1)
         {
-            currentAttackerBand = GetFirst(presentBands);
-            if (currentAttackerBand != null && _prototypeManager.TryIndex<STBandPrototype>(currentAttackerBand, out var bandProto))
+            if (comp.CaptureInProgress && (comp.CurrentAttackerBandProtoId != null || comp.CurrentAttackerFactionProtoId != null))
             {
-                currentAttackerFaction = bandProto.FactionId; // Faction associated with the single band
-                proceedWithCapture = true;
-                awardToFaction = false; // Award to the band
+                AnnounceCaptureAbandonedLocal(zone, comp, "Conflicting forces present");
+                comp.CaptureInProgress = false;
+            }
+            // Conflict pauses capture progress without resetting it.
+            return;
+        }
+
+        // Scenario 3: Single Faction Present
+        string? singlePresentBand = presentBands.Count == 1 ? GetFirst(presentBands) : null;
+        string? singlePresentFaction = GetFirst(presentFactions);
+
+        // Check if the present faction/band is the current defender / ally
+        bool isDefender = false;
+        if (!string.IsNullOrEmpty(comp.DefendingBandProtoId))
+        {
+            if (singlePresentBand != null && singlePresentBand == comp.DefendingBandProtoId)
+            {
+                isDefender = true;
+            }
+            else if (singlePresentFaction != null &&
+                     _prototypeManager.TryIndex<STBandPrototype>(comp.DefendingBandProtoId, out var defBandProto) &&
+                     defBandProto.FactionId == singlePresentFaction)
+            {
+                isDefender = true;
             }
         }
-        // Scenario 3: Multiple Bands Present
-        else // presentBands.Count > 1
+        else if (!string.IsNullOrEmpty(comp.DefendingFactionProtoId) && singlePresentFaction != null)
         {
-            // Subcase 3a: Single Faction (Cooperation)
-            if (presentFactions.Count == 1)
+            if (singlePresentFaction == comp.DefendingFactionProtoId)
             {
-                currentAttackerFaction = GetFirst(presentFactions);
-                currentAttackerBand = null; // Explicitly no single band attacker
-                proceedWithCapture = true;
-                awardToFaction = true; // Award to the faction
+                isDefender = true;
             }
-            // Subcase 3b: Multiple Factions (Conflict)
-            else
+        }
+
+        // Defender standing on their own flag: roll back enemy capture progress
+        if (isDefender)
+        {
+            comp.CaptureInProgress = false;
+
+            if (comp.CaptureProgressTime > 0f)
             {
-                if (comp.CurrentAttackerBandProtoId != null || comp.CurrentAttackerFactionProtoId != null)
+                comp.CaptureProgressTime = MathF.Max(0f, comp.CaptureProgressTime - effectiveFrameTime);
+                comp.CaptureProgress = Math.Clamp(comp.CaptureProgressTime / wzProto.CaptureTime, 0f, 1f);
+
+                var step = (int)Math.Ceiling(comp.CaptureProgress * 10);
+                if (step < comp.LastAnnouncedProgressStep)
                 {
-                    AnnounceCaptureAbandonedLocal(zone, comp, "Conflicting forces present");
+                    comp.LastAnnouncedProgressStep = step;
+                    if (feedbackEntity.HasValue)
+                        AnnounceCaptureProgressLocal(zone, comp, (int)(comp.CaptureProgress * 100));
+                }
+
+                if (comp.CaptureProgressTime <= 0f)
+                {
                     ResetCaptureProgress(comp);
                     comp.CurrentAttackerBandProtoId = null;
                     comp.CurrentAttackerFactionProtoId = null;
+
+                    var portalName = comp.PortalName ?? "Unknown";
+                    var message = Loc.GetString("st-warzone-capture-restored", ("zone", portalName));
+                    var mapCoords = _transformSystem.GetMapCoordinates(zone);
+                    var filter = Filter.Empty().AddInRange(mapCoords, ChatSystem.VoiceRange);
+                    _chatManager.ChatMessageToManyFiltered(filter, ChatChannel.Emotes, message, message, zone, false, true, colorOverride: null);
                 }
-                return; // Conflict stops capture
             }
-        }
 
-        // --- Capture Progression ---
-
-        if (!proceedWithCapture || (currentAttackerBand == null && currentAttackerFaction == null))
-        {
-            // Should not happen if logic above is correct, but safety check
-            Logger.WarningS("warzone", $"Zone '{comp.PortalName}': Capture logic reached invalid state. Bands: {presentBands.Count}, Factions: {presentFactions.Count}. AttackerBand: {currentAttackerBand}, AttackerFaction: {currentAttackerFaction}");
             return;
         }
 
-        // Check if the attacker (band or faction) is the current defender
-        if ((!awardToFaction && currentAttackerBand != null && currentAttackerBand == comp.DefendingBandProtoId) ||
-            (awardToFaction && currentAttackerFaction != null && currentAttackerFaction == comp.DefendingFactionProtoId))
+        // Attackers present
+        string? currentAttackerBand = null;
+        string? currentAttackerFaction = null;
+        bool awardToFaction = false;
+
+        if (presentBands.Count == 1)
         {
-            // Defender is present alone or with allies, no capture progress change needed.
-            // Reset requirements state if necessary (though capture isn't progressing anyway)
-            ResetAllRequirements(zone);
+            currentAttackerBand = singlePresentBand;
+            if (currentAttackerBand != null && _prototypeManager.TryIndex<STBandPrototype>(currentAttackerBand, out var bandProto))
+            {
+                currentAttackerFaction = bandProto.FactionId;
+                awardToFaction = false;
+            }
+        }
+        else
+        {
+            currentAttackerFaction = singlePresentFaction;
+            currentAttackerBand = null;
+            awardToFaction = true;
+        }
+
+        if (currentAttackerBand == null && currentAttackerFaction == null)
+        {
+            Logger.WarningS("warzone", $"Zone '{comp.PortalName}': Capture logic reached invalid state. Bands: {presentBands.Count}, Factions: {presentFactions.Count}.");
             return;
         }
 
@@ -289,26 +364,23 @@ public sealed partial class WarZoneSystem : EntitySystem
                 var message = Loc.GetString("st-warzone-cooldown", ("zone", portalName), ("minutes", $"{remainingTime.TotalMinutes:F1}"));
                 _popup.PopupEntity(message, feedbackEntity.Value);
             }
-            return; // Block capture attempt due to cooldown
+            return;
         }
 
         // Check for New Attacker (Band or Faction)
-        // This logic remains the same, but the underlying PresentBandProtoIds/PresentFactionProtoIds
-        // are now more stable due to the count-based updates in collision handlers.
         bool isNewAttacker = (currentAttackerBand != comp.CurrentAttackerBandProtoId || currentAttackerFaction != comp.CurrentAttackerFactionProtoId);
         if (isNewAttacker)
         {
-            // Logger.InfoS("warzone", $"Zone '{comp.PortalName}': Attacker changed. Calculated: B={currentAttackerBand ?? "N"}, F={currentAttackerFaction ?? "N"}. Stored: B={comp.CurrentAttackerBandProtoId ?? "N"}, F={comp.CurrentAttackerFactionProtoId ?? "N"}. Resetting progress."); // Optional debug log
             ResetCaptureProgress(comp);
-             comp.CurrentAttackerBandProtoId = currentAttackerBand;
-             comp.CurrentAttackerFactionProtoId = currentAttackerFaction;
-             // Announce based on who is attacking (band or faction)
-             string attackerName = GetAttackerName(currentAttackerBand, currentAttackerFaction);
-             AnnounceCaptureStartedLocal(zone, comp, attackerName);
+            comp.CurrentAttackerBandProtoId = currentAttackerBand;
+            comp.CurrentAttackerFactionProtoId = currentAttackerFaction;
+            string attackerName = GetAttackerName(currentAttackerBand, currentAttackerFaction);
+            AnnounceCaptureStartedLocal(zone, comp, attackerName);
         }
 
+        comp.CaptureInProgress = true;
+
         // Check Requirements
-        // Prepare data for requirement checks
         var ownerships = new Dictionary<ProtoId<STWarZonePrototype>, (string? BandProtoId, string? FactionProtoId)>();
         var lastCaptureTimes = new Dictionary<ProtoId<STWarZonePrototype>, DateTime?>();
         var zonePrototypes = new Dictionary<ProtoId<STWarZonePrototype>, STWarZonePrototype>();
@@ -336,7 +408,6 @@ public sealed partial class WarZoneSystem : EntitySystem
         {
             foreach (var req in wzProto.Requirements)
             {
-                // Pass the *effective* attacker (band OR faction) to the check
                 var blockReason = req.Check(
                     currentAttackerBand,
                     currentAttackerFaction,
@@ -358,8 +429,6 @@ public sealed partial class WarZoneSystem : EntitySystem
 
         if (!allMet)
         {
-            // If requirements fail, reset progress *if* it was a new attacker this tick.
-            // This prevents progress sticking if requirements become unmet mid-capture.
             if (isNewAttacker) ResetCaptureProgress(comp);
             return;
         }
@@ -369,29 +438,27 @@ public sealed partial class WarZoneSystem : EntitySystem
         comp.CaptureProgress = Math.Clamp(comp.CaptureProgressTime / wzProto.CaptureTime, 0f, 1f);
 
         // Announce each 10% increment locally
-        var step = (int)(comp.CaptureProgress * 10);
-        if (step > comp.LastAnnouncedProgressStep)
+        var progressStep = (int)(comp.CaptureProgress * 10);
+        if (progressStep > comp.LastAnnouncedProgressStep)
         {
-            comp.LastAnnouncedProgressStep = step;
+            comp.LastAnnouncedProgressStep = progressStep;
             if (feedbackEntity.HasValue)
-                AnnounceCaptureProgressLocal(zone, comp, step * 10);
+                AnnounceCaptureProgressLocal(zone, comp, progressStep * 10);
         }
 
         // Check for Capture Completion
         if (comp.CaptureProgressTime < wzProto.CaptureTime)
-            return; // Not captured yet
+            return;
 
         // --- Capture Complete ---
-
         ProtoId<STBandPrototype>? finalBandOwnerId = null;
         ProtoId<NpcFactionPrototype>? finalFactionOwnerId = null;
         string finalOwnerName;
 
         if (awardToFaction)
         {
-            // Faction Capture
             comp.DefendingFactionProtoId = currentAttackerFaction;
-            comp.DefendingBandProtoId = null; // Clear band defender
+            comp.DefendingBandProtoId = null;
             if (currentAttackerFaction != null)
                 finalFactionOwnerId = new ProtoId<NpcFactionPrototype>(currentAttackerFaction);
             finalOwnerName = GetAttackerName(null, currentAttackerFaction);
@@ -399,51 +466,40 @@ public sealed partial class WarZoneSystem : EntitySystem
         }
         else
         {
-            // Band Capture
             comp.DefendingBandProtoId = currentAttackerBand;
-            comp.DefendingFactionProtoId = currentAttackerFaction; // Store associated faction as defender info
+            comp.DefendingFactionProtoId = currentAttackerFaction;
             if (currentAttackerBand != null)
                 finalBandOwnerId = new ProtoId<STBandPrototype>(currentAttackerBand);
-            finalOwnerName = GetAttackerName(currentAttackerBand, null); // Prioritize band name
-             Logger.InfoS("warzone", $"Zone '{comp.PortalName}' captured by Band: {currentAttackerBand}");
+            finalOwnerName = GetAttackerName(currentAttackerBand, null);
+            Logger.InfoS("warzone", $"Zone '{comp.PortalName}' captured by Band: {currentAttackerBand}");
         }
 
-        // Update Database Ownership
         await _dbManager.SetStalkerZoneOwnershipAsync(
             comp.ZoneProto,
             finalBandOwnerId,
             finalFactionOwnerId);
 
-        // Set Cooldown
         if (wzProto.CaptureCooldownHours > 0)
         {
             comp.CooldownEndTime = _gameTiming.CurTime + TimeSpan.FromHours(wzProto.CaptureCooldownHours);
         }
 
-        // Announce Server-Wide
         _chatManager.DispatchServerAnnouncement(Loc.GetString(
             "st-warzone-captured",
             ("zone", comp.PortalName ?? "Unknown"),
             ("attacker", finalOwnerName)));
 
-        // Reset Reward Timer
         _lastRewardTimes[zone] = _gameTiming.CurTime;
 
-        // Finalize progress state
         comp.CaptureProgress = 1f;
-        // Reset progress time and clear attacker for next capture
         comp.CaptureProgressTime = 0f;
         comp.CurrentAttackerBandProtoId = null;
         comp.CurrentAttackerFactionProtoId = null;
+        comp.CaptureInProgress = false;
     }
 
     private void ResetAllRequirements(EntityUid zone)
     {
-        // This function might need more granular logic if requirements have persistent state
-        // For now, just ensures capture progress is reset if defender is present
-        if (!_entityManager.TryGetComponent(zone, out WarZoneComponent? wzComp))
-            return;
-        ResetCaptureProgress(wzComp);
     }
 
     private void DistributeRewards(EntityUid zone, TimeSpan lastRewardTime, TimeSpan now)
@@ -517,13 +573,27 @@ public sealed partial class WarZoneSystem : EntitySystem
         return null;
     }
 
-    // Collision Handling - Manages counts and presence sets
-    private void OnStartCollide(EntityUid uid, WarZoneComponent component, ref readonly StartCollideEvent args)
+    private bool IsEligibleCapturer(EntityUid entity)
     {
-        var other = args.OtherEntity;
+        if (Deleted(entity) || Terminating(entity))
+            return false;
 
-        if (!_entityManager.TryGetComponent(other, out BandsComponent? bands) || bands.BandProto == default)
-            return; // Ignore entities without a valid band
+        if (!TryComp<MobStateComponent>(entity, out var mobState) || _mobState.IsDead(entity, mobState))
+            return false;
+
+        if (!_entityManager.TryGetComponent(entity, out BandsComponent? bands) || bands.BandProto == default)
+            return false;
+
+        return true;
+    }
+
+    private void AddEntityToCaptureZone(EntityUid zoneUid, WarZoneComponent component, EntityUid entity)
+    {
+        if (!IsEligibleCapturer(entity))
+            return;
+
+        if (!_entityManager.TryGetComponent(entity, out BandsComponent? bands) || bands.BandProto == default)
+            return;
 
         string? bandId = null;
         string? factionId = null;
@@ -534,121 +604,99 @@ public sealed partial class WarZoneSystem : EntitySystem
             factionId = bandProto.FactionId;
         }
 
-        // Ensure collections are initialized (should be by OnWarZoneInit, but safety first)
         component.PresentEntities ??= new();
         component.PresentBandProtoIds ??= new();
         component.PresentFactionProtoIds ??= new();
         component.PresentBandCounts ??= new();
         component.PresentFactionCounts ??= new();
 
-        // Add entity first. If already present, do nothing (collision might fire multiple times).
-        if (!component.PresentEntities.Add(other))
+        if (!component.PresentEntities.Add(entity))
             return;
 
-        // Update counts and presence sets
         bool changedState = false;
         if (bandId != null)
         {
             component.PresentBandCounts.TryGetValue(bandId, out var currentBandCount);
             component.PresentBandCounts[bandId] = currentBandCount + 1;
-            if (currentBandCount == 0) // Only add to set if count was zero before increment
+            if (currentBandCount == 0)
             {
                 component.PresentBandProtoIds.Add(bandId);
-                changedState = true; // Band presence changed from none to some
+                changedState = true;
             }
         }
         if (factionId != null)
         {
             component.PresentFactionCounts.TryGetValue(factionId, out var currentFactionCount);
             component.PresentFactionCounts[factionId] = currentFactionCount + 1;
-            if (currentFactionCount == 0) // Only add to set if count was zero before increment
+            if (currentFactionCount == 0)
             {
-                 component.PresentFactionProtoIds.Add(factionId);
-                 // Note: Faction presence change doesn't trigger immediate update on its own,
-                 // as band presence change is usually the more critical factor for capture state.
+                component.PresentFactionProtoIds.Add(factionId);
             }
         }
 
-        // Force an update check if a new band appeared
         if (changedState)
         {
             component.NextCheckTime = TimeSpan.Zero;
         }
     }
 
+    // Collision Handling - Manages counts and presence sets
+    private void OnStartCollide(EntityUid uid, WarZoneComponent component, ref readonly StartCollideEvent args)
+    {
+        AddEntityToCaptureZone(uid, component, args.OtherEntity);
+    }
+
     private void OnEndCollide(EntityUid uid, WarZoneComponent component, ref readonly EndCollideEvent args)
     {
         var other = args.OtherEntity;
-
-        // Check if the component or necessary collections are null before proceeding
-        if (component.PresentEntities == null || component.PresentBandProtoIds == null || component.PresentFactionProtoIds == null || component.PresentBandCounts == null || component.PresentFactionCounts == null)
-            return;
-
-        // Only process if the entity was actually present and is now leaving
-        if (!component.PresentEntities.Remove(other))
-             return; // Entity wasn't in the set, maybe EndCollide fired before StartCollide processed?
-
-        if (!_entityManager.TryGetComponent(other, out BandsComponent? bands) || bands.BandProto == default)
-        {
-             // Entity had no band component, but was somehow in PresentEntities.
-             // Just ensure NextCheckTime is reset in case its removal matters.
-             component.NextCheckTime = TimeSpan.Zero;
-             return;
-        }
-
         string? bandId = null;
         string? factionId = null;
 
-        if (_prototypeManager.TryIndex<STBandPrototype>(bands.BandProto, out var bandProto))
+        if (_entityManager.TryGetComponent(other, out BandsComponent? bands) &&
+            bands.BandProto != default &&
+            _prototypeManager.TryIndex<STBandPrototype>(bands.BandProto, out var bandProto))
         {
             bandId = bandProto.ID;
             factionId = bandProto.FactionId;
         }
 
-        // Update counts and presence sets
-        bool changedState = false;
-        if (bandId != null && component.PresentBandCounts.TryGetValue(bandId, out var currentBandCount))
-        {
-            if (currentBandCount > 1)
-            {
-                component.PresentBandCounts[bandId] = currentBandCount - 1;
-            }
-            else // Count is 1, will become 0
-            {
-                component.PresentBandCounts.Remove(bandId);
-                if (component.PresentBandProtoIds.Remove(bandId)) // Remove from set only when count reaches zero
-                    changedState = true; // Band presence changed from some to none
-            }
-        }
-        else if (bandId != null)
-        {
-             Logger.WarningS("warzone", $"Entity {other} ending collision in zone {uid} had band {bandId}, but band count was not found or already zero.");
-        }
+        RemoveEntityFromCaptureZone(uid, component, other, bandId, factionId);
+    }
 
-        if (factionId != null && component.PresentFactionCounts.TryGetValue(factionId, out var currentFactionCount))
+    private void OnMobStateChanged(MobStateChangedEvent args)
+    {
+        if (args.NewMobState == MobState.Dead)
         {
-             if (currentFactionCount > 1)
+            var query = EntityQueryEnumerator<WarZoneComponent>();
+            while (query.MoveNext(out var zoneUid, out var wzComp))
             {
-                component.PresentFactionCounts[factionId] = currentFactionCount - 1;
-            }
-            else // Count is 1, will become 0
-            {
-                component.PresentFactionCounts.Remove(factionId);
-                component.PresentFactionProtoIds.Remove(factionId); // Remove from set only when count reaches zero
-                // Note: Faction presence change doesn't trigger immediate update on its own.
-            }
-        }
-         else if (factionId != null)
-        {
-             Logger.WarningS("warzone", $"Entity {other} ending collision in zone {uid} had faction {factionId}, but faction count was not found or already zero.");
-        }
+                if (wzComp.PresentEntities != null && wzComp.PresentEntities.Contains(args.Target))
+                {
+                    string? bandId = null;
+                    string? factionId = null;
+                    if (_entityManager.TryGetComponent(args.Target, out BandsComponent? bands) &&
+                        _prototypeManager.TryIndex<STBandPrototype>(bands.BandProto, out var bandProto))
+                    {
+                        bandId = bandProto.ID;
+                        factionId = bandProto.FactionId;
+                    }
 
-        // Trigger an immediate check if a band disappeared entirely
-        if (changedState)
+                    RemoveEntityFromCaptureZone(zoneUid, wzComp, args.Target, bandId, factionId);
+                }
+            }
+        }
+        else if (args.OldMobState == MobState.Dead && args.NewMobState != MobState.Dead)
         {
-             // Use TryComp as the zone entity might be deleting simultaneously
-             if (TryComp<WarZoneComponent>(uid, out var wzComp))
-                 wzComp.NextCheckTime = TimeSpan.Zero;
+            if (TryComp<PhysicsComponent>(args.Target, out var physics))
+            {
+                foreach (var contacting in _physics.GetContactingEntities(args.Target, physics))
+                {
+                    if (TryComp<WarZoneComponent>(contacting, out var wzComp))
+                    {
+                        AddEntityToCaptureZone(contacting, wzComp, args.Target);
+                    }
+                }
+            }
         }
     }
 

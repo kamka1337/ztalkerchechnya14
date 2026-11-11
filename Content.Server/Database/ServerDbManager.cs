@@ -460,11 +460,6 @@ namespace Content.Server.Database
         Task<bool> ToggleStalkerNewsReactionAsync(int targetType, int targetId, Guid userId, string reactionId);
         Task DeleteStalkerNewsReactionsByTargetAsync(int targetType, int targetId);
 
-        // stalker-en-changes-start: Character rank persistence
-        Task<StalkerCharacterRank?> GetStalkerCharacterRankAsync(Guid userId, string characterName);
-        Task UpdateStalkerCharacterRankTimesAsync(IReadOnlyCollection<(Guid UserId, string CharacterName, TimeSpan Time)> updates);
-        // stalker-en-changes-end
-
         // stalker-en-changes-start: Persistent craft profile persistence
         Task<StalkerPersistentCraftProfile?> GetStalkerPersistentCraftProfileAsync(Guid userId, string characterName);
         Task SetStalkerPersistentCraftProfileAsync(Guid userId, string characterName, string profileJson);
@@ -1410,20 +1405,6 @@ namespace Content.Server.Database
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.DeleteStalkerNewsReactionsByTargetAsync(targetType, targetId));
         }
-
-        // stalker-en-changes-start: Character rank persistence
-        public Task<StalkerCharacterRank?> GetStalkerCharacterRankAsync(Guid userId, string characterName)
-        {
-            DbReadOpsMetric.Inc();
-            return RunDbCommand(() => _db.GetStalkerCharacterRankAsync(userId, characterName));
-        }
-
-        public Task UpdateStalkerCharacterRankTimesAsync(IReadOnlyCollection<(Guid UserId, string CharacterName, TimeSpan Time)> updates)
-        {
-            DbWriteOpsMetric.Inc();
-            return RunDbCommand(() => _db.UpdateStalkerCharacterRankTimesAsync(updates));
-        }
-        // stalker-en-changes-end
 
         // stalker-en-changes-start: Persistent craft profile persistence
         public Task<StalkerPersistentCraftProfile?> GetStalkerPersistentCraftProfileAsync(Guid userId, string characterName)

@@ -11,7 +11,6 @@ using Content.Shared._Stalker.PdaMessenger;
 using Content.Shared._Stalker_EN.Emission;
 using Content.Shared._Stalker_EN.Portraits;
 using Content.Shared._Stalker_EN.CCVar;
-using Content.Shared._Stalker_EN.CharacterRank;
 using Content.Shared._Stalker_EN.FactionRelations;
 using Content.Shared._Stalker_EN.BulletinBoard;
 using Content.Shared._Stalker_EN.News;
@@ -455,12 +454,9 @@ public sealed partial class STMessengerSystem : EntitySystem
         _nextMessageId.TryAdd(storageKey, 0);
         var msgId = ++_nextMessageId[storageKey];
 
-        // Resolve faction and rank for non-anonymous messages; null hides them on anonymous messages
+        // Resolve faction for non-anonymous messages; null hides it on anonymous messages
         string? senderFaction = !isAnonymous
             ? ResolveContactFaction(senderKey)
-            : null;
-        string? senderRankIcon = !isAnonymous
-            ? ResolveContactRankIcon(senderKey)
             : null;
 
         var message = new STMessengerMessage(
@@ -470,8 +466,7 @@ public sealed partial class STMessengerSystem : EntitySystem
             _timing.CurTime,
             effectiveReplyToId,
             replySnippet,
-            senderFaction,
-            senderRankIcon);
+            senderFaction);
 
         chatMessages.Add(message);
 
@@ -1046,13 +1041,10 @@ public sealed partial class STMessengerSystem : EntitySystem
                     contactEntry.UserId, contactEntry.CharacterName, currentFaction);
             }
 
-            var rankIcon = ResolveContactRankIcon(contactKey);
-
             contactInfos.Add(new STMessengerContactInfo(
                 contactEntry.CharacterName,
                 contactMessengerId,
-                contactEntry.FactionName,
-                rankIcon));
+                contactEntry.FactionName));
         }
 
         return new STMessengerUiState(
@@ -1159,7 +1151,7 @@ public sealed partial class STMessengerSystem : EntitySystem
         if (!string.IsNullOrEmpty(server.OwnerCharacterName))
         {
             // If the rightful owner is re-equipping their own PDA (e.g. after death/respawn),
-            // update the cache so faction/rank resolution points to the correct (held) PDA.
+            // update the cache so faction resolution points to the correct (held) PDA.
             if (TryComp<ActorComponent>(holder, out var ownerActor))
             {
                 var holderId = ownerActor.PlayerSession.UserId.UserId;
@@ -1289,24 +1281,6 @@ public sealed partial class STMessengerSystem : EntitySystem
     #endregion
 
     #region Helpers
-
-    /// <summary>
-    /// Resolves the current rank icon of an online contact by looking up their session's attached entity.
-    /// Returns null if the contact is offline or has no rank.
-    /// </summary>
-    private string? ResolveContactRankIcon((Guid UserId, string CharName) contactKey)
-    {
-        if (!_playerManager.TryGetSessionById(new NetUserId(contactKey.UserId), out var session))
-            return null;
-
-        if (session.AttachedEntity is not { } mob)
-            return null;
-
-        if (!TryComp<STCharacterRankComponent>(mob, out var rank))
-            return null;
-
-        return rank.RankIconId;
-    }
 
     /// <summary>
     /// Resolves the current faction of an online contact by looking up their session's attached entity.

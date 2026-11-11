@@ -25,8 +25,10 @@ public sealed class MapDaySystem : EntitySystem
         while (query.MoveNext(out var uid, out var day, out var light))
         {
             var time = _timing.CurTime.TotalSeconds % day.DayTime;
-            var amount = time / day.DayTime;
-            var color = day.Colors[0];
+            var amount = (float)(time / day.DayTime);
+            var color = day.Colors.Count >= 2
+                ? InterpolateColor(day.Colors, amount)
+                : day.Colors.Count == 1 ? day.Colors[0] : Color.White;
             if (light.AmbientLightColor != color)
             {
                 light.AmbientLightColor = color;

@@ -1,0 +1,63 @@
+light_mode unshaded;
+
+uniform sampler2D SCREEN_TEXTURE;
+uniform highp float bloomStrength;
+uniform highp float duskFactor;
+uniform highp float nightFactor;
+
+highp vec3 sampleBright(highp vec2 uv) {
+    highp vec3 c = zTextureSpec(SCREEN_TEXTURE, clamp(uv, vec2(0.001), vec2(0.999))).rgb;
+    highp float luma = zGrayscale(c);
+    highp float weight = smoothstep(0.74, 1.00, luma);
+    return c * weight;
+}
+
+void fragment() {
+    highp vec2 uv = Pos;
+    highp vec4 baseCol = zTextureSpec(SCREEN_TEXTURE, uv);
+    highp vec3 col = baseCol.rgb;
+
+    // 1. Lightweight 4-tap bilinear optical bloom on bright highlights (fires, lamps, muzzle flashes)
+    highp vec2 offset = SCREEN_PIXEL_SIZE * 3.0;
+    highp vec3 bloom =
+        sampleBright(uv + vec2(offset.x, offset.y)) +
+        sampleBright(uv + vec2(-offset.x, offset.y)) +
+        sampleBright(uv + vec2(offset.x, -offset.y)) +
+        sampleBright(uv + vec2(-offset.x, -offset.y));
+    bloom *= 0.25;
+
+    highp vec3 bloomTint = mix(vec3(1.0, 0.96, 0.90), vec3(1.0, 0.78, 0.52), duskFactor);
+    bloomTint = mix(bloomTint, vec3(0.88, 0.93, 1.0), nightFactor * 0.45);
+    col += bloom * bloomTint * bloomStrength;
+
+    // 2. Minimal shadow depth lift (keeps blacks deep without creating milky haze)
+    highp float luma = zGrayscale(col);
+    highp float shadowMask = (1.0 - clamp(luma, 0.0, 1.0));
+    shadowMask *= shadowMask;
+    highp vec3 shadowLift = mix(vec3(0.003, 0.004, 0.006), vec3(0.004, 0.006, 0.012), nightFactor);
+    col += shadowLift * shadowMask;
+
+    // 3. Highlight-only roll-off above 0.72 (keeps midtones and shadows crisp and clear)
+    highp vec3 excess = max(col - vec3(0.72), vec3(0.0));
+    highp vec3 filmic = min(col, vec3(0.72)) + excess / (vec3(1.0) + excess * 1.40);
+    col = mix(col, filmic, 0.65);
+
+    // 4. Subtle Caucasus / STALKER woodland grading (preserves natural contrast without washed-out fog)
+    highp float finalLuma = zGrayscale(col);
+    col = mix(col, vec3(finalLuma), 0.04);
+
+    // Subtle time-of-day atmospheric tint
+    highp vec3 dayGrade = vec3(1.01, 1.00, 0.97);
+    highp vec3 duskGrade = vec3(1.05, 0.98, 0.91);
+    highp vec3 nightGrade = vec3(0.94, 0.97, 1.04);
+    highp vec3 grade = mix(dayGrade, duskGrade, duskFactor);
+    grade = mix(grade, nightGrade, nightFactor);
+    col *= grade;
+
+    // 5. Subtle edge softening
+    highp float dist = length(uv - vec2(0.5, 0.5));
+    highp float softEdge = 1.0 - smoothstep(0.45, 0.95, dist) * 0.06;
+    col *= softEdge;
+
+    COLOR = vec4(clamp(col, 0.0, 1.0), baseCol.a);
+}

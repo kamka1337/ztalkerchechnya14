@@ -1,0 +1,9 @@
+- type: shader
+  id: STAtmosphereFilm
+  kind: source
+  path: "/Textures/_Stalker_EN/Shaders/atmosphere_film.swsl"
+
+- type: shader
+  id: STCloudShadow
+  kind: source
+  path: "/Textures/_Stalker_EN/Shaders/cloud_shadows.swsl"

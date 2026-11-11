@@ -45,9 +45,10 @@ public abstract class SharedLightCycleSystem : EntitySystem
     {
         if (cycle.Comp.Enabled)
         {
-            var peakTime = (float) cycle.Comp.Duration.TotalSeconds * 0.5f;
-            var lightLevel = CalculateLightLevel(cycle.Comp, peakTime);
-            var colorLevel = CalculateColorLevel(cycle.Comp, peakTime);
+            var waveLength = MathF.Max(1f, (float) cycle.Comp.Duration.TotalSeconds);
+            var normalizedTime = ModPositive(time, waveLength);
+            var lightLevel = CalculateLightLevel(cycle.Comp, normalizedTime);
+            var colorLevel = CalculateColorLevel(cycle.Comp, normalizedTime);
             return new Color(
                 (byte)Math.Min(255, color.RByte * colorLevel.R * lightLevel),
                 (byte)Math.Min(255, color.GByte * colorLevel.G * lightLevel),

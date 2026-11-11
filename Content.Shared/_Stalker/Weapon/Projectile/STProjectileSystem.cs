@@ -3,6 +3,7 @@ using Content.Shared._Stalker.Weapon.Evasion;
 using Content.Shared.Examine;
 using Content.Shared.FixedPoint;
 using Content.Shared.Projectiles;
+using Robust.Shared.Physics;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
 
@@ -24,6 +25,8 @@ public sealed class STProjectileSystem : EntitySystem
 
         SubscribeLocalEvent<STProjectileAccuracyComponent, MapInitEvent>(OnProjectileAccuracyMapInit);
         SubscribeLocalEvent<STProjectileAccuracyComponent, PreventCollideEvent>(OnProjectileAccuracyPreventCollide);
+
+        SubscribeLocalEvent<STProjectilePassThroughComponent, PreventCollideEvent>(OnPassThroughPreventCollide);
     }
 
     public void SetProjectileFalloffWeaponModifier(Entity<STProjectileDamageFalloffComponent> projectile, float modifier)
@@ -107,5 +110,95 @@ public sealed class STProjectileSystem : EntitySystem
             return range >= 0 ? 0 : falloff * range;
 
         return range <= 0 ? 0 : -falloff * range;
+    }
+
+    private void OnPassThroughPreventCollide(Entity<STProjectilePassThroughComponent> ent, ref PreventCollideEvent args)
+    {
+        if (args.Cancelled || !args.OurFixture.Hard)
+            return;
+
+        if (!TryComp<FixturesComponent>(args.OtherEntity, out var fixtures) ||
+            !fixtures.Fixtures.TryGetValue(SharedProjectileSystem.ProjectileFixture, out var projectileFixture) ||
+            !ReferenceEquals(args.OtherFixture, projectileFixture) ||
+            !TryComp<ProjectileComponent>(args.OtherEntity, out var projectile))
+            return;
+
+        if (projectile.ProjectileSpent || projectile is { Weapon: null, OnlyCollideWhenShot: true })
+            return;
+
+        var startCoordinates = projectile.StartCoordinates;
+        if (startCoordinates is null)
+        {
+            if (projectile.Shooter is not { } shooter || TerminatingOrDeleted(shooter))
+                return;
+
+            startCoordinates = _transform.GetMoverCoordinates(shooter);
+        }
+
+        var startMapPos = _transform.ToMapCoordinates(startCoordinates.Value);
+        var coverMapPos = _transform.GetMapCoordinates(ent.Owner);
+        if (startMapPos.MapId != coverMapPos.MapId)
+            return;
+
+        var distance = (coverMapPos.Position - startMapPos.Position).Length();
+        var chance = CalculatePassThroughChance(ent.Comp, distance);
+        if (chance <= 0f)
+            return;
+
+        if (chance >= 1f)
+        {
+            args.Cancelled = true;
+            return;
+        }
+
+        var projectileNetId = GetNetEntity(args.OtherEntity).Id;
+        var coverNetId = GetNetEntity(ent.Owner).Id;
+        var s0 = ((long) projectile.StartTick << 32) | (uint) projectileNetId;
+        var s1 = ((long) projectileNetId << 32) | (uint) coverNetId;
+        var mixed = new STSplitMix64(s0).Next() ^ new STSplitMix64(s1).Next();
+        var roll = (float) ((ulong) new STSplitMix64(mixed).Next() / (double) ulong.MaxValue);
+
+        if (roll <= chance)
+            args.Cancelled = true;
+    }
+
+    /// <summary>
+    /// Computes the probability (0..1) of a projectile passing through cover at the given distance in tiles.
+    /// </summary>
+    public static float CalculatePassThroughChance(STProjectilePassThroughComponent comp, float distance)
+    {
+        return CalculatePassThroughChance(
+            distance,
+            comp.PointBlankRange,
+            comp.PointBlankChance,
+            comp.ReferenceRange,
+            comp.ReferenceChance,
+            comp.MinChance);
+    }
+
+    /// <summary>
+    /// Computes the probability (0..1) of a projectile passing through cover at the given distance in tiles.
+    /// </summary>
+    public static float CalculatePassThroughChance(
+        float distance,
+        float pointBlankRange,
+        float pointBlankChance,
+        float referenceRange,
+        float referenceChance,
+        float minChance)
+    {
+        var clampedMin = Math.Clamp(minChance, 0f, 1f);
+        var clampedPointBlank = Math.Clamp(pointBlankChance, clampedMin, 1f);
+
+        if (distance <= pointBlankRange)
+            return clampedPointBlank;
+
+        var clampedReference = Math.Clamp(referenceChance, clampedMin, 1f);
+        if (referenceRange <= pointBlankRange)
+            return clampedReference;
+
+        var slope = (clampedPointBlank - clampedReference) / (referenceRange - pointBlankRange);
+        var chance = clampedPointBlank - slope * (distance - pointBlankRange);
+        return Math.Clamp(chance, clampedMin, 1f);
     }
 }

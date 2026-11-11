@@ -438,6 +438,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         var shooter = user ?? gunUid;
         if (shooter != null)
             Projectiles.SetShooter(uid, projectile, shooter.Value);
+        Projectiles.SetShotOrigin(uid, projectile); // Stalker-Changes
 
         TransformSystem.SetWorldRotation(uid, direction.ToWorldAngle() + projectile.Angle);
     }

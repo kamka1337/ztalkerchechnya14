@@ -36,7 +36,7 @@ public sealed partial class LightCycleComponent : Component
     /// Should the offset be randomised upon MapInit.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public bool InitialOffset = false;
+    public bool InitialOffset = true;
 
     /// <summary>
     /// Trench of the oscillation.

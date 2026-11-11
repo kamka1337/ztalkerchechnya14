@@ -1,48 +1,97 @@
 <Control xmlns="https://spacestation14.io"
          xmlns:clog="clr-namespace:Content.Client.Changelog">
+    <!-- Background -->
     <TextureRect VerticalExpand="True" HorizontalExpand="True"
                  TexturePath="/Textures/_Stalker/Logo/zagruzzka.png"
                  Stretch="KeepAspectCovered" />
-    <BoxContainer Name="VBox"
-                  Orientation="Vertical"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  HorizontalExpand="True"
-                  VerticalExpand="True"
-                  StyleIdentifier="mainMenuVBox"
-                  SeparationOverride="3">
-        <TextureRect Name="Logo"
-                     Stretch="KeepCentered"/>
-        <GridContainer Columns="2">
-            <Label Text="{Loc 'main-menu-username-label'}" />
-            <LineEdit Name="UsernameBox"
-                      Access="Public"
-                      PlaceHolder="{Loc 'main-menu-username-text'}"
-                      HorizontalExpand="True" />
-            <Label Text="{Loc 'main-menu-address-label'}"/>
-            <LineEdit Name="AddressBox"
-                      Access="Public"
-                      Text="127.0.0.1"
-                      PlaceHolder="server address:port"
-                      HorizontalExpand="True" />
-        </GridContainer>
-        <Button Name="DirectConnectButton"
-                Access="Public"
-                Text="{Loc 'main-menu-direct-connect-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <Button Name="OptionsButton"
-                Access="Public"
-                Text="{Loc 'main-menu-options-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <Button Name="QuitButton"
-                Access="Public"
-                Text="{Loc 'main-menu-quit-button'}"
-                TextAlign="Center"
-                StyleIdentifier="mainMenu"/>
-        <clog:ChangelogButton
-            Name="ChangelogButton"
-            Access="Public"/>
+
+    <!-- Main menu container positioned below the CHECHNYA 14 background logo -->
+    <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True" MouseFilter="Ignore">
+        <Control VerticalExpand="True" SizeFlagsStretchRatio="1.8" MouseFilter="Ignore" />
+
+        <BoxContainer Name="VBox"
+                      Orientation="Vertical"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      StyleIdentifier="mainMenuVBox">
+            <PanelContainer StyleClasses="mainMenuCard" MinWidth="460">
+                <BoxContainer Orientation="Vertical" SeparationOverride="0">
+                    <!-- Top accent bar -->
+                    <PanelContainer StyleClasses="mainMenuAccentBar"
+                                    MinHeight="2"
+                                    HorizontalExpand="True" />
+
+                    <BoxContainer Orientation="Vertical" SeparationOverride="12" Margin="22 18 22 20">
+                        <!-- Connection fields -->
+                        <GridContainer Columns="2" HSeparationOverride="12" VSeparationOverride="8">
+                            <Label Text="{Loc 'main-menu-username-label'}"
+                                   StyleClasses="mainMenuLabel"
+                                   VAlign="Center" />
+                            <LineEdit Name="UsernameBox"
+                                      Access="Public"
+                                      PlaceHolder="{Loc 'main-menu-username-text'}"
+                                      HorizontalExpand="True"
+                                      MinHeight="34"
+                                      StyleClasses="mainMenuLineEdit" />
+                            <Label Text="{Loc 'main-menu-address-label'}"
+                                   StyleClasses="mainMenuLabel"
+                                   VAlign="Center" />
+                            <LineEdit Name="AddressBox"
+                                      Access="Public"
+                                      Text="127.0.0.1"
+                                      PlaceHolder="server address:port"
+                                      HorizontalExpand="True"
+                                      MinHeight="34"
+                                      StyleClasses="mainMenuLineEdit" />
+                        </GridContainer>
+
+                        <!-- Divider -->
+                        <PanelContainer StyleClasses="mainMenuDivider"
+                                        MinHeight="1"
+                                        HorizontalExpand="True" />
+
+                        <!-- Action buttons -->
+                        <BoxContainer Orientation="Vertical" SeparationOverride="8">
+                            <Button Name="DirectConnectButton"
+                                    Access="Public"
+                                    Text="{Loc 'main-menu-direct-connect-button'}"
+                                    TextAlign="Center"
+                                    StyleClasses="mainMenuConnectButton"
+                                    MinHeight="46"
+                                    HorizontalExpand="True" />
+
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="8" HorizontalExpand="True">
+                                <Button Name="OptionsButton"
+                                        Access="Public"
+                                        Text="{Loc 'main-menu-options-button'}"
+                                        TextAlign="Center"
+                                        StyleClasses="mainMenuSecondaryButton"
+                                        MinHeight="38"
+                                        HorizontalExpand="True"
+                                        SizeFlagsStretchRatio="1" />
+                                <clog:ChangelogButton
+                                    Name="ChangelogButton"
+                                    Access="Public"
+                                    TextAlign="Center"
+                                    StyleClasses="mainMenuSecondaryButton"
+                                    MinHeight="38"
+                                    HorizontalExpand="True"
+                                    SizeFlagsStretchRatio="1" />
+                            </BoxContainer>
+
+                            <Button Name="QuitButton"
+                                    Access="Public"
+                                    Text="{Loc 'main-menu-quit-button'}"
+                                    TextAlign="Center"
+                                    StyleClasses="mainMenuDangerButton"
+                                    MinHeight="38"
+                                    HorizontalExpand="True" />
+                        </BoxContainer>
+                    </BoxContainer>
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+
+        <Control VerticalExpand="True" SizeFlagsStretchRatio="0.3" MouseFilter="Ignore" />
     </BoxContainer>
 </Control>

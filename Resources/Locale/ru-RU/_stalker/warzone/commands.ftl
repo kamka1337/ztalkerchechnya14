@@ -11,3 +11,4 @@ st-warzone-captured = Зона '{$zone}' захвачена группировк
 st-warzone-cooldown = Зона '{$zone}' на перезарядке. Следующая попытка через {$minutes} минут.
 st-warzone-timewindow-fail = Время захвата не настало или прошло
 st-warzone-progress = Процесс захвата '{$zone}' {$percent}%
+st-warzone-capture-restored = Захват точки '{$zone}' был полностью отбит!

@@ -13,13 +13,11 @@ namespace Content.Client._Stalker.Overlays
         [Dependency] IEntityManager _entityManager = default!;
 
         public override OverlaySpace Space => OverlaySpace.WorldSpace;
-        private readonly ShaderInstance _vignetteNoisedShader;
         private readonly ShaderInstance _vignetteBaseShader;
 
         public VignetteOverlay()
         {
             IoCManager.InjectDependencies(this);
-            _vignetteNoisedShader = _prototypeManager.Index<ShaderPrototype>("VignetteNoised").InstanceUnique();
             _vignetteBaseShader = _prototypeManager.Index<ShaderPrototype>("VignetteBase").InstanceUnique();
         }
         protected override bool BeforeDraw(in OverlayDrawArgs args)
@@ -46,8 +44,6 @@ namespace Content.Client._Stalker.Overlays
             var worldHandle = args.WorldHandle;
             var viewport = args.WorldBounds;
             worldHandle.UseShader(_vignetteBaseShader);
-            worldHandle.DrawRect(viewport, Color.White);
-            worldHandle.UseShader(_vignetteNoisedShader);
             worldHandle.DrawRect(viewport, Color.White);
             worldHandle.UseShader(null);
         }

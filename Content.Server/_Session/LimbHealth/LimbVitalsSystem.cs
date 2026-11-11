@@ -62,8 +62,15 @@ public sealed class LimbVitalsSystem : EntitySystem
                 break;
         }
 
-        if (_limbs.CountDestroyed(ent.Comp) >= ent.Comp.MaxHealth.Count)
+        if (_limbs.CountDestroyed(ent.Comp) >= 6)
+        {
+            if (!_limbs.TryDestroyHeadOnSixLimbs(ent.Owner, ent.Comp))
+                _mobState.ChangeMobState(ent.Owner, MobState.Dead);
+        }
+        else if (_limbs.CountDestroyed(ent.Comp) >= ent.Comp.MaxHealth.Count)
+        {
             _mobState.ChangeMobState(ent.Owner, MobState.Dead);
+        }
 
         _limbs.RefreshVitalsActive(ent.Owner, ent.Comp);
     }
@@ -214,6 +221,9 @@ public sealed class LimbVitalsSystem : EntitySystem
         while (query.MoveNext(out var uid, out _, out var comp))
         {
             if (!_mobState.IsAlive(uid))
+                continue;
+
+            if (_limbs.TryDestroyHeadOnSixLimbs(uid, comp))
                 continue;
 
             if (comp.Limbs.TryGetValue(LimbType.Abdomen, out var abdomen) && abdomen.Destroyed)

@@ -13280,21 +13280,25 @@ entities:
         tile: FloorPlanetGrass
       seed: 194642491
     - type: MapLight
-      ambientLightColor: '#D8B059FF'
+      ambientLightColor: '#F5EDE0FF'
     - type: Roof
       data: {}
     - type: LightCycle
+      minLightLevel: 0.42
+      initialOffset: False
+      offset: 450
+      duration: 1800
     - type: SunShadow
     - type: SunShadowCycle
       directions:
       - direction: 0,3
-      - alpha: 0.5
+      - alpha: 0.45
         direction: -3,-0.1
         ratio: 0.25
-      - alpha: 0.8
+      - alpha: 0.65
         direction: 0,-3
         ratio: 0.5
-      - alpha: 0.5
+      - alpha: 0.45
         direction: 3,-0.1
         ratio: 0.75
     - type: MapAtmosphere

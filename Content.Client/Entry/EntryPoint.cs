@@ -3,6 +3,7 @@ using Content.Client._Stalker.JoinQueue;
 using Content.Client._Stalker.Overlays;
 using Content.Client._Stalker.Private.Scr;
 using Content.Client._Stalker.Sponsors;
+using Content.Client._Stalker_EN.Overlays; // Stalker-Changes-Atmosphere
 using Content.Client.Administration.Managers;
 using Content.Client.Changelog;
 using Content.Client.Chat.Managers;
@@ -172,6 +173,7 @@ namespace Content.Client.Entry
             _overlayManager.AddOverlay(new SingularityOverlay());
             _overlayManager.AddOverlay(new RadiationPulseOverlay());
             _overlayManager.AddOverlay(new VignetteOverlay()); // Stalker-Changes-Vignette
+            _overlayManager.AddOverlay(new AtmosphericFilmOverlay()); // Stalker-Changes-Atmosphere
             _chatManager.Initialize();
             _clientPreferencesManager.Initialize();
             _euiManager.Initialize();

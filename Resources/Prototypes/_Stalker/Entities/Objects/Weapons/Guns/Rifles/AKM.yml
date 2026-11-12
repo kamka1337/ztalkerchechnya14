@@ -63,6 +63,11 @@
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy
     accuracyMultiplier: 1.55
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeAKM
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.62
+    secondaryOffset: 0.46
 
 - type: entity
   parent: STBaseWeaponRifleAKM

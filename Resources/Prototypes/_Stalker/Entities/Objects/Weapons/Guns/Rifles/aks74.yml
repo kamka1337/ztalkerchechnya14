@@ -123,6 +123,11 @@
         whitelist:
           tags:
           - STCartridge545
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeAKS74
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.60
+    secondaryOffset: 0.45
 
 
 - type: entity
@@ -131,6 +136,11 @@
   name: AK-74M "Modern"
   description: Modern modification with polymer furniture and optics rail. Valued in the Zone for versatility and improved ergonomics.
   components:
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeAKS74
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.60
+    secondaryOffset: 0.45
   - type: STWeight
     self: 4
   - type: GunWieldBonus
@@ -260,6 +270,11 @@
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/_Skins/aks74-green.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/_Skins/aks74-green.rsi
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeAKS74
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.60
+    secondaryOffset: 0.45
 
 - type: entity
   parent: STBaseWeaponRifleAKS74
@@ -345,6 +360,11 @@
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy
     accuracyMultiplier: 1.42
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeAKS74
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.50
+    secondaryOffset: 0.38
 
 - type: entity
   parent: STBaseWeaponRifleAKS74U

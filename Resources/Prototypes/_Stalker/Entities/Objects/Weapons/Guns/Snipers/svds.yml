@@ -73,6 +73,12 @@
   id: STWeaponSniperSVDS
   name: SVDS (Dragunov Sniper Rifle)
   description: A modernized folding version of the legendary SVD sniper rifle, chambered in 7.62x54mmR. Features improved ergonomics and comes equipped with a medium-range scope. A favorite among Zone marksmen for its reliability and stopping power.
+  components:
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeSVD
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.76
+    secondaryOffset: 0.54
 
 - type: entity
   parent: STBaseWeaponRifleSVDS
@@ -87,6 +93,11 @@
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/SVDS/srdcGrass.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/SVDS/srdcGrass.rsi
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeSVD
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.76
+    secondaryOffset: 0.54
 
 - type: entity
   parent: STBaseWeaponRifleSVDS
@@ -100,6 +111,11 @@
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/SVDS/covenant.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/SVDS/covenant.rsi
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokeSVD
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.76
+    secondaryOffset: 0.54
 
 - type: entity
   parent: STBaseWeaponRifleSVDS
@@ -185,6 +201,11 @@
       falloffMultiplier: 0.2
     - type: STWeaponAccuracy
       accuracyMultiplier: 5
+    - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+      effectProto: STEffectGunshotSmokeSVD
+      secondaryEffectProto: STEffectGunshotSmokeWisp
+      muzzleOffset: 0.76
+      secondaryOffset: 0.54
 
 - type: entity
   parent: STBaseWeaponRifleSVDS

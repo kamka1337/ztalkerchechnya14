@@ -1,0 +1,120 @@
+- type: entity
+  id: STBaseEffectGunshotSmoke
+  abstract: true
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 0.8
+  - type: Sprite
+    drawdepth: Effects
+    noRot: false
+    sprite: _Zona14/Effects/gun_smoke.rsi
+    layers:
+    - state: akm_0
+      map: ["base"]
+  - type: EffectVisuals
+  - type: AnimationPlayer
+  - type: Tag
+    tags:
+    - HideContextMenu
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeAKM
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - akm_0
+    - akm_1
+    - akm_2
+    startScale: 0.48, 0.48
+    endScale: 0.72, 0.72
+    scaleJitter: 0.10
+    angleJitterDegrees: 6
+    driftDistance: 0.24
+    lateralDrift: 0.04
+    startAlpha: 0.48
+    lifetime: 0.46
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeAKS74
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - aks74_0
+    - aks74_1
+    - aks74_2
+    startScale: 0.45, 0.45
+    endScale: 0.68, 0.68
+    scaleJitter: 0.10
+    angleJitterDegrees: 5
+    driftDistance: 0.22
+    lateralDrift: 0.04
+    startAlpha: 0.44
+    lifetime: 0.44
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokePKM
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - pkm_0
+    - pkm_1
+    - pkm_2
+    startScale: 0.50, 0.50
+    endScale: 0.76, 0.76
+    scaleJitter: 0.10
+    angleJitterDegrees: 6
+    driftDistance: 0.26
+    lateralDrift: 0.05
+    startAlpha: 0.50
+    lifetime: 0.50
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeSVD
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - svd_0
+    - svd_1
+    - svd_2
+    startScale: 0.48, 0.46
+    endScale: 0.74, 0.68
+    scaleJitter: 0.08
+    angleJitterDegrees: 4
+    driftDistance: 0.30
+    lateralDrift: 0.03
+    startAlpha: 0.46
+    lifetime: 0.48
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeWisp
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    drawdepth: Effects
+    noRot: false
+    sprite: _Zona14/Effects/gun_smoke.rsi
+    layers:
+    - state: wisp_0
+      map: ["base"]
+  - type: STGunshotSmokeEffect
+    states:
+    - wisp_0
+    - wisp_1
+    startScale: 0.36, 0.36
+    endScale: 0.56, 0.56
+    scaleJitter: 0.12
+    angleJitterDegrees: 10
+    driftDistance: 0.10
+    lateralDrift: 0.04
+    startAlpha: 0.32
+    lifetime: 0.55

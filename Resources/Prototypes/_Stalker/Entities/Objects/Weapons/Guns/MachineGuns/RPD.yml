@@ -101,6 +101,11 @@
     pullTime: 5
   - type: STWeaponAccuracy
     accuracyMultiplier: 1.55
+  - type: STGunshotSmoke # Zona14: Gunshot smoke cloud effect
+    effectProto: STEffectGunshotSmokePKM
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.72
+    secondaryOffset: 0.52
 
 - type: entity
   parent: STBaseWeaponMachineGunPKM

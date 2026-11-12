@@ -5,6 +5,7 @@ using Content.Client.Items;
 using Content.Client.Weapons.Ranged.Components;
 using Content.Client.UserInterface.Systems.Actions;
 using Robust.Client.UserInterface;
+using Content.Shared._Zona14.Weapon.Effects; // Zona14
 using Content.Shared.Camera;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
@@ -314,6 +315,10 @@ public sealed partial class GunSystem : SharedGunSystem
             Log.Debug($"Invalid Entity sent MuzzleFlashEvent (proto: {message.Prototype}, gun: {ToPrettyString(gunUid)})");
             return;
         }
+
+        // Zona14: Notify gunshot smoke/effect systems on the gun entity.
+        var gunEffectEv = new STGunshotMuzzleEffectEvent(message.Angle, tracked);
+        RaiseLocalEvent(gunUid, ref gunEffectEv);
 
         var gunXform = Transform(gunUid);
         var gridUid = gunXform.GridUid;

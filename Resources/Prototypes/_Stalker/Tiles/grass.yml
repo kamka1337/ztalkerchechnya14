@@ -96,3 +96,19 @@
     - type: Sprite
       layers:
         - state: grass11
+
+- type: entity
+  id: StalkerMapGrass12
+  parent: StalkerMapGrass1
+  components:
+    - type: Sprite
+      layers:
+        - state: grass12
+
+- type: entity
+  id: StalkerMapGrass13
+  parent: StalkerMapGrass1
+  components:
+    - type: Sprite
+      layers:
+        - state: grass13

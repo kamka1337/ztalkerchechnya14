@@ -12,7 +12,7 @@
     projectileClass: 3
     damage:
       types:
-        Piercing: 34
+        Piercing: 53
   - type: StaminaDamageOnCollide
     damage: 4
 

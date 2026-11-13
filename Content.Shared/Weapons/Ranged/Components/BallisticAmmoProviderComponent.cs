@@ -33,6 +33,31 @@ public sealed partial class BallisticAmmoProviderComponent : Component
 
     public Container Container = default!;
 
+    /// <summary>
+    /// If the gun has a bolt and whether that bolt is closed. Firing is blocked if false.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField("boltClosed"), AutoNetworkedField]
+    public bool? BoltClosed;
+
+    /// <summary>
+    /// Does the gun automatically cycle/chamber a new round after firing.
+    /// Set to false for bolt-action rifles (e.g. Mosin).
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField("autoCycle"), AutoNetworkedField]
+    public bool AutoCycle = true;
+
+    /// <summary>
+    /// For bolt-action weapons: whether a round is currently chambered and ready to fire.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField("chambered"), AutoNetworkedField]
+    public bool Chambered = true;
+
+    /// <summary>
+    /// Can the gun be racked manually to cycle or close the bolt.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite), DataField("canRack"), AutoNetworkedField]
+    public bool CanRack = true;
+
     // stalker-changes-start
     [DataField, AutoNetworkedField]
     public List<EntProtoId> EntProtos = new();

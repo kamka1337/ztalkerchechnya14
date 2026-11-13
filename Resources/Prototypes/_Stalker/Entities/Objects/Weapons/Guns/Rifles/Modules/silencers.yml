@@ -5,6 +5,9 @@
   name: makeshift rifle silencer
   suffix: ST, silencer, T1, RU
   components:
+    - type: STWeaponModule
+      layer: muzzle
+      statePostfix: muzzle
     - type: Sprite
       sprite: _Stalker/Objects/Weapons/Guns/Rifles/Modules/silencer.rsi
       scale: 0.5, 0.5

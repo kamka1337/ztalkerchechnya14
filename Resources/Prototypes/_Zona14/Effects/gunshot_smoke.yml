@@ -118,3 +118,90 @@
     lateralDrift: 0.04
     startAlpha: 0.32
     lifetime: 0.55
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokePistol
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - aks74_0
+    - aks74_1
+    - aks74_2
+    startScale: 0.32, 0.32
+    endScale: 0.50, 0.50
+    scaleJitter: 0.08
+    angleJitterDegrees: 8
+    driftDistance: 0.16
+    lateralDrift: 0.03
+    startAlpha: 0.38
+    lifetime: 0.32
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeSMG
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - aks74_0
+    - aks74_1
+    - aks74_2
+    startScale: 0.38, 0.38
+    endScale: 0.56, 0.56
+    scaleJitter: 0.09
+    angleJitterDegrees: 6
+    driftDistance: 0.18
+    lateralDrift: 0.04
+    startAlpha: 0.40
+    lifetime: 0.36
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeShotgun
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - akm_0
+    - akm_1
+    - akm_2
+    startScale: 0.54, 0.54
+    endScale: 0.86, 0.86
+    scaleJitter: 0.12
+    angleJitterDegrees: 9
+    driftDistance: 0.30
+    lateralDrift: 0.07
+    startAlpha: 0.55
+    lifetime: 0.54
+
+- type: entity
+  parent: STBaseEffectGunshotSmoke
+  id: STEffectGunshotSmokeLauncher
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: STGunshotSmokeEffect
+    states:
+    - pkm_0
+    - pkm_1
+    - pkm_2
+    startScale: 0.65, 0.65
+    endScale: 1.05, 1.05
+    scaleJitter: 0.14
+    angleJitterDegrees: 12
+    driftDistance: 0.36
+    lateralDrift: 0.09
+    startAlpha: 0.65
+    lifetime: 0.65
+
+- type: entity
+  id: MuzzleNoFlashEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TimedDespawn
+    lifetime: 0.01
+  - type: Tag
+    tags:
+    - HideContextMenu
+

@@ -30,6 +30,11 @@
     projectileSpeed: 75
   - type: BallisticAmmoProvider
     capacity: 5
+    boltClosed: true
+    autoCycle: false
+    chambered: true
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/ltrifle_cock.ogg
     whitelist:
       tags:
       - STCartridge754

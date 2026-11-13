@@ -52,9 +52,9 @@
     minAngle: -43
     maxAngle: -60
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aek971.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aek971.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/aek971.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/aek971.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/aek971.rsi
   - type: Gun

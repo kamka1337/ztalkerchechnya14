@@ -145,9 +145,9 @@
   description: A Russian sniper rifle based on the 9A-91 small-sized assault rifle developed by the Tula Design Bureau.
   components:
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Snipers/VSK.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Snipers/inhands/VSK.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Snipers/VSK.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Snipers/inhands/VSK.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/VSK.rsi
   - type: GunWieldBonus

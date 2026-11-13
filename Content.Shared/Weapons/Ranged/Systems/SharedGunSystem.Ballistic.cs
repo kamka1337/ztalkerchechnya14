@@ -5,6 +5,7 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Verbs;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Wieldable.Components;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Serialization;
@@ -27,10 +28,25 @@ public abstract partial class SharedGunSystem
 
         SubscribeLocalEvent<BallisticAmmoProviderComponent, ExaminedEvent>(OnBallisticExamine);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, GetVerbsEvent<Verb>>(OnBallisticVerb);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, GetVerbsEvent<ActivationVerb>>(OnBallisticActivationVerb);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, GetVerbsEvent<InteractionVerb>>(OnBallisticInteractionVerb);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, InteractUsingEvent>(OnBallisticInteractUsing);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, AfterInteractEvent>(OnBallisticAfterInteract);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, AmmoFillDoAfterEvent>(OnBallisticAmmoFillDoAfter);
         SubscribeLocalEvent<BallisticAmmoProviderComponent, UseInHandEvent>(OnBallisticUse);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, ActivateInWorldEvent>(OnBallisticActivate);
+    }
+
+    private void OnBallisticActivate(EntityUid uid, BallisticAmmoProviderComponent component, ActivateInWorldEvent args)
+    {
+        if (args.Handled || !args.Complex)
+            return;
+
+        if (component.BoltClosed == null && component.AutoCycle)
+            return;
+
+        args.Handled = true;
+        ToggleBallisticBolt(uid, component, args.User);
     }
 
     private void OnBallisticUse(EntityUid uid, BallisticAmmoProviderComponent component, UseInHandEvent args)
@@ -38,8 +54,12 @@ public abstract partial class SharedGunSystem
         if (args.Handled)
             return;
 
-        ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User);
+        // If weapon is wieldable or has bolt mechanics, leave Z for wielding/unwielding!
+        if (HasComp<WieldableComponent>(uid) || component.BoltClosed != null || !component.AutoCycle)
+            return;
+
         args.Handled = true;
+        ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User);
     }
 
     private void OnBallisticInteractUsing(EntityUid uid, BallisticAmmoProviderComponent component, InteractUsingEvent args)
@@ -168,21 +188,89 @@ public abstract partial class SharedGunSystem
         args.Repeat = moreSpace && moreAmmo;
     }
 
+    private void ToggleBallisticBolt(EntityUid uid, BallisticAmmoProviderComponent component, EntityUid? user = null)
+    {
+        if (component.BoltClosed == null && component.AutoCycle)
+            return;
+
+        var currentlyClosed = component.BoltClosed ?? true;
+
+        if (currentlyClosed)
+        {
+            component.BoltClosed = false;
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+            Audio.PlayPredicted(component.SoundRack, uid, user);
+
+            if (!component.AutoCycle)
+            {
+                Cycle(uid, component, TransformSystem.GetMapCoordinates(uid));
+            }
+
+            UpdateBallisticAppearance(uid, component);
+            Popup(Loc.GetString("gun-chamber-bolt-opened"), uid, user);
+        }
+        else
+        {
+            component.BoltClosed = true;
+            component.Chambered = true;
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Chambered));
+            Audio.PlayPredicted(component.SoundRack, uid, user);
+
+            UpdateBallisticAppearance(uid, component);
+            Popup(Loc.GetString("gun-chamber-bolt-closed"), uid, user);
+        }
+    }
+
+    private void OnBallisticActivationVerb(EntityUid uid, BallisticAmmoProviderComponent component, GetVerbsEvent<ActivationVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract || args.Hands == null || !component.CanRack)
+            return;
+
+        if (component.BoltClosed == null && component.AutoCycle)
+            return;
+
+        args.Verbs.Add(new ActivationVerb()
+        {
+            Text = Loc.GetString("gun-chamber-rack"),
+            Act = () =>
+            {
+                component.Chambered = true;
+                component.BoltClosed = true;
+                DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+                DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Chambered));
+                ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User);
+            }
+        });
+    }
+
+    private void OnBallisticInteractionVerb(EntityUid uid, BallisticAmmoProviderComponent component, GetVerbsEvent<InteractionVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract || args.Hands == null)
+            return;
+
+        if (component.BoltClosed == null && component.AutoCycle)
+            return;
+
+        var isClosed = component.BoltClosed ?? true;
+        args.Verbs.Add(new InteractionVerb()
+        {
+            Text = isClosed ? Loc.GetString("gun-chamber-bolt-open") : Loc.GetString("gun-chamber-bolt-close"),
+            Act = () => ToggleBallisticBolt(uid, component, args.User),
+        });
+    }
+
     private void OnBallisticVerb(EntityUid uid, BallisticAmmoProviderComponent component, GetVerbsEvent<Verb> args)
     {
         if (!args.CanAccess || !args.CanInteract || args.Hands == null || !component.Cycleable)
             return;
 
-        if (component.Cycleable)
+        args.Verbs.Add(new Verb()
         {
-            args.Verbs.Add(new Verb()
-            {
-                Text = Loc.GetString("gun-ballistic-cycle"),
-                Disabled = GetBallisticShots(component) == 0,
-                Act = () => ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User),
-            });
-
-        }
+            Text = Loc.GetString("gun-ballistic-cycle"),
+            Disabled = GetBallisticShots(component) == 0,
+            Act = () => ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User),
+        });
     }
 
     private void OnBallisticExamine(EntityUid uid, BallisticAmmoProviderComponent component, ExaminedEvent args)
@@ -248,6 +336,18 @@ public abstract partial class SharedGunSystem
 
     private void OnBallisticTakeAmmo(EntityUid uid, BallisticAmmoProviderComponent component, TakeAmmoEvent args)
     {
+        if (component.BoltClosed == false)
+        {
+            args.Reason = Loc.GetString("gun-chamber-bolt-ammo");
+            return;
+        }
+
+        if (!component.AutoCycle && !component.Chambered)
+        {
+            args.Reason = Loc.GetString("gun-chamber-bolt-ammo");
+            return;
+        }
+
         for (var i = 0; i < args.Shots; i++)
         {
             EntityUid entity;
@@ -290,6 +390,18 @@ public abstract partial class SharedGunSystem
             } // stalker-changes-end
         }
 
+        if (!component.AutoCycle)
+        {
+            // Bolt action: shot is fired, round is spent, but bolt stays closed until player opens it
+            component.Chambered = false;
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Chambered));
+        }
+        else if (component.BoltClosed != null && GetBallisticShots(component) == 0)
+        {
+            component.BoltClosed = false;
+            DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+        }
+
         UpdateBallisticAppearance(uid, component);
     }
 
@@ -303,6 +415,11 @@ public abstract partial class SharedGunSystem
     {
         if (!Timing.IsFirstTimePredicted || !TryComp<AppearanceComponent>(uid, out var appearance))
             return;
+
+        if (component.BoltClosed != null)
+        {
+            Appearance.SetData(uid, AmmoVisuals.BoltClosed, component.BoltClosed.Value, appearance);
+        }
 
         Appearance.SetData(uid, AmmoVisuals.AmmoCount, GetBallisticShots(component), appearance);
         Appearance.SetData(uid, AmmoVisuals.AmmoMax, component.Capacity, appearance);

@@ -38,4 +38,9 @@
     categoryName: Оружие
   - type: Wieldable
   - type: GunRequiresWield
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeLauncher
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.70
+    secondaryOffset: 0.50
 

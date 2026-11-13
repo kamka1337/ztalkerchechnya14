@@ -12,6 +12,8 @@
       sprite: _Stalker/Objects/Weapons/Guns/Rifles/Modules/scope.rsi
       scale: 0.6, 0.6
     - type: STWeaponModule
+      layer: scope
+      statePostfix: scope
       scopeEffect:
         delay: 0.3
         requireWielding: true

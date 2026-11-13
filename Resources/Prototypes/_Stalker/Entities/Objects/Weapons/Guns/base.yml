@@ -28,6 +28,9 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-0
       map: ["enum.GunVisualLayers.Mag"]
+    - map: ["scope"]
+    - map: ["muzzle"]
+    - map: ["launcher"]
   - type: ItemSlots
     # If you change the caliber,
     # you need to completely rewrite every property described here
@@ -63,3 +66,8 @@
     magState: mag
     steps: 1
     zeroVisible: true
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeAKM
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.56
+    secondaryOffset: 0.44

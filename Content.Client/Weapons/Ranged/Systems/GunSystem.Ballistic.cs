@@ -1,5 +1,9 @@
+using Content.Client.Weapons.Ranged.Components;
+using Content.Shared.Weapons.Ranged;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Weapons.Ranged.Systems;
+using Robust.Client.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Utility;
 
@@ -11,6 +15,26 @@ public sealed partial class GunSystem
     {
         base.InitializeBallistic();
         SubscribeLocalEvent<BallisticAmmoProviderComponent, UpdateAmmoCounterEvent>(OnBallisticAmmoCount);
+        SubscribeLocalEvent<BallisticAmmoProviderComponent, AppearanceChangeEvent>(OnBallisticAppearance);
+    }
+
+    private void OnBallisticAppearance(EntityUid uid, BallisticAmmoProviderComponent component, ref AppearanceChangeEvent args)
+    {
+        if (args.Sprite == null ||
+            !_sprite.LayerMapTryGet((uid, args.Sprite), GunVisualLayers.Base, out var boltLayer, false) ||
+            !Appearance.TryGetData(uid, AmmoVisuals.BoltClosed, out bool boltClosed))
+        {
+            return;
+        }
+
+        if (boltClosed)
+        {
+            _sprite.LayerSetRsiState((uid, args.Sprite), boltLayer, "base");
+        }
+        else
+        {
+            _sprite.LayerSetRsiState((uid, args.Sprite), boltLayer, "bolt-open");
+        }
     }
 
     private void OnBallisticAmmoCount(EntityUid uid, BallisticAmmoProviderComponent component, UpdateAmmoCounterEvent args)

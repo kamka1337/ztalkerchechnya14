@@ -4,6 +4,9 @@
   id: STBaseModuleSilencerSMG
   name: silencer
   components:
+  - type: STWeaponModule
+    layer: muzzle
+    statePostfix: muzzle
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/SMGs/Modules/smg_silencers.rsi
     scale: 0.5, 0.5

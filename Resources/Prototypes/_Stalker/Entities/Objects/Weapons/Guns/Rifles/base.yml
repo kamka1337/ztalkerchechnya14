@@ -13,6 +13,8 @@
       map: ["enum.GunVisualLayers.Base"]
     - map: ["enum.GunVisualLayers.Mag"]
     - map: ["scope"]
+    - map: ["muzzle"]
+    - map: ["launcher"]
   - type: Wieldable
   - type: GunWieldBonus
     minAngle: -50
@@ -35,3 +37,11 @@
       gun_module_muzzle: !type:ContainerSlot {}
       gun_module_scope: !type:ContainerSlot {}
       gun_chamber: !type:ContainerSlot {}
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeAKM
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.62
+    secondaryOffset: 0.46
+    suppressedMuzzleOffsetBonus: 0.16
+    suppressedScaleMultiplier: 0.6
+    suppressedAlphaMultiplier: 0.55

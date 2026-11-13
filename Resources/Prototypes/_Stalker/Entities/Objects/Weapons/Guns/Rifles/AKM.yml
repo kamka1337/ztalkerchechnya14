@@ -11,9 +11,9 @@
     minAngle: -53
     maxAngle: -55
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/akm.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/akm.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/akm.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/akm.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/akm.rsi
   - type: Gun
@@ -29,6 +29,13 @@
     availableModes:
     - SemiAuto
     - FullAuto
+  - type: ContainerContainer
+    containers:
+      gun_magazine: !type:ContainerSlot {}
+      gun_module_muzzle: !type:ContainerSlot {}
+      gun_module_scope: !type:ContainerSlot {}
+      gun_module_launcher: !type:ContainerSlot {}
+      gun_chamber: !type:ContainerSlot {}
   - type: ItemSlots
     slots:
       gun_magazine:
@@ -36,22 +43,28 @@
         startingItem: Base739Mag10
         insertSound: /Audio/_Stalker/Weapons/Guns/RifleGen/MagIn/rifle_magin.ogg
         ejectSound: /Audio/_Stalker/Weapons/Guns/RifleGen/MagOut/rifle_magout.ogg
-        priority: 4
+        priority: 5
         whitelist:
           tags:
           - Magazine739
       gun_module_muzzle:
         name: Muzzle
-        priority: 3
+        priority: 4
         whitelist:
           tags:
           - STWeaponModuleRifleSilencerRu
       gun_module_scope:
         name: Scope
-        priority: 2
+        priority: 3
         whitelist:
           tags:
           - STWeaponModuleRifleScopeRu
+      gun_module_launcher:
+        name: Подствольный гранатомет
+        priority: 2
+        whitelist:
+          tags:
+          - STWeaponModuleLauncherRu
       gun_chamber:
         name: Chamber
         startingItem:
@@ -138,9 +151,9 @@
   - type: STWeight
     self: 2.7
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/akms.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/akms.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Rifles/akms.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/akms.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/akms.rsi
   - type: Gun

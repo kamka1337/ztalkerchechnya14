@@ -33,6 +33,11 @@
     - type: ContainerContainer
       containers:
         gun_gl_chamber: !type:ContainerSlot {}
+    - type: STGunshotSmoke
+      effectProto: STEffectGunshotSmokeLauncher
+      secondaryEffectProto: STEffectGunshotSmokeWisp
+      muzzleOffset: 0.60
+      secondaryOffset: 0.45
 
 - type: entity
   parent: STBaseModuleLauncherRifles

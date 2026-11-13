@@ -25,6 +25,12 @@ public sealed class GunshotSmokeTest : InteractionTest
         "STWeaponSniperSVDSGrass",
         "STWeaponSniperSVDSCovenant",
         "STWeaponRifleSVDSWood",
+        "WeaponPistolStalkerPM",
+        "STWeaponSMGMP5",
+        "STWeaponLauncherRocket",
+        "STWeaponLauncherRG6",
+        "STWeaponLauncherRGM40",
+        "STModuleLauncherGP25",
     ];
 
     [Test]

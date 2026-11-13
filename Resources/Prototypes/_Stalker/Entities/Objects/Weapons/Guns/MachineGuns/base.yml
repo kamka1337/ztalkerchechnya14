@@ -43,3 +43,11 @@
     containers:
       gun_magazine: !type:ContainerSlot
       gun_chamber: !type:ContainerSlot
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokePKM
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.72
+    secondaryOffset: 0.50
+    suppressedMuzzleOffsetBonus: 0.18
+    suppressedScaleMultiplier: 0.65
+    suppressedAlphaMultiplier: 0.55

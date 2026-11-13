@@ -60,11 +60,11 @@
   id: STBaseWeaponMachineGunPKM
   components:
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/MachineGuns/pkm.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/MachineGuns/inhands/pkm.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/MachineGuns/pkm.rsi
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/MachineGuns/pkm.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/MachineGuns/inhands/pkm.rsi
     equipDelay: 4
   - type: Gun
     soundGunshot:

@@ -15,6 +15,7 @@
       map: ["enum.GunVisualLayers.Base"]
     - map: ["enum.GunVisualLayers.Mag"]
     - map: ["scope"]
+    - map: ["muzzle"]
   - type: Wieldable
   - type: GunWieldBonus
     minAngle: -50
@@ -52,4 +53,12 @@
         whitelist:
           tags:
           - STWeaponModuleSniperSilencer
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeSVD
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.85
+    secondaryOffset: 0.60
+    suppressedMuzzleOffsetBonus: 0.20
+    suppressedScaleMultiplier: 0.6
+    suppressedAlphaMultiplier: 0.55
 

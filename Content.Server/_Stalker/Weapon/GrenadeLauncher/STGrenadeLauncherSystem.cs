@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Stalker.Weapon.GrenadeLauncher;
+using Content.Shared._Zona14.Weapon.Effects;
 using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Hands.EntitySystems;
@@ -18,6 +19,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
@@ -280,6 +282,10 @@ public sealed class STGrenadeLauncherSystem : STSharedGrenadeLauncherSystem
 
         if (launcherComp.SoundShot != null)
             _audio.PlayPvs(launcherComp.SoundShot, gun);
+
+        var targetEntity = HasComp<STGunshotSmokeComponent>(launcher) ? launcher : gun;
+        var flashEv = new MuzzleFlashEvent(GetNetEntity(targetEntity), "MuzzleNoFlashEffect", mapDirection.ToAngle());
+        RaiseNetworkEvent(flashEv, Filter.Pvs(gun, entityManager: EntityManager));
 
         _itemSlots.TryEject(launcher, launcherComp.ChamberSlotId, user, out _);
         if (!TerminatingOrDeleted(grenadeEntity))

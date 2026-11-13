@@ -44,6 +44,14 @@
           - STWeaponModuleShotgunChoke
   - type: STWeaponAccuracy
     accuracyMultiplier: 1.15
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeShotgun
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.68
+    secondaryOffset: 0.50
+    suppressedMuzzleOffsetBonus: 0.18
+    suppressedScaleMultiplier: 0.65
+    suppressedAlphaMultiplier: 0.55
 
 - type: entity
   abstract: true

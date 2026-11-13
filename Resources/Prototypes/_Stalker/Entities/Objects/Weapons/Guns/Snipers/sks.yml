@@ -11,9 +11,9 @@
     minAngle: -50
     maxAngle: -45
   - type: Clothing
-    sprite: _Stalker/Objects/Weapons/Guns/Snipers/sks.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Snipers/inhands/sks.rsi
   - type: Item
-    sprite: _Stalker/Objects/Weapons/Guns/Snipers/sks.rsi
+    sprite: _Stalker/Objects/Weapons/Guns/Snipers/inhands/sks.rsi
   - type: Sprite
     sprite: _Stalker/Objects/Weapons/Guns/Snipers/sks.rsi
     layers:
@@ -30,6 +30,10 @@
     projectileSpeed: 70
   - type: BallisticAmmoProvider
     capacity: 10
+    boltClosed: false
+    autoCycle: true
+    soundRack:
+      path: /Audio/Weapons/Guns/Cock/ltrifle_cock.ogg
     whitelist:
       tags:
       - STCartridge739

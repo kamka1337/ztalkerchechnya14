@@ -46,3 +46,11 @@
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy
     accuracyMultiplier: 1.42
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokeSMG
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.48
+    secondaryOffset: 0.36
+    suppressedMuzzleOffsetBonus: 0.16
+    suppressedScaleMultiplier: 0.6
+    suppressedAlphaMultiplier: 0.55

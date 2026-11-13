@@ -71,3 +71,11 @@
   - type: STWeaponAccuracy
     accuracyMultiplierUnwielded: 1.5
     modifiedAccuracyMultiplier: 1.5
+  - type: STGunshotSmoke
+    effectProto: STEffectGunshotSmokePistol
+    secondaryEffectProto: STEffectGunshotSmokeWisp
+    muzzleOffset: 0.38
+    secondaryOffset: 0.28
+    suppressedMuzzleOffsetBonus: 0.14
+    suppressedScaleMultiplier: 0.6
+    suppressedAlphaMultiplier: 0.5

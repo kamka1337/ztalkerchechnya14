@@ -17,6 +17,7 @@ gun-FullAuto = full-auto
 gun-ballistic-cycle = Cycle
 gun-ballistic-cycled = Cycled
 gun-ballistic-cycled-empty = Cycled (empty)
+gun-ballistic-bolt-closed-insert = You must open the bolt first!
 gun-ballistic-transfer-invalid = {CAPITALIZE(THE($ammoEntity))} won't fit inside {THE($targetEntity)}!
 gun-ballistic-transfer-empty = {CAPITALIZE(THE($entity))} is empty.
 gun-ballistic-transfer-target-full = {CAPITALIZE(THE($entity))} is already fully loaded.

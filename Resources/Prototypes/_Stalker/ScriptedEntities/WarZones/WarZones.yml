@@ -310,12 +310,6 @@
         - MobMask
         layer:
         - MidImpassable
-  - type: PointLight
-    enabled: true
-    radius: 15
-    color: Cyan
-    energy: 1
-
 
 - type: stWarZone
   id: FreedomBase
@@ -356,11 +350,6 @@
         - MobMask
         layer:
         - MidImpassable
-  - type: PointLight
-    enabled: true
-    radius: 15
-    color: Cyan
-    energy: 1
 
 #SESSION-STALKER END
 

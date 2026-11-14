@@ -14,6 +14,12 @@ public sealed partial class BallisticAmmoProviderComponent : Component
     [DataField]
     public SoundSpecifier? SoundRack = new SoundPathSpecifier("/Audio/Weapons/Guns/Cock/smg_cock.ogg");
 
+    [DataField("soundBoltOpen")]
+    public SoundSpecifier? SoundBoltOpen;
+
+    [DataField("soundBoltClose")]
+    public SoundSpecifier? SoundBoltClose;
+
     [DataField]
     public SoundSpecifier? SoundInsert = new SoundPathSpecifier("/Audio/Weapons/Guns/MagIn/bullet_insert.ogg");
 

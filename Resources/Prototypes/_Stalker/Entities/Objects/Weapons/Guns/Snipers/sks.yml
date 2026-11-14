@@ -32,8 +32,12 @@
     capacity: 10
     boltClosed: false
     autoCycle: true
+    soundBoltOpen:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg
+    soundBoltClose:
+      path: /Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg
     soundRack:
-      path: /Audio/Weapons/Guns/Cock/ltrifle_cock.ogg
+      path: /Audio/Weapons/Guns/Cock/batrifle_cock.ogg
     whitelist:
       tags:
       - STCartridge739

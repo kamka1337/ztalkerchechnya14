@@ -69,6 +69,13 @@ public abstract partial class SharedGunSystem
 
         if (_whitelistSystem.IsWhitelistFailOrNull(component.Whitelist, args.Used))
             return;
+
+        if (component.BoltClosed == true)
+        {
+            Popup(Loc.GetString("gun-ballistic-bolt-closed-insert", ("entity", uid)), uid, args.User);
+            return;
+        }
+
         if (GetBallisticShots(component) >= component.Capacity)
             return;
         // stalker-changes-start
@@ -104,6 +111,12 @@ public abstract partial class SharedGunSystem
             return;
         }
 
+        if (targetComponent.BoltClosed == true)
+        {
+            Popup(Loc.GetString("gun-ballistic-bolt-closed-insert", ("entity", args.Target.Value)), args.Target.Value, args.User);
+            return;
+        }
+
         args.Handled = true;
 
         // Continuous loading
@@ -124,6 +137,12 @@ public abstract partial class SharedGunSystem
             !TryComp<BallisticAmmoProviderComponent>(args.Target, out var target) ||
             target.Whitelist == null)
             return;
+
+        if (target.BoltClosed == true)
+        {
+            Popup(Loc.GetString("gun-ballistic-bolt-closed-insert", ("entity", args.Target)), args.Target, args.User);
+            return;
+        }
 
         if (target.Entities.Count + target.UnspawnedCount == target.Capacity)
         {
@@ -199,7 +218,7 @@ public abstract partial class SharedGunSystem
         {
             component.BoltClosed = false;
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
-            Audio.PlayPredicted(component.SoundRack, uid, user);
+            Audio.PlayPredicted(component.SoundBoltOpen ?? component.SoundRack, uid, user);
 
             if (!component.AutoCycle)
             {
@@ -215,7 +234,7 @@ public abstract partial class SharedGunSystem
             component.Chambered = true;
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Chambered));
-            Audio.PlayPredicted(component.SoundRack, uid, user);
+            Audio.PlayPredicted(component.SoundBoltClose ?? component.SoundRack, uid, user);
 
             UpdateBallisticAppearance(uid, component);
             Popup(Loc.GetString("gun-chamber-bolt-closed"), uid, user);
@@ -400,6 +419,7 @@ public abstract partial class SharedGunSystem
         {
             component.BoltClosed = false;
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+            Audio.PlayPredicted(component.SoundBoltOpen ?? component.SoundRack, uid, args.User);
         }
 
         UpdateBallisticAppearance(uid, component);

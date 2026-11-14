@@ -33,8 +33,12 @@
     boltClosed: true
     autoCycle: false
     chambered: true
+    soundBoltOpen:
+      path: /Audio/_Stalker/Weapons/Guns/RifleGen/Bolt/rifle_bolt_open.ogg
+    soundBoltClose:
+      path: /Audio/_Stalker/Weapons/Guns/RifleGen/Bolt/rifle_bolt_closed.ogg
     soundRack:
-      path: /Audio/Weapons/Guns/Cock/ltrifle_cock.ogg
+      path: /Audio/_Stalker/Weapons/Guns/RifleGen/Cock/rifle_cock.ogg
     whitelist:
       tags:
       - STCartridge754

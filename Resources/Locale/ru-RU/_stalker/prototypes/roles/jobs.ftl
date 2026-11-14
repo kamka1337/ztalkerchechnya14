@@ -246,7 +246,7 @@ job-rf-medic = Медик ВС РФ АКС-74У
 job-rf-spec = 7-й ОСН Росич
 job-rf-grenadier = Гранатометчик ВС РФ
 job-rf-desc = Защитник z zov.
-job-rf-supervisor = Еби чурок.
+job-rf-supervisor = командирам
 
 # CRI
 
@@ -257,4 +257,4 @@ job-cri-medic = Медик ВС ЧРИ АКС-74У
 job-cri-spec = ПСН Борз
 job-cri-grenadier = Гранатометчик ВС ЧРИ
 job-cri-desc = Защитник барашков.
-job-cri-supervisor = Еби баранов.
+job-cri-supervisor = командирам

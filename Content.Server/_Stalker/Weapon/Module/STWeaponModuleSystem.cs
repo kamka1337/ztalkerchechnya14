@@ -35,12 +35,12 @@ public sealed class STWeaponModuleSystem : STSharedWeaponModuleSystem
 
     private void OnInserted(Entity<STWeaponModuleComponent> entity, ref EntGotInsertedIntoContainerMessage args)
     {
-        UpdateContainerEffect(args.Container);
+        UpdateAllContainerEffects(args.Container.Owner);
     }
 
     private void OnRemoved(Entity<STWeaponModuleComponent> entity, ref EntGotRemovedFromContainerMessage args)
     {
-        UpdateContainerEffect(args.Container);
+        UpdateAllContainerEffects(args.Container.Owner);
     }
 
     private void OnInit(Entity<STWeaponModuleContainerComponent> entity, ref ComponentInit args)
@@ -49,13 +49,7 @@ public sealed class STWeaponModuleSystem : STSharedWeaponModuleSystem
         entity.Comp.CachedScopeEffect = null;
         entity.Comp.IntegratedScopeEffect = HasComp<ScopeComponent>(entity);
 
-        if (!_containerMangerQuery.TryGetComponent(entity, out var containerComponent))
-            return;
-
-        foreach (var (_, container) in containerComponent.Containers)
-        {
-            UpdateContainerEffect(entity, container);
-        }
+        UpdateAllContainerEffects(entity);
     }
 
     private void OnGunRefreshModifiers(Entity<STWeaponModuleContainerComponent> entity, ref GunRefreshModifiersEvent args)
@@ -69,61 +63,63 @@ public sealed class STWeaponModuleSystem : STSharedWeaponModuleSystem
         args.MaxAngle *= effect.MaxAngleModifier;
         args.ProjectileSpeed *= effect.ProjectileSpeedModifier;
 
-        if (TryComp(entity.Owner, out FarGunshotComponent? farGunshotComponent)
-            && farGunshotComponent.Sound is not null)
+        if (TryComp(entity.Owner, out FarGunshotComponent? farGunshotComponent))
         {
-            farGunshotComponent.SilencerDecrease = MathHelper.CloseToPercent(effect.FarshotSoundDecrease, FarGunshotComponent.DefaultSilencerDecrease)
+            farGunshotComponent.SilencerDecrease = effect.FarshotSoundDecrease < 0.99f
                 ? effect.FarshotSoundDecrease
                 : null;
-
-            var farAudioParams = farGunshotComponent.Sound.Params;
-
-            farAudioParams.Volume += effect.SoundGunshotVolumeAddition;
-            farGunshotComponent.Sound.Params = farAudioParams;
         }
 
         if (args.SoundGunshot is null)
             return;
 
-        var audioParams = args.SoundGunshot?.Params ?? AudioParams.Default;
+        if (effect.SoundGunshotVolumeAddition != 0)
+        {
+            var audioParams = args.SoundGunshot.Params;
+            audioParams.Volume += effect.SoundGunshotVolumeAddition;
 
-        // Hotfix how to handle super silent silencers happening because volume additions
-        // pile up. We need to find something else, because a user in the future might have
-        // not only one volume reducing module
-        audioParams.Volume += effect.SoundGunshotVolumeAddition;
-        args.SoundGunshot!.Params = audioParams;
+            if (args.SoundGunshot is SoundPathSpecifier pathSpec)
+            {
+                args.SoundGunshot = new SoundPathSpecifier(pathSpec.Path, audioParams);
+            }
+            else if (args.SoundGunshot is SoundCollectionSpecifier colSpec && colSpec.Collection != null)
+            {
+                args.SoundGunshot = new SoundCollectionSpecifier(colSpec.Collection, audioParams);
+            }
+        }
     }
 
-    private void UpdateContainerEffect(BaseContainer container)
-    {
-        UpdateContainerEffect(container.Owner, container);
-    }
-
-    private void UpdateContainerEffect(EntityUid entityUid, BaseContainer container)
+    private void UpdateAllContainerEffects(EntityUid entityUid)
     {
         if (!_containerModuleQuery.TryGetComponent(entityUid, out var containerComponent))
             return;
 
-        UpdateContainerEffect((entityUid, containerComponent), container);
+        UpdateAllContainerEffects((entityUid, containerComponent));
     }
 
-    private void UpdateContainerEffect(Entity<STWeaponModuleContainerComponent> entity, BaseContainer container)
+    private void UpdateAllContainerEffects(Entity<STWeaponModuleContainerComponent> entity)
     {
+        if (!_containerMangerQuery.TryGetComponent(entity, out var containerComponent))
+            return;
+
         var effect = new STWeaponModuleEffect();
         STWeaponModuleScopeEffect? scopeEffect = null;
 
-        foreach (var containedEntity in container.ContainedEntities)
+        foreach (var (_, container) in containerComponent.Containers)
         {
-            if (!TryComp<STWeaponModuleComponent>(containedEntity, out var moduleComponent))
-                continue;
+            foreach (var containedEntity in container.ContainedEntities)
+            {
+                if (!TryComp<STWeaponModuleComponent>(containedEntity, out var moduleComponent))
+                    continue;
 
-            effect = STWeaponModuleEffect.Merge(effect, moduleComponent.Effect);
+                effect = STWeaponModuleEffect.Merge(effect, moduleComponent.Effect);
 
-            if (moduleComponent.ScopeEffect is null)
-                continue;
+                if (moduleComponent.ScopeEffect is null)
+                    continue;
 
-            scopeEffect ??= moduleComponent.ScopeEffect;
-            scopeEffect = STWeaponModuleScopeEffect.Merge(scopeEffect.Value, moduleComponent.ScopeEffect.Value);
+                scopeEffect ??= moduleComponent.ScopeEffect;
+                scopeEffect = STWeaponModuleScopeEffect.Merge(scopeEffect.Value, moduleComponent.ScopeEffect.Value);
+            }
         }
 
         var modeDelta = effect.AdditionalAvailableModes ^ entity.Comp.CachedEffect.AdditionalAvailableModes;
@@ -131,7 +127,7 @@ public sealed class STWeaponModuleSystem : STSharedWeaponModuleSystem
         entity.Comp.CachedEffect = effect;
         Dirty(entity);
 
-        if (!entity.Comp.IntegratedScopeEffect && container.ID == "gun_module_scope")
+        if (!entity.Comp.IntegratedScopeEffect)
             _sharedScope.TrySet(entity.Owner, scopeEffect);
 
         if (!TryComp<GunComponent>(entity, out var gun))

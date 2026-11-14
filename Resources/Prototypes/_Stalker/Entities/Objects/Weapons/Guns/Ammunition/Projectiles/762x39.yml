@@ -41,7 +41,7 @@
     projectileClass: 4
     damage:
       types:
-        Piercing: 35
+        Piercing: 62
 
 - type: entity
   id: Bullet739BP

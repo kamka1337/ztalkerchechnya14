@@ -156,7 +156,7 @@
   - type: Gun
     minAngle: 52
     maxAngle: 85
-    fireRate: 4
+    fireRate: 6
     angleIncrease: 2.5
     angleDecay: 20
     projectileSpeed: 75

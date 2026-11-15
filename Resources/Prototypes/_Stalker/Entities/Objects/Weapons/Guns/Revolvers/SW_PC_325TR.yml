@@ -17,7 +17,7 @@
       fireRate: 4
       angleIncrease: 12
       angleDecay: 12
-      projectileSpeed: 50
+      projectileSpeed: 60
       selectedMode: SemiAuto
       soundGunshot:
         path: /Audio/_Stalker/Effects/Guns/revolver4.ogg

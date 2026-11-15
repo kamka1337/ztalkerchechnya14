@@ -1,17 +1,18 @@
 # ВС РФ
+
 - type: job
-  id: ChechnyaRFRPK
-  name: job-rf-rpk
+  id: ChechnyaRFShooter
+  name: job-rf-shooter
   icon: rus
   description: job-rf-desc
-  playTimeTracker: JobRFRPK
+  playTimeTracker: JobRFShooter
   whitelisted: false
   requirements:
     - !type:SpeciesRequirement
       species:
       - Human
       - Dwarf
-  startingGear: RFRPK74Gear
+  startingGear: RFBaseShooterGear
   supervisors: job-rf-supervisor
   canBeAntag: false
   special:
@@ -34,78 +35,20 @@
           pullingItemTag: PliersStalker
           teethCount: 3
           initialTeeth: 3
-
-- type: job
-  id: ChechnyaRFAKC
-  name: job-rf-akc74
-  icon: rus
-  description: job-rf-desc
-  playTimeTracker: JobRFAKC
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: RFAKC74Gear
-  supervisors: job-rf-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - Duty
-    - type: Access
-      tags:
-      - Dolg
-    - type: Bands
-      band: Stalker
-      bandIcon: rus
-      bandProto: RFBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-- type: job
-  id: ChechnyaRFAKCY
-  name: job-rf-akc74y
-  icon: rus
-  description: job-rf-desc
-  playTimeTracker: JobRFAKCY
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: RFAKC74YGear
-  supervisors: job-rf-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - Duty
-    - type: Access
-      tags:
-      - Dolg
-    - type: Bands
-      band: Stalker
-      bandIcon: rus
-      bandProto: RFBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 70
+          gear: RFShooterKitAK74
+          magazine: Chechnya545Mag30
+        - weight: 10
+          gear: RFShooterKitAK74Scope
+          magazine: Chechnya545Mag30
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleScopeRiflesT2Ru
+        - weight: 20
+          gear: RFShooterKitAK74U
+          magazine: Chechnya545Mag30
 
 - type: job
   id: ChechnyaRFMedic
@@ -115,33 +58,75 @@
   playTimeTracker: JobRFMedic
   whitelisted: false
   requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
   startingGear: RFMedicGear
   supervisors: job-rf-supervisor
   canBeAntag: false
   special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - Duty
-    - type: Access
-      tags:
-      - Dolg
-    - type: Bands
-      band: Stalker
-      bandIcon: rus
-      bandProto: RFBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: rus
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: Chechnya545Mag30
+
+- type: job
+  id: ChechnyaRFRPK
+  name: job-rf-rpk
+  icon: rus
+  description: job-rf-desc
+  playTimeTracker: JobRFRPK
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: RFRPKGear
+  supervisors: job-rf-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: rus
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: Chechnya545MagRPK
 
 - type: job
   id: ChechnyaRFSpec
@@ -151,69 +136,232 @@
   playTimeTracker: JobRFSpec
   whitelisted: false
   requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: RFRosichGear
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: RFBaseSpecGear
   supervisors: job-rf-supervisor
   canBeAntag: false
   special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - Duty
-    - type: Access
-      tags:
-      - Dolg
-    - type: Bands
-      band: Stalker
-      bandIcon: roz
-      bandProto: RFBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: vv
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 25
+          gear: RFSpecKitAK74Scope
+          magazine: Chechnya545Mag60
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleScopeRiflesT2Ru
+        - weight: 25
+          gear: RFSpecKitAEK971
+          magazine: Chechnya545Mag30
+        - weight: 25
+          gear: RFSpecKitVSK94
+          magazine: Chechnya939MagVSKSP5
+        - weight: 25
+          gear: RFSpecKitASVAL
+          magazine: Chechnya939Mag20SP5
+
+- type: job
+  id: ChechnyaRFGrenadier
+  name: job-rf-grenadier
+  icon: rus
+  description: job-rf-desc
+  playTimeTracker: JobRFGrenadier
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: RFGrenadierGear
+  supervisors: job-rf-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: rus
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:STAttachWeaponModuleSpecial
+      equipmentSlot: suitstorage
+      itemSlot: gun_module_launcher
+      module: STModuleLauncherGP25
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: Chechnya545Mag30
+
+- type: job
+  id: ChechnyaRFPKM
+  name: job-rf-pkm
+  icon: rus
+  description: job-rf-desc
+  playTimeTracker: JobRFPKM
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: RFPKMGear
+  supervisors: job-rf-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: rus
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: ChechnyaMagazine762x54PKMFMJ
+
+- type: job
+  id: ChechnyaRFSniper
+  name: job-rf-sniper
+  icon: rus
+  description: job-rf-desc
+  playTimeTracker: JobRFSniper
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: RFBaseSniperGear
+  supervisors: job-rf-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - Duty
+        - type: Access
+          tags:
+            - Dolg
+        - type: Bands
+          band: Stalker
+          bandIcon: rus
+          bandProto: RFBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 20
+          gear: RFSniperKitVSS
+          magazine: Chechnya939Mag10SP5
+        - weight: 80
+          gear: RFSniperKitSVD
+          magazine: Chechnya754Mag10PC
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleSniperSightT2
+
+# ВС РФ Наборы снаряжения
 
 - type: startingGear
-  id: RFRPK74Gear
-  equipment:
-    legs: ClothingLegsJeansVSR93
-    torso: ClothingTorsoTurtlenecksVSR93
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetZsh1
-    outerClothing: ClothingOuterArmor6B2
-    suitstorage: STWeaponRifleRPK74
-    belt: ClothingBeltGreenWebbingStalkerFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
-
-- type: startingGear
-  id: RFAKC74Gear
-  equipment:
-    legs: ClothingLegsJeansVSR93
-    torso: ClothingTorsoTurtlenecksVSR93
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetZsh1
-    outerClothing: ClothingOuterArmor6B2
-    suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
-
-- type: startingGear
-  id: RFAKC74YGear
+  id: RFBaseShooterGear
   equipment:
     legs: ClothingLegsJeansVSR93
     torso: ClothingTorsoTurtlenecksVSR93
     shoes: STClothingShoesBootsCombatFilled
     head: ClothingHeadHelmetSH68
     outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: RFShooterKitAK74
+  equipment:
+    suitstorage: STWeaponRifleAKS74
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+
+- type: startingGear
+  id: RFShooterKitAK74Scope
+  equipment:
+    suitstorage: STWeaponRifleAKS74
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+
+- type: startingGear
+  id: RFShooterKitAK74U
+  equipment:
     suitstorage: STWeaponRifleAKS74U
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
 
 - type: startingGear
   id: RFMedicGear
@@ -224,337 +372,103 @@
     head: ClothingHeadHelmetSH68
     outerClothing: ClothingOuterArmor6B2
     suitstorage: STWeaponRifleAKS74U
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - SessionMedkitCMS
+    - SessionMedkitAFAK
 
 - type: startingGear
-  id: RFRosichGear
+  id: RFRPKGear
   equipment:
-    legs: ClothingLegsJeansBereza
-    torso: ClothingTorsoTurtlenecksBereza
+    legs: ClothingLegsJeansVSR93
+    torso: ClothingTorsoTurtlenecksVSR93
     shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetZsh1
-    outerClothing: ClothingOuterArmor6B13
-    suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
-
-- type: stBand
-  id: RFBand
-  name: RF
-  factionId: RF
-  maxMembers: 50
-  managingRankId: 3
-  hierarchy:
-    1: ChechnyaRFRPK
-    2: ChechnyaRFAKC
-    3: ChechnyaRFAKCY
-    4: ChechnyaRFMedic
-    5: ChechnyaRFSpec
-    6: ChechnyaRFGrenadier
-
-
-# ВС ЧРИ
-- type: job
-  id: ChechnyaCRIRPK
-  name: job-cri-rpk
-  icon: cri
-  description: job-cri-desc
-  playTimeTracker: JobCRIRPK
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIRPK74Gear
-  supervisors: job-cri-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-- type: job
-  id: ChechnyaCRIAKC
-  name: job-cri-akc74
-  icon: cri
-  description: job-cri-desc
-  playTimeTracker: JobCRIAKC
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIAKC74Gear
-  supervisors: job-cri-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-- type: job
-  id: ChechnyaCRIAKCY
-  name: job-cri-akc74y
-  icon: cri
-  description: job-cri-desc
-  playTimeTracker: JobCRIAKCY
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIAKC74YGear
-  supervisors: job-cri-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-- type: job
-  id: ChechnyaCRIMedic
-  name: job-cri-medic
-  icon: cri
-  description: job-cri-desc
-  playTimeTracker: JobCRIMedic
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIMedicGear
-  supervisors: job-cri-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-- type: job
-  id: ChechnyaCRISpec
-  name: job-cri-spec
-  icon: cri
-  description: job-cri-desc
-  playTimeTracker: JobCRISpec
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIBorzGear
-  supervisors: job-cri-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-
-
-- type: startingGear
-  id: CRIRPK74Gear
-  equipment:
-    legs: ClothingLegsJeansM81
-    torso: ClothingTorsoTurtlenecksM81
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetZsh1
+    head: ClothingHeadHelmetSH68
     outerClothing: ClothingOuterArmor6B2
     suitstorage: STWeaponRifleRPK74
-    belt: ClothingBeltGreenWebbingStalkerFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - Chechnya545MagRPK
+    - Chechnya545MagRPK
+    - Chechnya545MagRPK
 
 - type: startingGear
-  id: CRIAKC74Gear
+  id: RFBaseSpecGear
   equipment:
-    legs: ClothingLegsJeansM81
-    torso: ClothingTorsoTurtlenecksM81
+    legs: ClothingLegsJeansVSR93
+    torso: ClothingTorsoTurtlenecksVSR93
     shoes: STClothingShoesBootsCombatFilled
     head: ClothingHeadHelmetZsh1
     outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: RFSpecKitAK74Scope
+  equipment:
     suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+  storage:
+    belt:
+    - Chechnya545Mag60
+    - Chechnya545Mag60
+    - Chechnya545Mag60
 
 - type: startingGear
-  id: CRIAKC74YGear
+  id: RFSpecKitAEK971
   equipment:
-    legs: ClothingLegsJeansM81
-    torso: ClothingTorsoTurtlenecksM81
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetSH68
-    outerClothing: ClothingOuterArmor6B2
-    suitstorage: STWeaponRifleAKS74U
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+    suitstorage: STWeaponRifleStalkerAek971
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
 
 - type: startingGear
-  id: CRIMedicGear
+  id: RFSpecKitVSK94
   equipment:
-    legs: ClothingLegsJeansM81
-    torso: ClothingTorsoTurtlenecksM81
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetSH68
-    outerClothing: ClothingOuterArmor6B2
-    suitstorage: STWeaponRifleAKS74U
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+    suitstorage: STWeaponSniperVSK94
+  storage:
+    belt:
+    - Chechnya939MagVSKSP5
+    - Chechnya939MagVSKSP5
+    - Chechnya939MagVSKSP5
+    - Chechnya939MagVSKSP5
+    - Chechnya939MagVSKSP5
 
 - type: startingGear
-  id: CRIBorzGear
+  id: RFSpecKitASVAL
   equipment:
-    legs: ClothingLegsJeansM81
-    torso: ClothingTorsoTurtlenecksM81
-    shoes: STClothingShoesBootsCombatFilled
-    head: ClothingHeadHelmetZsh1
-    outerClothing: ClothingOuterArmor6B13
-    suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
-
-- type: stBand
-  id: CRIBand
-  name: CRI
-  factionId: CRI
-  maxMembers: 50
-  managingRankId: 2
-  hierarchy:
-    1: ChechnyaCRIRPK
-    2: ChechnyaCRIAKC
-    3: ChechnyaCRIAKCY
-    4: ChechnyaCRIMedic
-    5: ChechnyaCRISpec
-    6: ChechnyaCRIGrenadier
-
-
-- type: job
-  id: ChechnyaRFGrenadier
-  name: job-rf-grenadier
-  icon: rus
-  description: job-rf-desc
-  playTimeTracker: JobRFGrenadier
-  whitelisted: false
-  requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: RFGrenadierGear
-  supervisors: job-rf-supervisor
-  canBeAntag: false
-  special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - Duty
-    - type: Access
-      tags:
-      - Dolg
-    - type: Bands
-      band: Stalker
-      bandIcon: rus
-      bandProto: RFBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-  - !type:STAttachWeaponModuleSpecial
-    equipmentSlot: suitstorage
-    itemSlot: gun_module_launcher
-    module: STModuleLauncherGP25
+    suitstorage: STWeaponRifleASVAL
+  storage:
+    belt:
+    - Chechnya939Mag20SP5
+    - Chechnya939Mag20SP5
+    - Chechnya939Mag20SP5
+    - Chechnya939Mag20SP5
+    - Chechnya939Mag20SP5
+    - Chechnya939Mag20SP5
 
 - type: startingGear
   id: RFGrenadierGear
@@ -565,8 +479,297 @@
     head: ClothingHeadHelmetSH68
     outerClothing: ClothingOuterArmor6B2
     suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenGrenadierFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+
+- type: startingGear
+  id: RFPKMGear
+  equipment:
+    legs: ClothingLegsJeansVSR93
+    torso: ClothingTorsoTurtlenecksVSR93
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B13
+    suitstorage: STWeaponMachineGunPKM
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - ChechnyaMagazine762x54PKMFMJ
+    - ChechnyaMagazine762x54PKMFMJ
+    - ChechnyaMagazine762x54PKMFMJ
+
+- type: startingGear
+  id: RFBaseSniperGear
+  equipment:
+    legs: ClothingLegsJeansVSR93
+    torso: ClothingTorsoTurtlenecksVSR93
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: RFSniperKitVSS
+  equipment:
+    suitstorage: STWeaponSniperVSS
+  storage:
+    belt:
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+    - Chechnya939Mag10SP5
+
+- type: startingGear
+  id: RFSniperKitSVD
+  equipment:
+    suitstorage: STWeaponSniperSVDS
+  storage:
+    belt:
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+
+- type: stBand
+  id: RFBand
+  name: RF
+  factionId: RF
+  maxMembers: 100
+  managingRankId: 3
+  hierarchy:
+    1: ChechnyaRFShooter
+    2: ChechnyaRFMedic
+    3: ChechnyaRFRPK
+    4: ChechnyaRFSpec
+    5: ChechnyaRFGrenadier
+    6: ChechnyaRFPKM
+    7: ChechnyaRFSniper
+
+
+# ВС ЧРИ
+
+- type: job
+  id: ChechnyaCRIShooter
+  name: job-cri-shooter
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRIShooter
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIBaseShooterGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 50
+          gear: CRIShooterKitAK74
+          magazine: Chechnya545Mag30
+        - weight: 10
+          gear: CRIShooterKitAK74Scope
+          magazine: Chechnya545Mag30
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleScopeRiflesT2Ru
+        - weight: 10
+          gear: CRIShooterKitAK74U
+          magazine: Chechnya545Mag30
+        - weight: 10
+          gear: CRIShooterKitAKMC
+          magazine: Chechnya739Mag30FMJ
+        - weight: 20
+          gear: CRIShooterKitAKM
+          magazine: Chechnya739Mag30FMJ
+
+- type: job
+  id: ChechnyaCRIMedic
+  name: job-cri-medic
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRIMedic
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIMedicGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: Chechnya545Mag30
+
+- type: job
+  id: ChechnyaCRIRPK
+  name: job-cri-rpk
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRIRPK
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIRPKGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: Chechnya545MagRPK
+
+- type: job
+  id: ChechnyaCRISpec
+  name: job-cri-spec
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRISpec
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIBaseSpecGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 30
+          gear: CRISpecKitAK74Scope
+          magazine: Chechnya545Mag60
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleScopeRiflesT2Ru
+        - weight: 30
+          gear: CRISpecKitFAL
+          magazine: Chechnya751Mag20M80
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleSniperSightT2
+        - weight: 40
+          gear: CRISpecKitAKMCScope
+          magazine: Chechnya739Mag45FMJ
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleScopeRiflesT2Ru
 
 - type: job
   id: ChechnyaCRIGrenadier
@@ -576,47 +779,468 @@
   playTimeTracker: JobCRIGrenadier
   whitelisted: false
   requirements:
-  - !type:SpeciesRequirement
-    species:
-    - Human
-    - Dwarf
-  startingGear: CRIGrenadierGear
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIBaseGrenadierGear
   supervisors: job-cri-supervisor
   canBeAntag: false
   special:
-  - !type:AddComponentSpecial
-    components:
-    - type: NpcFactionMember
-      factions:
-      - BandsUnion
-      - Freedom
-    - type: Access
-      tags:
-      - Freedom
-    - type: Bands
-      band: Stalker
-      bandIcon: cri
-      bandProto: CRIBand
-      bandRankId: 2
-    - type: BlockTackingHolyItems
-    - type: TeethPull
-      teethProto: ToothStalker
-      pullingItemTag: PliersStalker
-      teethCount: 3
-      initialTeeth: 3
-  - !type:STAttachWeaponModuleSpecial
-    equipmentSlot: suitstorage
-    itemSlot: gun_module_launcher
-    module: STModuleLauncherGP25
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 33.3
+          gear: CRIGrenadierKitAK74
+          magazine: Chechnya545Mag30
+          modules:
+            suitstorage:
+              gun_module_launcher: STModuleLauncherGP25
+        - weight: 33.3
+          gear: CRIGrenadierKitAKM
+          magazine: Chechnya739Mag30FMJ
+          modules:
+            suitstorage:
+              gun_module_launcher: STModuleLauncherGP25
+        - weight: 33.4
+          gear: CRIGrenadierKitAKMC
+          magazine: Chechnya739Mag30FMJ
+          modules:
+            suitstorage:
+              gun_module_launcher: STModuleLauncherGP25
+
+- type: job
+  id: ChechnyaCRIPKM
+  name: job-cri-pkm
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRIPKM
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIPKMGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - magazine: ChechnyaMagazine762x54PKMFMJ
+
+- type: job
+  id: ChechnyaCRISniper
+  name: job-cri-sniper
+  icon: cri
+  description: job-cri-desc
+  playTimeTracker: JobCRISniper
+  whitelisted: false
+  requirements:
+    - !type:SpeciesRequirement
+      species:
+      - Human
+      - Dwarf
+  startingGear: CRIBaseSniperGear
+  supervisors: job-cri-supervisor
+  canBeAntag: false
+  special:
+    - !type:AddComponentSpecial
+      components:
+        - type: NpcFactionMember
+          factions:
+          - BandsUnion
+          - Freedom
+        - type: Access
+          tags:
+            - Freedom
+        - type: Bands
+          band: Stalker
+          bandIcon: cri
+          bandProto: CRIBand
+          bandRankId: 2
+        - type: BlockTackingHolyItems
+        - type: TeethPull
+          teethProto: ToothStalker
+          pullingItemTag: PliersStalker
+          teethCount: 3
+          initialTeeth: 3
+    - !type:RandomStartingGearSpecial
+      kits:
+        - weight: 70
+          gear: CRISniperKitSVD
+          magazine: Chechnya754Mag10PC
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleSniperSightT2
+        - weight: 15
+          gear: CRISniperKitSKS
+          internalAmmo: STCartridge739PC
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleSniperSightT2
+        - weight: 15
+          gear: CRISniperKitMosin
+          internalAmmo: STCartridge754PC
+          modules:
+            suitstorage:
+              gun_module_scope: STModuleSniperSightT2
+
+# ВС ЧРИ Наборы снаряжения
 
 - type: startingGear
-  id: CRIGrenadierGear
+  id: CRIBaseShooterGear
   equipment:
     legs: ClothingLegsJeansM81
     torso: ClothingTorsoTurtlenecksM81
     shoes: STClothingShoesBootsCombatFilled
     head: ClothingHeadHelmetSH68
     outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: CRIShooterKitAK74
+  equipment:
     suitstorage: STWeaponRifleAKS74
-    belt: ClothingBeltTarzanGreenGrenadierFilled
-    back: ClothingBackpackStalkerZaryaGreenFilled
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+
+- type: startingGear
+  id: CRIShooterKitAK74Scope
+  equipment:
+    suitstorage: STWeaponRifleAKS74
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+
+- type: startingGear
+  id: CRIShooterKitAK74U
+  equipment:
+    suitstorage: STWeaponRifleAKS74U
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+
+- type: startingGear
+  id: CRIShooterKitAKMC
+  equipment:
+    suitstorage: STWeaponRifleAKMC
+  storage:
+    belt:
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+
+- type: startingGear
+  id: CRIShooterKitAKM
+  equipment:
+    suitstorage: STWeaponRifleAKM
+  storage:
+    belt:
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+
+- type: startingGear
+  id: CRIMedicGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    suitstorage: STWeaponRifleAKS74U
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - SessionMedkitCMS
+    - SessionMedkitAFAK
+
+- type: startingGear
+  id: CRIRPKGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    suitstorage: STWeaponRifleRPK74
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - Chechnya545MagRPK
+    - Chechnya545MagRPK
+    - Chechnya545MagRPK
+
+- type: startingGear
+  id: CRIBaseSpecGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: CRISpecKitAK74Scope
+  equipment:
+    suitstorage: STWeaponRifleAKS74
+  storage:
+    belt:
+    - Chechnya545Mag60
+    - Chechnya545Mag60
+    - Chechnya545Mag60
+
+- type: startingGear
+  id: CRISpecKitFAL
+  equipment:
+    suitstorage: STWeaponRifleFAL
+  storage:
+    belt:
+    - Chechnya751Mag20M80
+    - Chechnya751Mag20M80
+    - Chechnya751Mag20M80
+    - Chechnya751Mag20M80
+    - Chechnya751Mag20M80
+    - Chechnya751Mag20M80
+
+- type: startingGear
+  id: CRISpecKitAKMCScope
+  equipment:
+    suitstorage: STWeaponRifleAKMC
+  storage:
+    belt:
+    - Chechnya739Mag45FMJ
+    - Chechnya739Mag45FMJ
+    - Chechnya739Mag45FMJ
+    - Chechnya739Mag45FMJ
+
+- type: startingGear
+  id: CRIBaseGrenadierGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: CRIGrenadierKitAK74
+  equipment:
+    suitstorage: STWeaponRifleAKS74
+  storage:
+    belt:
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - Chechnya545Mag30
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+
+- type: startingGear
+  id: CRIGrenadierKitAKM
+  equipment:
+    suitstorage: STWeaponRifleAKM
+  storage:
+    belt:
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+
+- type: startingGear
+  id: CRIGrenadierKitAKMC
+  equipment:
+    suitstorage: STWeaponRifleAKMC
+  storage:
+    belt:
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - Chechnya739Mag30FMJ
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+    - GrenadeVOG25
+
+- type: startingGear
+  id: CRIPKMGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B13
+    suitstorage: STWeaponMachineGunPKM
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+    belt:
+    - ChechnyaMagazine762x54PKMFMJ
+    - ChechnyaMagazine762x54PKMFMJ
+    - ChechnyaMagazine762x54PKMFMJ
+
+- type: startingGear
+  id: CRIBaseSniperGear
+  equipment:
+    legs: ClothingLegsJeansM81
+    torso: ClothingTorsoTurtlenecksM81
+    shoes: STClothingShoesBootsCombatFilled
+    head: ClothingHeadHelmetSH68
+    outerClothing: ClothingOuterArmor6B2
+    belt: ClothingBeltGreenWebbingStalker
+    back: ClothingBackpackDuffelGreenStalker
+  storage:
+    back:
+    - SessionMedkitAFAK
+    - SessionMedkitCMS
+
+- type: startingGear
+  id: CRISniperKitSVD
+  equipment:
+    suitstorage: STWeaponSniperSVDS
+  storage:
+    belt:
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+    - Chechnya754Mag10PC
+
+- type: startingGear
+  id: CRISniperKitSKS
+  equipment:
+    suitstorage: STWeaponSniperSKS
+  storage:
+    belt:
+    - 739PCBox
+    - 739PCBox
+
+- type: startingGear
+  id: CRISniperKitMosin
+  equipment:
+    suitstorage: STWeaponSniperMosin
+  storage:
+    belt:
+    - 754PCBox
+    - 754PCBox
+    - 754PCBox
+
+- type: stBand
+  id: CRIBand
+  name: CRI
+  factionId: CRI
+  maxMembers: 100
+  managingRankId: 2
+  hierarchy:
+    1: ChechnyaCRIShooter
+    2: ChechnyaCRIMedic
+    3: ChechnyaCRIRPK
+    4: ChechnyaCRISpec
+    5: ChechnyaCRIGrenadier
+    6: ChechnyaCRIPKM
+    7: ChechnyaCRISniper

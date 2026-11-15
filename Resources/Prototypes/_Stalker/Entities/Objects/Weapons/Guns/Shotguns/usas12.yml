@@ -34,7 +34,7 @@
     fireRate: 4
     angleIncrease: 10
     angleDecay: 50
-    projectileSpeed: 55
+    projectileSpeed: 60
     selectedMode: FullAuto
     availableModes:
     - SemiAuto

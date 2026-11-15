@@ -172,7 +172,7 @@
       fireRate: 1
       angleIncrease: 10
       angleDecay: 50
-      projectileSpeed: 75
+      projectileSpeed: 60
     - type: ChamberMagazineAmmoProvider
       soundRack:
         path: /Audio/_Stalker/Weapons/Guns/RifleGen/Cock/rifle_cock.ogg
@@ -312,7 +312,7 @@
     fireRate: 0.9
     angleIncrease: 3
     angleDecay: 60
-    projectileSpeed: 70
+    projectileSpeed: 60
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.1
   - type: STWeaponAccuracy
@@ -383,7 +383,7 @@
     fireRate: 0.9
     angleIncrease: 3
     angleDecay: 60
-    projectileSpeed: 70
+    projectileSpeed: 60
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.1
   - type: STWeaponAccuracy

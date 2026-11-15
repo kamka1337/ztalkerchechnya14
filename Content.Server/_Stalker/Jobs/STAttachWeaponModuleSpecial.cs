@@ -33,8 +33,17 @@ public sealed partial class STAttachWeaponModuleSpecial : JobSpecial
             return;
 
         var itemSlots = entMan.System<ItemSlotsSystem>();
-        if (!itemSlots.TryGetSlot(item.Value, ItemSlot, out var slot, itemSlotsComp) || slot.HasItem)
+        if (!itemSlots.TryGetSlot(item.Value, ItemSlot, out var slot, itemSlotsComp))
             return;
+
+        if (slot.HasItem)
+        {
+            if (itemSlots.TryEject(item.Value, slot, user: null, out var oldItem, excludeUserAudio: true))
+            {
+                if (oldItem != null)
+                    entMan.QueueDeleteEntity(oldItem.Value);
+            }
+        }
 
         var coords = entMan.GetComponent<TransformComponent>(mob).Coordinates;
         var moduleEnt = entMan.SpawnEntity(Module, coords);

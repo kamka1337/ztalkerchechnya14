@@ -699,7 +699,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
     public bool RestoreDestroyedLimb(EntityUid uid, LimbType limb, LimbHealthComponent? comp = null)
     {
-        if (limb is LimbType.Chest or LimbType.Head)
+        if (limb == LimbType.Head)
             return false;
 
         if (!Resolve(uid, ref comp, false))
@@ -715,6 +715,12 @@ public sealed class LimbHealthSystem : EntitySystem
 
         if (comp.MaxHealth.TryGetValue(limb, out var maxHp) && maxHp > 1)
             st.Damage.DamageDict["Blunt"] = maxHp - 1;
+
+        if (limb == LimbType.Chest)
+        {
+            comp.ChestCheckStep = 0;
+            comp.NextChestCheck = TimeSpan.Zero;
+        }
 
         RecomputeBody(uid, comp);
         Dirty(uid, comp);

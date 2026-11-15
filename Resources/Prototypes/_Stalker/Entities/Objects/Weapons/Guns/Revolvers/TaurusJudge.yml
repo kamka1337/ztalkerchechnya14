@@ -17,7 +17,7 @@
       fireRate: 3
       angleIncrease: 20
       angleDecay: 20
-      projectileSpeed: 50
+      projectileSpeed: 60
       selectedMode: SemiAuto
       soundGunshot:
         path: /Audio/_Stalker/Effects/Guns/revolver3.ogg

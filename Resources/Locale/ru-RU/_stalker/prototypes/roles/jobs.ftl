@@ -239,22 +239,28 @@ job-evolver-symbiote-archon-supervisor = Защищать Зону, контро
 
 # RF
 
-job-rf-rpk = Пулеметчик ВС РФ
+job-rf-shooter = Стрелок ВС РФ
+job-rf-medic = Медик ВС РФ
+job-rf-rpk = Стрелок-пулеметчик ВС РФ
+job-rf-spec = 8-й ОСН
+job-rf-grenadier = Гранатометчик ВС РФ
+job-rf-pkm = Пулеметчик ВС РФ
+job-rf-sniper = Снайпер ВС РФ
 job-rf-akc74 = Штурмовик ВС РФ АКС-74
 job-rf-akc74y = Штурмовик ВС РФ АКС-74У
-job-rf-medic = Медик ВС РФ АКС-74У
-job-rf-spec = 7-й ОСН Росич
-job-rf-grenadier = Гранатометчик ВС РФ
 job-rf-desc = Защитник z zov.
 job-rf-supervisor = командирам
 
 # CRI
 
-job-cri-rpk = Пулеметчик ВС ЧРИ
+job-cri-shooter = Стрелок ВС ЧРИ
+job-cri-medic = Медик ВС ЧРИ
+job-cri-rpk = Стрелок-пулеметчик ВС ЧРИ
+job-cri-spec = Специалист ВС ЧРИ
+job-cri-grenadier = Гранатометчик ВС ЧРИ
+job-cri-pkm = Пулеметчик ВС ЧРИ
+job-cri-sniper = Снайпер ВС ЧРИ
 job-cri-akc74 = Штурмовик ВС ЧРИ АКС-74
 job-cri-akc74y = Штурмовик ВС ЧРИ АКС-74У
-job-cri-medic = Медик ВС ЧРИ АКС-74У
-job-cri-spec = ПСН Борз
-job-cri-grenadier = Гранатометчик ВС ЧРИ
 job-cri-desc = Защитник барашков.
 job-cri-supervisor = командирам

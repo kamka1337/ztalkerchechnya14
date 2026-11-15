@@ -22,7 +22,7 @@
     fireRate: 12
     angleIncrease: 1
     angleDecay: 6
-    projectileSpeed: 55
+    projectileSpeed: 60
     soundGunshot:
       path: /Audio/_Stalker/Effects/Guns/919.ogg
   - type: ItemSlots

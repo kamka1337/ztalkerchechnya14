@@ -24,7 +24,7 @@
     fireRate: 7.5
     angleIncrease: 1.2
     angleDecay: 5.5
-    projectileSpeed: 55
+    projectileSpeed: 60
     soundGunshot:
       path: /Audio/_Stalker/Effects/Guns/n_mp5_shot.ogg
   - type: ItemSlots

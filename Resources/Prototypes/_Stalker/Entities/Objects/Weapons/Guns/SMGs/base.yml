@@ -27,7 +27,7 @@
   - type: PullDoAfter
     pullTime: 1.5
   - type: Gun
-    projectileSpeed: 50
+    projectileSpeed: 60
     selectedMode: FullAuto
     availableModes:
     - FullAuto

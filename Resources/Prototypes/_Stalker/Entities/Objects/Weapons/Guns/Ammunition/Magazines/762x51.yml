@@ -230,3 +230,13 @@
             tags:
               - STElasticRubberBlue
       sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Magazines/751/elastic_rubber.rsi
+
+- type: entity
+  id: Chechnya751Mag20M80
+  name: магазин 7,62x51 (20) M80
+  parent: 751Mag20
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: Cartridge751M80
+    capacity: 20

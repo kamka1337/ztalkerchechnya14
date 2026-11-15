@@ -15,7 +15,7 @@
     fireRate: 4
     angleIncrease: 5
     angleDecay: 5
-    projectileSpeed: 55
+    projectileSpeed: 60
     soundGunshot:
       path: /Audio/Weapons/Guns/Gunshots/mateba.ogg
   - type: RevolverAmmoProvider

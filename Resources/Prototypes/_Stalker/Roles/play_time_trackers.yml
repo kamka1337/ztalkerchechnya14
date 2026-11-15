@@ -242,4 +242,22 @@
   id: JobRFGrenadier
 
 - type: playTimeTracker
+  id: JobRFShooter
+
+- type: playTimeTracker
+  id: JobRFPKM
+
+- type: playTimeTracker
+  id: JobRFSniper
+
+- type: playTimeTracker
   id: JobCRIGrenadier
+
+- type: playTimeTracker
+  id: JobCRIShooter
+
+- type: playTimeTracker
+  id: JobCRIPKM
+
+- type: playTimeTracker
+  id: JobCRISniper

@@ -18,7 +18,7 @@
       - state: mag-0
         map: ["enum.GunVisualLayers.Mag"]
   - type: Gun
-    projectileSpeed: 45
+    projectileSpeed: 60
     minAngle: 8
     maxAngle: 15
     angleIncrease: 1

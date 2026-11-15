@@ -118,12 +118,13 @@
   description: department-Stalker-description
   weight: 10
   roles:
-  - ChechnyaRFRPK
-  - ChechnyaRFAKC
-  - ChechnyaRFAKCY
+  - ChechnyaRFShooter
   - ChechnyaRFMedic
+  - ChechnyaRFRPK
   - ChechnyaRFSpec
   - ChechnyaRFGrenadier
+  - ChechnyaRFPKM
+  - ChechnyaRFSniper
 
 - type: department
   id: StalkerCRI
@@ -132,9 +133,10 @@
   color: "#111111"
   weight: 8
   roles:
-  - ChechnyaCRIRPK
-  - ChechnyaCRIAKC
-  - ChechnyaCRIAKCY
+  - ChechnyaCRIShooter
   - ChechnyaCRIMedic
+  - ChechnyaCRIRPK
   - ChechnyaCRISpec
   - ChechnyaCRIGrenadier
+  - ChechnyaCRIPKM
+  - ChechnyaCRISniper

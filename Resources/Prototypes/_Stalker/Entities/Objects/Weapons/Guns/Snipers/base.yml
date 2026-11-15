@@ -24,7 +24,7 @@
     sprite: Objects/Weapons/Guns/Snipers/bolt_gun_wood.rsi
   - type: AmmoCounter
   - type: Gun
-    projectileSpeed: 75
+    projectileSpeed: 60
     fireRate: 0.75
     selectedMode: SemiAuto
     availableModes:

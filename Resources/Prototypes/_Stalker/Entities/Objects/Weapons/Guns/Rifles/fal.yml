@@ -24,13 +24,14 @@
         volume: -2
     minAngle: 50
     maxAngle: 115
-    fireRate: 3
+    fireRate: 5
     angleIncrease: 4.5
     angleDecay: 27
-    projectileSpeed: 75
-    selectedMode: SemiAuto
+    projectileSpeed: 60
+    selectedMode: FullAuto
     availableModes:
     - SemiAuto
+    - FullAuto
   - type: ItemSlots
     slots:
       gun_magazine:
@@ -53,7 +54,7 @@
         priority: 2
         whitelist:
           tags:
-          - STWeaponModuleRifleScopeNato
+          - STWeaponModuleSniperSight
       gun_chamber:
         name: Chamber
         startingItem:
@@ -70,4 +71,4 @@
   parent: STBaseWeaponRifleFAL
   id: STWeaponRifleFAL
   name: FN FAL
-  description:  Legendary Belgian battle rifle chambered in powerful 7.62x51mm NATO. Appears in the Zone via mercenaries and smugglers. Each shot hits like a sledgehammer, but semi-auto only. "A gentleman's weapon", as veterans say.
+  description:  Legendary Belgian battle rifle chambered in powerful 7.62x51mm NATO. Appears in the Zone via mercenaries and smugglers. Each shot hits like a sledgehammer. "A gentleman's weapon", as veterans say.

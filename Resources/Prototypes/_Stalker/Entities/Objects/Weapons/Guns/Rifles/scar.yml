@@ -27,7 +27,7 @@
     fireRate: 6
     angleIncrease: 1.3
     angleDecay: 5
-    projectileSpeed: 65
+    projectileSpeed: 60
     selectedMode: FullAuto
     availableModes:
     - SemiAuto
@@ -119,7 +119,7 @@
     fireRate: 8
     angleIncrease: 1.3
     angleDecay: 5.5
-    projectileSpeed: 70
+    projectileSpeed: 60
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy
@@ -145,7 +145,7 @@
     fireRate: 5
     angleIncrease: 1.1
     angleDecay: 5.5
-    projectileSpeed: 55
+    projectileSpeed: 60
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy
@@ -214,7 +214,7 @@
     fireRate: 5.5
     angleIncrease: 1.3
     angleDecay: 3.5
-    projectileSpeed: 70
+    projectileSpeed: 60
   - type: STWeaponDamageFalloff
     falloffMultiplier: 0.8
   - type: STWeaponAccuracy

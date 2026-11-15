@@ -5,6 +5,7 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.DoAfter;
 using Content.Shared.FixedPoint;
 using Content.Shared.Interaction;
+using Content.Shared.Interaction.Events;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 
@@ -29,6 +30,7 @@ public sealed class LimbMedicalSystem : EntitySystem
         SubscribeLocalEvent<LimbSyringeComponent, LimbSyringeDoAfterEvent>(OnSyringeDoAfter);
 
         SubscribeLocalEvent<LimbSurgeryToolComponent, AfterInteractEvent>(OnSurgeryInteract);
+        SubscribeLocalEvent<LimbSurgeryToolComponent, UseInHandEvent>(OnSurgeryUseInHand);
         SubscribeLocalEvent<LimbSurgeryToolComponent, LimbSurgeryDoAfterEvent>(OnSurgeryDoAfter);
 
         SubscribeLocalEvent<LimbBleedCureComponent, AfterInteractEvent>(OnBleedCureInteract);
@@ -207,52 +209,71 @@ public sealed class LimbMedicalSystem : EntitySystem
         if (args.Handled || !args.CanReach || args.Target is not { } target)
             return;
 
-        if (!TryComp<LimbHealthComponent>(target, out var comp))
+        if (StartSurgery(ent, args.User, target))
+            args.Handled = true;
+    }
+
+    private void OnSurgeryUseInHand(Entity<LimbSurgeryToolComponent> ent, ref UseInHandEvent args)
+    {
+        if (args.Handled)
             return;
 
-        args.Handled = true;
+        if (StartSurgery(ent, args.User, args.User))
+            args.Handled = true;
+    }
+
+    private bool StartSurgery(Entity<LimbSurgeryToolComponent> ent, EntityUid user, EntityUid target)
+    {
+        if (!TryComp<LimbHealthComponent>(target, out var comp))
+            return false;
 
         if (_mobState.IsDead(target))
         {
-            _popup.PopupEntity("Бесполезно - пациент мёртв.", target, args.User);
-            return;
+            _popup.PopupEntity("Бесполезно - пациент мёртв.", target, user);
+            return false;
         }
 
-        var limb = GetSelected(args.User);
+        var limb = GetSelected(user);
 
-        if (limb is LimbType.Head or LimbType.Chest)
+        if (limb == LimbType.Head)
         {
-            _popup.PopupEntity("Это ранение необратимо - зашить невозможно.", target, args.User);
-            return;
+            _popup.PopupEntity("Это ранение необратимо - зашить невозможно.", target, user);
+            return false;
         }
 
         if (!comp.Limbs.TryGetValue(limb, out var st) || !st.Destroyed)
         {
-            _popup.PopupEntity("Эта конечность не выбита.", target, args.User);
-            return;
+            _popup.PopupEntity("Эта конечность не выбита.", target, user);
+            return false;
         }
 
         if (ent.Comp.Stage == LimbSurgeryStage.Scissors && !comp.NeedledLimbs.Contains(limb))
         {
-            _popup.PopupEntity("Сначала введите мед. иглу.", target, args.User);
-            return;
+            _popup.PopupEntity("Сначала введите мед. иглу.", target, user);
+            return false;
         }
 
         if (ent.Comp.Stage == LimbSurgeryStage.Needle && comp.NeedledLimbs.Contains(limb))
         {
-            _popup.PopupEntity("Игла уже введена - используйте тактические ножницы.", target, args.User);
-            return;
+            _popup.PopupEntity("Игла уже введена - используйте тактические ножницы.", target, user);
+            return false;
+        }
+
+        if (TryComp<LimitedChargesComponent>(ent.Owner, out var charges) && _charges.IsEmpty(ent.Owner))
+        {
+            _popup.PopupEntity("Заряды исчерпаны.", ent.Owner, user);
+            return false;
         }
 
         var ev = new LimbSurgeryDoAfterEvent(ent.Comp.Stage, limb);
-        var doAfter = new DoAfterArgs(EntityManager, args.User, ent.Comp.Delay, ev, ent.Owner, target, ent.Owner)
+        var doAfter = new DoAfterArgs(EntityManager, user, ent.Comp.Delay, ev, ent.Owner, target, ent.Owner)
         {
             NeedHand = true,
             BreakOnMove = true,
             BreakOnHandChange = true,
             BlockDuplicate = true,
         };
-        _doAfter.TryStartDoAfter(doAfter);
+        return _doAfter.TryStartDoAfter(doAfter);
     }
 
     private void OnSurgeryDoAfter(Entity<LimbSurgeryToolComponent> ent, ref LimbSurgeryDoAfterEvent args)
@@ -268,7 +289,7 @@ public sealed class LimbMedicalSystem : EntitySystem
         if (_mobState.IsDead(target))
             return;
 
-        if (args.Limb is LimbType.Head or LimbType.Chest)
+        if (args.Limb == LimbType.Head)
             return;
 
         if (!comp.Limbs.TryGetValue(args.Limb, out var st) || !st.Destroyed)
@@ -278,9 +299,18 @@ public sealed class LimbMedicalSystem : EntitySystem
         {
             comp.NeedledLimbs.Add(args.Limb);
             _popup.PopupEntity("Мед. нить наложена. Завершите тактическими ножницами.", target, args.Args.User);
-            QueueDel(ent.Owner);
+            if (TryComp<LimitedChargesComponent>(ent.Owner, out _))
+            {
+                _charges.TryUseCharge(ent.Owner);
+                if (_charges.IsEmpty(ent.Owner))
+                    QueueDel(ent.Owner);
+            }
+            else
+            {
+                QueueDel(ent.Owner);
+            }
         }
-        else
+        else if (args.Stage == LimbSurgeryStage.Scissors)
         {
             if (!comp.NeedledLimbs.Contains(args.Limb))
                 return;
@@ -288,6 +318,24 @@ public sealed class LimbMedicalSystem : EntitySystem
             comp.NeedledLimbs.Remove(args.Limb);
             _limbs.RestoreDestroyedLimb(target, args.Limb, comp);
             _popup.PopupEntity("Конечность восстановлена.", target, args.Args.User);
+            if (TryComp<LimitedChargesComponent>(ent.Owner, out _))
+            {
+                _charges.TryUseCharge(ent.Owner);
+                if (_charges.IsEmpty(ent.Owner))
+                    QueueDel(ent.Owner);
+            }
+        }
+        else if (args.Stage == LimbSurgeryStage.Full)
+        {
+            comp.NeedledLimbs.Remove(args.Limb);
+            _limbs.RestoreDestroyedLimb(target, args.Limb, comp);
+            _popup.PopupEntity("Конечность восстановлена.", target, args.Args.User);
+            if (TryComp<LimitedChargesComponent>(ent.Owner, out _))
+            {
+                _charges.TryUseCharge(ent.Owner);
+                if (_charges.IsEmpty(ent.Owner))
+                    QueueDel(ent.Owner);
+            }
         }
     }
 }

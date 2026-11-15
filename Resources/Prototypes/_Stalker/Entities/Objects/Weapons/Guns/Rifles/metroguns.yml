@@ -22,7 +22,7 @@
       path: /Audio/_Stalker/Effects/Guns/val_shoot.ogg
     minAngle: 55
     maxAngle: 105
-    projectileSpeed: 65
+    projectileSpeed: 60
     angleIncrease: 0.8
     angleDecay: 5
     fireRate: 5

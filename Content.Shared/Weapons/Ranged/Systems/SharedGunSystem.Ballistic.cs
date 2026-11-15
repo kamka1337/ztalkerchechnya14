@@ -220,11 +220,6 @@ public abstract partial class SharedGunSystem
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
             Audio.PlayPredicted(component.SoundBoltOpen ?? component.SoundRack, uid, user);
 
-            if (!component.AutoCycle)
-            {
-                Cycle(uid, component, TransformSystem.GetMapCoordinates(uid));
-            }
-
             UpdateBallisticAppearance(uid, component);
             Popup(Loc.GetString("gun-chamber-bolt-opened"), uid, user);
         }
@@ -454,6 +449,27 @@ public abstract partial class SharedGunSystem
         UpdateBallisticAppearance(entity.Owner, entity.Comp);
         UpdateAmmoCount(entity.Owner);
         Dirty(entity);
+    }
+
+    public void SetBallisticInternalAmmo(Entity<BallisticAmmoProviderComponent> entity, Robust.Shared.Prototypes.EntProtoId cartridgeProto)
+    {
+        var component = entity.Comp;
+        component.Proto = cartridgeProto;
+        component.EntProtos.Clear();
+        for (var i = 0; i < component.Capacity; i++)
+        {
+            component.EntProtos.Add(cartridgeProto);
+        }
+        component.Chambered = true;
+        component.BoltClosed = true;
+        component.UnspawnedCount = component.Capacity;
+        DirtyField(entity.Owner, component, nameof(BallisticAmmoProviderComponent.Chambered));
+        DirtyField(entity.Owner, component, nameof(BallisticAmmoProviderComponent.BoltClosed));
+        DirtyField(entity.Owner, component, nameof(BallisticAmmoProviderComponent.Proto));
+        DirtyField(entity.Owner, component, nameof(BallisticAmmoProviderComponent.EntProtos));
+        DirtyField(entity.Owner, component, nameof(BallisticAmmoProviderComponent.UnspawnedCount));
+        UpdateBallisticAppearance(entity.Owner, component);
+        UpdateAmmoCount(entity.Owner);
     }
 }
 

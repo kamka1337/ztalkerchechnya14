@@ -230,3 +230,14 @@
           tags:
             - STElasticRubberBlue
     sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Magazines/545/elastic_rubber.rsi
+
+- type: entity
+  id: Chechnya545Mag60
+  name: магазин 5,45х39 (60)
+  description: Магазин 5.45х39 для АК. Вместимость пуль 60.
+  parent: 545Mag60
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge545PC
+    capacity: 60

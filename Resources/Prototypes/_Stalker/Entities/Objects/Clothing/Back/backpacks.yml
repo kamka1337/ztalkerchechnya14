@@ -12,10 +12,9 @@
       reductionFraction: 0.20
     - type: Sprite
       sprite: _Stalker/Objects/Clothing/backpacks/Duffels/duffel.rsi
-    - type: Storage # 6 клеток подряд + доп 1 клетка отдельно (всего 7)
+    - type: Storage # 8 клеток (4 в длину, 2 в высоту)
       grid:
-        - 0,0,2,3
-        - 3,0,3,0
+        - 0,0,3,1
       quickInsert: true
       areaInsert: true
 

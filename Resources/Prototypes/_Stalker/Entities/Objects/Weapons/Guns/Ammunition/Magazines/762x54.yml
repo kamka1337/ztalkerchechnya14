@@ -162,3 +162,13 @@
             tags:
               - STElasticRubberBlue
       sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Magazines/754/elastic_rubber.rsi
+
+- type: entity
+  id: Chechnya754Mag10PC
+  name: магазин 7,62x54 (10) ПС
+  parent: 754Mag10
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge754PC
+    capacity: 10

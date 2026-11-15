@@ -22,7 +22,7 @@
       fireRate: 10
       angleIncrease: 1.8
       angleDecay: 7
-      projectileSpeed: 55
+      projectileSpeed: 60
       selectedMode: FullAuto
       availableModes:
       - Burst

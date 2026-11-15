@@ -405,6 +405,14 @@
     state: roz
 
 - type: jobIcon
+  id: vv
+  locationPreference: Right
+  icon:
+    sprite: /Textures/_Stalker/Icons/Patches/band.rsi
+    hideOnStealth: true
+    state: roz
+
+- type: jobIcon
   id: de
   locationPreference: Right
   icon:

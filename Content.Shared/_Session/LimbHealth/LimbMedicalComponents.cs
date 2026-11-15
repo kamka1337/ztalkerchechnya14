@@ -46,10 +46,12 @@ public enum SyringeVisuals : byte
     Spent,
 }
 
+[Serializable, NetSerializable]
 public enum LimbSurgeryStage : byte
 {
     Needle,
     Scissors,
+    Full,
 }
 
 [RegisterComponent]

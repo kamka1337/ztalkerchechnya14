@@ -20,7 +20,7 @@
     - type: Clothing
       sprite: _Stalker/Objects/Weapons/Guns/Pistols/gyrza.rsi
     - type: Gun
-      projectileSpeed: 45
+      projectileSpeed: 60
       minAngle: 5
       maxAngle: 15
       angleIncrease: 1.5

@@ -86,7 +86,7 @@
     - type: Item
       size: Small
       shape:
-        - 0,0,0,0
+        - 0,0,0,1
     - type: ContainerContainer
       containers:
         ballistic-ammo: !type:Container
@@ -223,3 +223,33 @@
             tags:
               - STElasticRubberBlue
       sprite: _Stalker/Objects/Weapons/Guns/Ammunition/Magazines/939/elastic_rubber.rsi
+
+- type: entity
+  id: Chechnya939MagVSKSP5
+  name: магазин ВСК-94 (20) СП-5
+  parent: Base939MagVSK
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge9x39SP5
+    capacity: 20
+
+- type: entity
+  id: Chechnya939Mag20SP5
+  name: магазин 9x39 (20) СП-5
+  parent: 939Mag20
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge9x39SP5
+    capacity: 20
+
+- type: entity
+  id: Chechnya939Mag10SP5
+  name: магазин 9x39 (10) СП-5
+  parent: Base939Mag10
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge9x39SP5
+    capacity: 10

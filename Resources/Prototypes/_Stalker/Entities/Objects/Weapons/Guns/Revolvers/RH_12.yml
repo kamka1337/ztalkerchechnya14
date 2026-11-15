@@ -17,7 +17,7 @@
       - state: icon
         map: ["enum.GunVisualLayers.Base"]
     - type: Gun
-      projectileSpeed: 75
+      projectileSpeed: 60
       minAngle:  0
       maxAngle: 70
       angleIncrease: 30

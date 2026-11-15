@@ -16,7 +16,7 @@
     maxAngle: 125
     angleIncrease: 1.4
     angleDecay: 5
-    projectileSpeed: 55
+    projectileSpeed: 60
     fireRate: 8.5
   - type: Clothing
     sprite: _Stalker/Objects/Weapons/Guns/Rifles/inhands/RPK-74mag.rsi

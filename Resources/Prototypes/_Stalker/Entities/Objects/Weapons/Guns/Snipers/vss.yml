@@ -29,10 +29,10 @@
         volume: -10
     minAngle: 50
     maxAngle: 85
-    fireRate: 6
+    fireRate: 8
     angleIncrease: 2.5
     angleDecay: 20
-    projectileSpeed: 75
+    projectileSpeed: 60
   - type: ChamberMagazineAmmoProvider
     soundRack:
       path: /Audio/_Stalker/Weapons/Guns/RifleGen/Cock/rifle_cock.ogg
@@ -156,10 +156,10 @@
   - type: Gun
     minAngle: 52
     maxAngle: 85
-    fireRate: 6
+    fireRate: 5
     angleIncrease: 2.5
     angleDecay: 20
-    projectileSpeed: 75
+    projectileSpeed: 60
     selectedMode: FullAuto
     availableModes:
     - SemiAuto

@@ -254,10 +254,10 @@
       amount: 2
 
 - type: entity
-  parent: BaseStorageItem
+  parent: BaseItem
   id: SessionMedkitCMS
   name: набор CMS
-  description: "Хирургический набор: три медицинские нити и тактические ножницы."
+  description: Хирургический набор для полевой хирургии на 10 использований. Позволяет восстанавливать выбитые (черные) конечности, включая грудь.
   components:
   - type: Sprite
     sprite: _Session/Objects/Medical/cms.rsi
@@ -265,15 +265,11 @@
   - type: Item
     size: Normal
     sprite: _Session/Objects/Medical/cms.rsi
-  - type: Storage
-    maxItemSize: Small
-    grid:
-    - 0,0,4,1
-  - type: StorageFill
-    contents:
-    - id: SessionMedicalNeedle
-      amount: 3
-    - id: SessionTacticalScissors
+  - type: LimbSurgeryTool
+    stage: Full
+    delay: 5
+  - type: LimitedCharges
+    maxCharges: 10
 
 - type: entity
   parent: BaseItem

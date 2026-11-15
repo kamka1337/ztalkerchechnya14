@@ -528,5 +528,17 @@
     - id: GrenadeVOG25
     - id: GrenadeVOG25
     - id: GrenadeVOG25
+
+- type: entity
+  parent: ClothingBeltTarzanGreen
+  id: ClothingBelt6Sh92
+  name: разгрузочный жилет 6Ш92
+  description: Общевойсковой индивидуальный разгрузочный жилет 6Ш92 Вооружённых Сил РФ. Предназначен для размещения и транспортировки боекомплекта АК-74, гранат и сигнальных средств.
+  suffix: ST, РФ
+  components:
+  - type: Sprite
+    sprite: _Stalker/Objects/Clothing/belt/6sh92.rsi
+  - type: Clothing
+    sprite: _Stalker/Objects/Clothing/belt/6sh92.rsi
     - id: GrenadeVOG25
     - id: GrenadeVOG25

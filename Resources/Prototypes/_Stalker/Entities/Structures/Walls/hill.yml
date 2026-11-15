@@ -1,9 +1,9 @@
 - type: entity
   parent: BaseWall
   id: HolmIndestructible
-  name: холм
-  description: Небольшая возвышенность, в плане округлой или овальной формы, с пологими склонами и слабо выраженным подножием.
-  suffix: ST, Mapping, indestructible
+  name: холм (зимний)
+  description: Заснеженная возвышенность с пологими склонами, выступающая границей локации.
+  suffix: ST, Mapping, indestructible, winter
   components:
     - type: Tag
       tags:
@@ -12,6 +12,24 @@
       sprite: _Stalker/Structures/Walls/holm.rsi
     - type: Icon
       sprite: _Stalker/Structures/Walls/holm.rsi
+    - type: IconSmooth
+      key: walls
+      base: holm
+
+- type: entity
+  parent: BaseWall
+  id: HolmSummerIndestructible
+  name: холм (летний)
+  description: Небольшая возвышенность, в плане округлой или овальной формы, с пологими склонами и слабо выраженным подножием.
+  suffix: ST, Mapping, indestructible, summer
+  components:
+    - type: Tag
+      tags:
+        - Wall
+    - type: Sprite
+      sprite: _Stalker/Structures/Walls/holm_summer.rsi
+    - type: Icon
+      sprite: _Stalker/Structures/Walls/holm_summer.rsi
     - type: IconSmooth
       key: walls
       base: holm

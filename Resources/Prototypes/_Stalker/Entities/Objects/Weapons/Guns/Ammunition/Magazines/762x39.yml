@@ -275,3 +275,33 @@
     whitelist:
       tags:
       - STCartridge754
+
+- type: entity
+  id: ChechnyaMagazine762x54PKMFMJ
+  name: короб ПКМ (100) FMJ
+  parent: Magazine762x54PKM
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge754FMJ
+    capacity: 100
+
+- type: entity
+  id: Chechnya739Mag30FMJ
+  name: магазин 7,62x39 (30) FMJ
+  parent: 739Mag30
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge739FMJ
+    capacity: 30
+
+- type: entity
+  id: Chechnya739Mag45FMJ
+  name: магазин 7,62x39 (45) FMJ
+  parent: 739Mag45
+  suffix: Chechnya
+  components:
+  - type: BallisticAmmoProvider
+    proto: STCartridge739FMJ
+    capacity: 45

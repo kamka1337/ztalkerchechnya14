@@ -22,7 +22,7 @@
     - type: Gun
       soundGunshot:
         path: /Audio/_Stalker/Effects/Guns/pm-shoot.ogg
-      projectileSpeed: 45
+      projectileSpeed: 60
       minAngle: 10
       maxAngle: 50
       fireRate: 8

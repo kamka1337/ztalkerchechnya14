@@ -11,16 +11,18 @@
           mapNameTemplate: "Чечня"
         - type: StationJobs
           availableJobs:
-            ChechnyaRFRPK: [ 0, 5 ]
-            ChechnyaRFAKC: [ 0, 60 ]
-            ChechnyaRFAKCY: [ 0, 20 ]
+            ChechnyaRFShooter: [ 0, 36 ]
             ChechnyaRFMedic: [ 0, 10 ]
-            ChechnyaRFSpec: [ 0, 10 ]
-            ChechnyaRFGrenadier: [ 0, 6 ]
+            ChechnyaRFRPK: [ 0, 5 ]
+            ChechnyaRFSpec: [ 0, 8 ]
+            ChechnyaRFGrenadier: [ 0, 5 ]
+            ChechnyaRFPKM: [ 0, 3 ]
+            ChechnyaRFSniper: [ 0, 8 ]
             ##
-            ChechnyaCRIRPK: [ 0, 5 ]
-            ChechnyaCRIAKC: [ 0, 60 ]
-            ChechnyaCRIAKCY: [ 0, 20 ]
+            ChechnyaCRIShooter: [ 0, 40 ]
             ChechnyaCRIMedic: [ 0, 10 ]
-            ChechnyaCRISpec: [ 0, 10 ]
-            ChechnyaCRIGrenadier: [ 0, 6 ]
+            ChechnyaCRIRPK: [ 0, 5 ]
+            ChechnyaCRISpec: [ 0, 8 ]
+            ChechnyaCRIGrenadier: [ 0, 5 ]
+            ChechnyaCRIPKM: [ 0, 3 ]
+            ChechnyaCRISniper: [ 0, 8 ]

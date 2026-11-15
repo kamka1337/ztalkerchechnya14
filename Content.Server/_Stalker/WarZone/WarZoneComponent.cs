@@ -87,4 +87,10 @@ public sealed partial class WarZoneComponent : Component
     /// </summary>
     [DataField]
     public TimeSpan NextCheckTime = TimeSpan.Zero;
+
+    /// <summary>
+    /// If true, the zone is locked and cannot be captured or contested.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public bool IsLocked = false;
 }

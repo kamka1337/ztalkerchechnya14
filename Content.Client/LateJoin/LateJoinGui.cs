@@ -3,6 +3,8 @@ using System.Numerics;
 using Content.Client.CrewManifest;
 using Content.Client.GameTicking.Managers;
 using Content.Client.Lobby;
+using Content.Client._Stalker.Chechnya;
+using Content.Shared._Stalker.Chechnya;
 using Content.Client.UserInterface.Controls;
 using Content.Client.Players.PlayTimeTracking;
 using Content.Shared.CCVar;
@@ -83,6 +85,78 @@ namespace Content.Client.LateJoin
             _jobLists.Clear();
             _jobButtons.Clear();
             _jobCategories.Clear();
+
+            var teamSys = _entitySystem.GetEntitySystem<ChechnyaTeamClientSystem>();
+            var currentTeam = teamSys.CurrentTeam;
+
+            if (currentTeam == ChechnyaTeam.None)
+            {
+                var selectContainer = new BoxContainer
+                {
+                    Orientation = LayoutOrientation.Vertical,
+                    Margin = new Thickness(6, 6, 6, 12),
+                    SeparationOverride = 8,
+                };
+
+                selectContainer.AddChild(new Label
+                {
+                    Text = "ВЫБЕРИТЕ СТОРОНУ:",
+                    StyleClasses = { "LabelHeadingBigger" },
+                    Align = Label.AlignMode.Center
+                });
+
+                var btnRow = new BoxContainer
+                {
+                    Orientation = LayoutOrientation.Horizontal,
+                    HorizontalAlignment = HAlignment.Center,
+                    SeparationOverride = 14
+                };
+
+                var rfBtn = new Button { Text = "ВС РФ", MinWidth = 130, MinHeight = 42 };
+                rfBtn.OnPressed += _ =>
+                {
+                    teamSys.SelectTeam(ChechnyaTeam.RF);
+                    RebuildUI();
+                };
+
+                var criBtn = new Button { Text = "ВС ЧРИ", MinWidth = 130, MinHeight = 42 };
+                criBtn.OnPressed += _ =>
+                {
+                    teamSys.SelectTeam(ChechnyaTeam.CRI);
+                    RebuildUI();
+                };
+
+                btnRow.AddChild(rfBtn);
+                btnRow.AddChild(criBtn);
+                selectContainer.AddChild(btnRow);
+
+                selectContainer.AddChild(new Label
+                {
+                    Text = "Выберите команду, чтобы отобразить доступные роли",
+                    StyleClasses = { "LabelSecondaryColor" },
+                    Align = Label.AlignMode.Center
+                });
+
+                _base.AddChild(selectContainer);
+            }
+            else
+            {
+                var teamBadge = new PanelContainer
+                {
+                    Margin = new Thickness(6, 4, 6, 8),
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = $"Сторона: {(currentTeam == ChechnyaTeam.RF ? "ВС РФ" : "ВС ЧРИ")} (только роли вашей команды)",
+                            Align = Label.AlignMode.Center,
+                            Margin = new Thickness(8, 6, 8, 6),
+                            FontColorOverride = currentTeam == ChechnyaTeam.RF ? Color.FromHex("#5B9BD5") : Color.FromHex("#70AD47")
+                        }
+                    }
+                };
+                _base.AddChild(teamBadge);
+            }
 
             if (!_gameTicker.DisallowedLateJoin && _gameTicker.StationNames.Count == 0)
                 _sawmill.Warning("No stations exist, nothing to display in late-join GUI");
@@ -173,6 +247,13 @@ namespace Content.Client.LateJoin
 
                 foreach (var department in departments)
                 {
+                    if (currentTeam == ChechnyaTeam.RF && department.ID != "StalkerRF")
+                        continue;
+                    if (currentTeam == ChechnyaTeam.CRI && department.ID != "StalkerCRI")
+                        continue;
+                    if (currentTeam == ChechnyaTeam.None && (department.ID == "StalkerRF" || department.ID == "StalkerCRI"))
+                        continue;
+
                     var departmentName = Loc.GetString(department.Name);
                     _jobCategories[id] = new Dictionary<string, BoxContainer>();
                     var stationAvailable = _gameTicker.JobsAvailable[id];

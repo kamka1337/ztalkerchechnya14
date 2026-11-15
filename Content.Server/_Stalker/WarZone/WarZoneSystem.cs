@@ -3,6 +3,7 @@ using Content.Shared._Stalker.WarZone.Requirenments;
 using Robust.Shared.Player;
 using Content.Server.Database;
 using Content.Shared._Stalker.WarZone;
+using Content.Shared.GameTicking;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Physics.Events;
@@ -117,6 +118,7 @@ public sealed partial class WarZoneSystem : EntitySystem
         SubscribeLocalEvent<WarZoneComponent, EndCollideEvent>(OnEndCollide);
         SubscribeLocalEvent<MetaDataComponent, EntityTerminatingEvent>(OnEntityTerminating);
         SubscribeLocalEvent<MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
     }
 
     private void OnWarZoneInit(EntityUid uid, WarZoneComponent component, ComponentInit args)
@@ -320,6 +322,11 @@ public sealed partial class WarZoneSystem : EntitySystem
                     var mapCoords = _transformSystem.GetMapCoordinates(zone);
                     var filter = Filter.Empty().AddInRange(mapCoords, ChatSystem.VoiceRange);
                     _chatManager.ChatMessageToManyFiltered(filter, ChatChannel.Emotes, message, message, zone, false, true, colorOverride: null);
+
+                    if (IsControlPoint(comp))
+                    {
+                        _chatManager.DispatchServerAnnouncement($"Захват точки '{comp.PortalName}' был успешно отбит защитниками!", Color.Cyan);
+                    }
                 }
             }
 
@@ -351,6 +358,43 @@ public sealed partial class WarZoneSystem : EntitySystem
         {
             Logger.WarningS("warzone", $"Zone '{comp.PortalName}': Capture logic reached invalid state. Bands: {presentBands.Count}, Factions: {presentFactions.Count}.");
             return;
+        }
+
+        // Check if point is locked (when enemy holds all 3 points, they cannot be recaptured)
+        if (comp.IsLocked)
+        {
+            if (feedbackEntity.HasValue)
+            {
+                _popup.PopupEntity("Эта точка заблокирована, так как все три контрольные точки уже захвачены!", feedbackEntity.Value);
+            }
+            return;
+        }
+
+        // Check if this is a Base (DutyBase or FreedomBase)
+        var isRfBaseTarget = comp.ZoneProto == "DutyBase" || comp.ZoneProto == "RFBASE" || comp.PortalName == "RFBase" || comp.PortalName == "RFBASE" || comp.DefendingBandProtoId == "RFBand";
+        var isCriBaseTarget = comp.ZoneProto == "FreedomBase" || comp.ZoneProto == "CRIBASE" || comp.PortalName == "CRIBase" || comp.PortalName == "CRIBASE" || comp.DefendingBandProtoId == "CRIBand";
+
+        if (HasControlPointsOnMap())
+        {
+            if (isRfBaseTarget && !DoAllPointsBelongTo("CRIBand"))
+            {
+                if (feedbackEntity.HasValue)
+                {
+                    _popup.PopupEntity("Штурм базы невозможен! Сначала ВС ЧРИ должны захватить все три точки (A, B, C)!", feedbackEntity.Value);
+                }
+                ResetCaptureProgress(comp);
+                return;
+            }
+
+            if (isCriBaseTarget && !DoAllPointsBelongTo("RFBand"))
+            {
+                if (feedbackEntity.HasValue)
+                {
+                    _popup.PopupEntity("Штурм базы невозможен! Сначала ВС РФ должны захватить все три точки (A, B, C)!", feedbackEntity.Value);
+                }
+                ResetCaptureProgress(comp);
+                return;
+            }
         }
 
         // Check Cooldown
@@ -488,6 +532,19 @@ public sealed partial class WarZoneSystem : EntitySystem
             "st-warzone-captured",
             ("zone", comp.PortalName ?? "Unknown"),
             ("attacker", finalOwnerName)));
+
+        if (IsControlPoint(comp))
+        {
+            var teamName = finalBandOwnerId == "RFBand" ? "ВС РФ" : (finalBandOwnerId == "CRIBand" ? "ВС ЧРИ" : finalOwnerName);
+            _chatManager.DispatchServerAnnouncement($"Точка {comp.PortalName} захвачена силами {teamName}!", Color.Yellow);
+
+            if (finalBandOwnerId.HasValue && DoAllPointsBelongTo(finalBandOwnerId.Value))
+            {
+                LockAllControlPoints();
+                var enemyTeam = finalBandOwnerId.Value == "RFBand" ? "ВС ЧРИ" : "ВС РФ";
+                _chatManager.DispatchServerAnnouncement($"ВНИМАНИЕ! {teamName} захватили все три точки (A, B, C)! Точки заблокированы! Начинается штурм базы {enemyTeam}!", Color.Red);
+            }
+        }
 
         _lastRewardTimes[zone] = _gameTiming.CurTime;
 
@@ -844,6 +901,11 @@ public sealed partial class WarZoneSystem : EntitySystem
         {
             _chatManager.DispatchServerAnnouncement("\u0412\u0421 \u0420\u0424 \u043D\u0430\u0447\u0430\u043B\u0430 \u0437\u0430\u0445\u0432\u0430\u0442 \u0431\u0430\u0437\u044B \u0412\u0421 \u0427\u0420\u0418", Color.Red);
         }
+        else if (IsControlPoint(wzComp))
+        {
+            var teamName = wzComp.CurrentAttackerBandProtoId == "RFBand" ? "ВС РФ" : (wzComp.CurrentAttackerBandProtoId == "CRIBand" ? "ВС ЧРИ" : attackerName);
+            _chatManager.DispatchServerAnnouncement($"Идёт захват точки '{wzComp.PortalName}' силами {teamName}!", Color.Orange);
+        }
     }
 
 
@@ -902,6 +964,87 @@ public sealed partial class WarZoneSystem : EntitySystem
         {
             component.InitialLoadComplete = true; // Ensure load completes even on error
             Logger.ErrorS("warzone", $"Exception during async zone state load for {zoneUid} ({component.ZoneProto}): {ex}");
+        }
+    }
+
+    public bool IsControlPoint(WarZoneComponent wz)
+    {
+        var id = wz.ZoneProto.Id;
+        return id.Equals("PointA", StringComparison.OrdinalIgnoreCase) ||
+               id.Equals("PointB", StringComparison.OrdinalIgnoreCase) ||
+               id.Equals("PointC", StringComparison.OrdinalIgnoreCase) ||
+               (wz.PortalName != null && (wz.PortalName.Contains("Точка A") || wz.PortalName.Contains("Точка B") || wz.PortalName.Contains("Точка C")));
+    }
+
+    public bool HasControlPointsOnMap()
+    {
+        var query = EntityQueryEnumerator<WarZoneComponent>();
+        var count = 0;
+        while (query.MoveNext(out var _, out var wz))
+        {
+            if (IsControlPoint(wz))
+                count++;
+        }
+        return count >= 3;
+    }
+
+    public bool DoAllPointsBelongTo(string bandProtoId)
+    {
+        var points = new[] { "PointA", "PointB", "PointC" };
+        var query = EntityQueryEnumerator<WarZoneComponent>();
+        var foundCount = 0;
+        var ownedCount = 0;
+
+        while (query.MoveNext(out var _, out var wz))
+        {
+            foreach (var p in points)
+            {
+                if (wz.ZoneProto.Id.Equals(p, StringComparison.OrdinalIgnoreCase) ||
+                    (wz.PortalName != null && wz.PortalName.Contains(p == "PointA" ? "Точка A" : (p == "PointB" ? "Точка B" : "Точка C"))))
+                {
+                    foundCount++;
+                    if (!string.IsNullOrEmpty(wz.DefendingBandProtoId) &&
+                        wz.DefendingBandProtoId.Equals(bandProtoId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ownedCount++;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return foundCount >= 3 && ownedCount >= 3;
+    }
+
+    public void LockAllControlPoints()
+    {
+        var query = EntityQueryEnumerator<WarZoneComponent>();
+        while (query.MoveNext(out var _, out var wz))
+        {
+            if (IsControlPoint(wz))
+            {
+                wz.IsLocked = true;
+            }
+        }
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
+    {
+        var query = EntityQueryEnumerator<WarZoneComponent>();
+        while (query.MoveNext(out var _, out var wz))
+        {
+            wz.IsLocked = false;
+            wz.CaptureProgress = 0f;
+            wz.CaptureProgressTime = 0f;
+            wz.CurrentAttackerBandProtoId = null;
+            wz.CurrentAttackerFactionProtoId = null;
+            wz.CaptureInProgress = false;
+
+            if (IsControlPoint(wz))
+            {
+                wz.DefendingBandProtoId = null;
+                wz.DefendingFactionProtoId = null;
+            }
         }
     }
 }

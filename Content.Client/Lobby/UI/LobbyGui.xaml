@@ -28,6 +28,16 @@
                           VerticalAlignment="Center">
                 <PanelContainer Name="ButtonCard" StyleClasses="LobbyButtonCard" MinWidth="440">
                     <BoxContainer Orientation="Vertical" SeparationOverride="18" Margin="24 24 24 24">
+                        <!-- Team Selection Section -->
+                        <BoxContainer Name="TeamSelectContainer" Orientation="Vertical" SeparationOverride="10">
+                            <Label Name="TeamSelectHeader" Text="ВЫБОР СТОРОНЫ" Align="Center" StyleClasses="LabelHeadingBigger" FontColorOverride="#E0E6EE" />
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="14" HorizontalAlignment="Center">
+                                <Button Name="TeamRFButton" Access="Public" Text="ВС РФ" MinWidth="180" MinHeight="50" StyleClasses="LobbyMenuButton" />
+                                <Button Name="TeamCRIButton" Access="Public" Text="ВС ЧРИ" MinWidth="180" MinHeight="50" StyleClasses="LobbyMenuButton" />
+                            </BoxContainer>
+                            <Label Name="TeamStatusLabel" Access="Public" Text="Выберите сторону для участия в раунде" Align="Center" StyleClasses="LabelSecondaryColor" />
+                        </BoxContainer>
+
                         <Button Name="ReadyButton" Access="Public" ToggleMode="True"
                                 Text="{Loc 'lobby-state-play-button'}"
                                 StyleClasses="LobbyPlayButton"

@@ -4,6 +4,8 @@ using Content.Client.LateJoin;
 using Content.Client.Lobby.UI;
 using Content.Client.Message;
 using Content.Client.Playtime;
+using Content.Client._Stalker.Chechnya;
+using Content.Shared._Stalker.Chechnya;
 using Content.Client.UserInterface.Systems.Chat;
 using Content.Client.Voting;
 using Content.Shared.CCVar;
@@ -33,6 +35,7 @@ namespace Content.Client.Lobby
 
         private ClientGameTicker _gameTicker = default!;
         private ContentAudioSystem _contentAudioSystem = default!;
+        private ChechnyaTeamClientSystem _teamSystem = default!;
 
         protected override Type? LinkedScreenType { get; } = typeof(LobbyGui);
         public LobbyGui? Lobby;
@@ -49,6 +52,7 @@ namespace Content.Client.Lobby
             var chatController = _userInterfaceManager.GetUIController<ChatUIController>();
             _gameTicker = _entityManager.System<ClientGameTicker>();
             _contentAudioSystem = _entityManager.System<ContentAudioSystem>();
+            _teamSystem = _entityManager.System<ChechnyaTeamClientSystem>();
             _contentAudioSystem.LobbySoundtrackChanged += UpdateLobbySoundtrackInfo;
 
             chatController.SetMainChat(true);
@@ -72,6 +76,11 @@ namespace Content.Client.Lobby
             Lobby.CharacterPreview.CharacterSetupButton.OnPressed += OnSetupPressed;
             Lobby.ReadyButton.OnPressed += OnReadyPressed;
             Lobby.ReadyButton.OnToggled += OnReadyToggled;
+            Lobby.TeamRFButton.OnPressed += OnSelectRF;
+            Lobby.TeamCRIButton.OnPressed += OnSelectCRI;
+
+            _teamSystem.TeamChanged += UpdateTeamUi;
+            UpdateTeamUi(_teamSystem.CurrentTeam);
 
             _gameTicker.InfoBlobUpdated += UpdateLobbyUi;
             _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
@@ -89,11 +98,57 @@ namespace Content.Client.Lobby
 
             _voteManager.ClearPopupContainer();
 
-            Lobby!.CharacterPreview.CharacterSetupButton.OnPressed -= OnSetupPressed;
-            Lobby!.ReadyButton.OnPressed -= OnReadyPressed;
-            Lobby!.ReadyButton.OnToggled -= OnReadyToggled;
+            if (Lobby != null)
+            {
+                Lobby.CharacterPreview.CharacterSetupButton.OnPressed -= OnSetupPressed;
+                Lobby.ReadyButton.OnPressed -= OnReadyPressed;
+                Lobby.ReadyButton.OnToggled -= OnReadyToggled;
+                Lobby.TeamRFButton.OnPressed -= OnSelectRF;
+                Lobby.TeamCRIButton.OnPressed -= OnSelectCRI;
+            }
+
+            _teamSystem.TeamChanged -= UpdateTeamUi;
 
             Lobby = null;
+        }
+
+        private void OnSelectRF(BaseButton.ButtonEventArgs args)
+        {
+            _teamSystem.SelectTeam(ChechnyaTeam.RF);
+        }
+
+        private void OnSelectCRI(BaseButton.ButtonEventArgs args)
+        {
+            _teamSystem.SelectTeam(ChechnyaTeam.CRI);
+        }
+
+        private void UpdateTeamUi(ChechnyaTeam team)
+        {
+            if (Lobby == null)
+                return;
+
+            switch (team)
+            {
+                case ChechnyaTeam.RF:
+                    Lobby.TeamRFButton.Disabled = true;
+                    Lobby.TeamCRIButton.Disabled = true;
+                    Lobby.TeamStatusLabel.Text = "Выбранная сторона: ВС РФ (зафиксировано до конца раунда)";
+                    Lobby.TeamStatusLabel.FontColorOverride = Color.FromHex("#5B9BD5");
+                    break;
+                case ChechnyaTeam.CRI:
+                    Lobby.TeamRFButton.Disabled = true;
+                    Lobby.TeamCRIButton.Disabled = true;
+                    Lobby.TeamStatusLabel.Text = "Выбранная сторона: ВС ЧРИ (зафиксировано до конца раунда)";
+                    Lobby.TeamStatusLabel.FontColorOverride = Color.FromHex("#70AD47");
+                    break;
+                case ChechnyaTeam.None:
+                default:
+                    Lobby.TeamRFButton.Disabled = false;
+                    Lobby.TeamCRIButton.Disabled = false;
+                    Lobby.TeamStatusLabel.Text = "Выберите сторону для участия в раунде";
+                    Lobby.TeamStatusLabel.FontColorOverride = Color.FromHex("#8A92A0");
+                    break;
+            }
         }
 
         public void SwitchState(LobbyGui.LobbyGuiState state)
@@ -115,11 +170,32 @@ namespace Content.Client.Lobby
                 return;
             }
 
+            if (_teamSystem.CurrentTeam == ChechnyaTeam.None)
+            {
+                if (Lobby != null)
+                {
+                    Lobby.TeamStatusLabel.Text = "Сначала выберите сторону: ВС РФ или ВС ЧРИ!";
+                    Lobby.TeamStatusLabel.FontColorOverride = Color.Red;
+                }
+                return;
+            }
+
             new LateJoinGui().OpenCentered();
         }
 
         private void OnReadyToggled(BaseButton.ButtonToggledEventArgs args)
         {
+            if (args.Pressed && _teamSystem.CurrentTeam == ChechnyaTeam.None)
+            {
+                if (Lobby != null)
+                {
+                    Lobby.ReadyButton.Pressed = false;
+                    Lobby.TeamStatusLabel.Text = "Сначала выберите сторону: ВС РФ или ВС ЧРИ!";
+                    Lobby.TeamStatusLabel.FontColorOverride = Color.Red;
+                }
+                return;
+            }
+
             SetReady(args.Pressed);
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Content.Server._Stalker.WarZone;
+using Content.Server.Chat.Managers;
 using Content.Shared._Session.Flag;
 using Content.Shared._Stalker.WarZone;
 using Robust.Shared.Audio.Systems;
@@ -18,6 +19,7 @@ public sealed class FlagWarZoneSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly WarZoneSystem _warSys = default!;
     [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
+    [Dependency] private readonly IChatManager _chatManager = default!;
 
     private const float UpdateInterval = 0.25f;
     private float _timer;
@@ -65,6 +67,7 @@ public sealed class FlagWarZoneSystem : EntitySystem
                     if (!_roundEnded)
                     {
                         _roundEnded = true;
+                        _chatManager.DispatchServerAnnouncement("База ВС РФ захвачена! Победа ВС ЧРИ!", Color.Green);
                         _audio.PlayGlobal("/Audio/_Session/CRIpobeda.ogg", Filter.Broadcast(), true);
                         _roundEndSystem.EndRound();
                     }
@@ -84,6 +87,7 @@ public sealed class FlagWarZoneSystem : EntitySystem
                     if (!_roundEnded)
                     {
                         _roundEnded = true;
+                        _chatManager.DispatchServerAnnouncement("База ВС ЧРИ захвачена! Победа ВС РФ!", Color.Green);
                         _audio.PlayGlobal("/Audio/_Session/RFpobeda.ogg", Filter.Broadcast(), true);
                         _roundEndSystem.EndRound();
                     }

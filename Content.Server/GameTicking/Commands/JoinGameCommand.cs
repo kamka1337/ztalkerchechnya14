@@ -1,5 +1,6 @@
 using Content.Server.Administration.Managers;
 using Content.Server.Station.Systems;
+using Content.Server._Stalker.Chechnya;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
@@ -67,6 +68,14 @@ namespace Content.Server.GameTicking.Commands
 
                 var station = _entManager.GetEntity(new NetEntity(sid));
                 var jobPrototype = _prototypeManager.Index<JobPrototype>(id);
+
+                var chechnyaTeam = _entManager.System<ChechnyaTeamSystem>();
+                if (!chechnyaTeam.CanJoinJob(player.UserId, id))
+                {
+                    shell.WriteError("Вы не можете выбрать эту роль: выберите соответствующую сторону (ВС РФ или ВС ЧРИ) в лобби!");
+                    return;
+                }
+
                 if(stationJobs.TryGetJobSlot(station, jobPrototype, out var slots) == false || slots == 0)
                 {
                     shell.WriteLine($"{jobPrototype.LocalizedName} has no available slots.");

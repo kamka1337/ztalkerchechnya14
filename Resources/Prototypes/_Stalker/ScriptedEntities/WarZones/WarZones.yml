@@ -1,5 +1,110 @@
 # 1. Создание прототипа зоны
 - type: stWarZone
+  id: PointA
+  captureTime: 180
+  captureCooldownHours: 0
+  requirements: []
+
+- type: entity
+  id: WarZoneEntity_PointA
+  parent: MarkerBase
+  name: Точка A
+  description: Контрольная точка A.
+  components:
+  - type: WarZone
+    proto: PointA
+    portalName: Точка A
+  - type: Physics
+    bodyType: Static
+    canCollide: true
+  - type: Fixtures
+    fixtures:
+      trigger:
+        shape:
+          !type:PhysShapeCircle
+          radius: 5
+        hard: false
+        mask:
+        - MobMask
+        layer:
+        - MidImpassable
+  - type: PointLight
+    enabled: true
+    radius: 6
+    color: "#E5C158"
+    energy: 1.5
+
+- type: stWarZone
+  id: PointB
+  captureTime: 180
+  captureCooldownHours: 0
+  requirements: []
+
+- type: entity
+  id: WarZoneEntity_PointB
+  parent: MarkerBase
+  name: Точка B
+  description: Контрольная точка B.
+  components:
+  - type: WarZone
+    proto: PointB
+    portalName: Точка B
+  - type: Physics
+    bodyType: Static
+    canCollide: true
+  - type: Fixtures
+    fixtures:
+      trigger:
+        shape:
+          !type:PhysShapeCircle
+          radius: 5
+        hard: false
+        mask:
+        - MobMask
+        layer:
+        - MidImpassable
+  - type: PointLight
+    enabled: true
+    radius: 6
+    color: "#E5C158"
+    energy: 1.5
+
+- type: stWarZone
+  id: PointC
+  captureTime: 180
+  captureCooldownHours: 0
+  requirements: []
+
+- type: entity
+  id: WarZoneEntity_PointC
+  parent: MarkerBase
+  name: Точка C
+  description: Контрольная точка C.
+  components:
+  - type: WarZone
+    proto: PointC
+    portalName: Точка C
+  - type: Physics
+    bodyType: Static
+    canCollide: true
+  - type: Fixtures
+    fixtures:
+      trigger:
+        shape:
+          !type:PhysShapeCircle
+          radius: 5
+        hard: false
+        mask:
+        - MobMask
+        layer:
+        - MidImpassable
+  - type: PointLight
+    enabled: true
+    radius: 6
+    color: "#E5C158"
+    energy: 1.5
+
+- type: stWarZone
   id: KordonVillage # Идентификатор зоны. Сохраняется в БД, поэтому не меняйте его.
   rewardPointsPerPeriod: 1 # Сколько очков будет начисляться за период
   rewardPeriod: 1230 # Период начисления очков в секундах

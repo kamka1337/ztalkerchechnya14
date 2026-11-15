@@ -25,6 +25,8 @@ public sealed class SpawnPointSystem : EntitySystem
 
         // TODO: Cache all this if it ends up important.
         var points = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
+        var jobSpecificPositions = new List<EntityCoordinates>();
+        var lateJoinPositions = new List<EntityCoordinates>();
         var possiblePositions = new List<EntityCoordinates>();
 
         while (points.MoveNext(out var uid, out var spawnPoint, out var xform))
@@ -32,9 +34,14 @@ public sealed class SpawnPointSystem : EntitySystem
             if (args.Station != null && _stationSystem.GetOwningStation(uid, xform) != args.Station)
                 continue;
 
+            if (args.Job != null && spawnPoint.Job == args.Job)
+            {
+                jobSpecificPositions.Add(xform.Coordinates);
+            }
+
             if (_gameTicker.RunLevel == GameRunLevel.InRound && spawnPoint.SpawnType == SpawnPointType.LateJoin)
             {
-                possiblePositions.Add(xform.Coordinates);
+                lateJoinPositions.Add(xform.Coordinates);
             }
 
             if (_gameTicker.RunLevel != GameRunLevel.InRound &&
@@ -43,6 +50,16 @@ public sealed class SpawnPointSystem : EntitySystem
             {
                 possiblePositions.Add(xform.Coordinates);
             }
+        }
+
+        // Job-specific spawners (e.g. CRI vs RF bases) always take absolute priority
+        if (jobSpecificPositions.Count > 0)
+        {
+            possiblePositions = jobSpecificPositions;
+        }
+        else if (_gameTicker.RunLevel == GameRunLevel.InRound && lateJoinPositions.Count > 0)
+        {
+            possiblePositions = lateJoinPositions;
         }
 
         if (possiblePositions.Count == 0)

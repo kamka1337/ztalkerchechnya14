@@ -1,0 +1,217 @@
+# Spawners for Chechnya RF and CRI factions
+
+# ========================
+# ВС РФ (Вооруженные Силы РФ)
+# ========================
+
+- type: entity
+  id: SpawnPointChechnyaRFShooter
+  parent: SpawnPointJobBase
+  name: Стрелок ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFShooter
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFMedic
+  parent: SpawnPointJobBase
+  name: Санитар ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFMedic
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFRPK
+  parent: SpawnPointJobBase
+  name: Пулемётчик РПК ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFRPK
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFSpec
+  parent: SpawnPointJobBase
+  name: Спецназ ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFSpec
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFGrenadier
+  parent: SpawnPointJobBase
+  name: Гранатомётчик ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFGrenadier
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFPKM
+  parent: SpawnPointJobBase
+  name: Пулемётчик ПКМ ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFPKM
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFSniper
+  parent: SpawnPointJobBase
+  name: Снайпер ВС РФ Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaRFSniper
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaRFLatejoin
+  parent: SpawnPointJobBase
+  name: ВС РФ Latejoin Spawn
+  suffix: Chechnya, RF
+  components:
+  - type: SpawnPoint
+    spawn_type: LateJoin
+  - type: Sprite
+    layers:
+      - state: green
+      - state: security_officer
+
+# ========================
+# ВС ЧРИ (Чеченская Республика Ичкерия)
+# ========================
+
+- type: entity
+  id: SpawnPointChechnyaCRIShooter
+  parent: SpawnPointJobBase
+  name: Стрелок ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRIShooter
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRIMedic
+  parent: SpawnPointJobBase
+  name: Санитар ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRIMedic
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRIRPK
+  parent: SpawnPointJobBase
+  name: Пулемётчик РПК ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRIRPK
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRISpec
+  parent: SpawnPointJobBase
+  name: Спецназ ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRISpec
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRIGrenadier
+  parent: SpawnPointJobBase
+  name: Гранатомётчик ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRIGrenadier
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRIPKM
+  parent: SpawnPointJobBase
+  name: Пулемётчик ПКМ ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRIPKM
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRISniper
+  parent: SpawnPointJobBase
+  name: Снайпер ВС ЧРИ Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    job_id: ChechnyaCRISniper
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer
+
+- type: entity
+  id: SpawnPointChechnyaCRILatejoin
+  parent: SpawnPointJobBase
+  name: ВС ЧРИ Latejoin Spawn
+  suffix: Chechnya, CRI
+  components:
+  - type: SpawnPoint
+    spawn_type: LateJoin
+  - type: Sprite
+    layers:
+      - state: red
+      - state: security_officer

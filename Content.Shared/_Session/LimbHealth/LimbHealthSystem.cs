@@ -191,7 +191,7 @@ public sealed class LimbHealthSystem : EntitySystem
             if (IsDestroyedState(ent.Comp, selected))
             {
                 var spread = RunVanillaModifiers(ent.Owner, new DamageSpecifier(raw), origin,
-                    ~SlotFlags.POCKET, ignoreResistances, ignoreGlobal, ignoreResistors);
+                    SlotsForLimb(selected), ignoreResistances, ignoreGlobal, ignoreResistors);
                 DistributeDamage(ent, spread, destroyedNow, allowHead: allowHead);
                 return;
             }
@@ -525,9 +525,9 @@ public sealed class LimbHealthSystem : EntitySystem
         LimbType.Head => SlotFlags.HEAD | SlotFlags.MASK | SlotFlags.EYES | SlotFlags.EARS,
         LimbType.Chest => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.TORSO | SlotFlags.NECK,
         LimbType.Abdomen => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.TORSO | SlotFlags.BELT,
-        LimbType.LeftArm or LimbType.RightArm => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.GLOVES,
-        LimbType.LeftLeg or LimbType.RightLeg => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING | SlotFlags.LEGS | SlotFlags.FEET,
-        _ => SlotFlags.OUTERCLOTHING | SlotFlags.INNERCLOTHING,
+        LimbType.LeftArm or LimbType.RightArm => SlotFlags.GLOVES,
+        LimbType.LeftLeg or LimbType.RightLeg => SlotFlags.LEGS | SlotFlags.FEET,
+        _ => SlotFlags.NONE,
     }) & ~SlotFlags.POCKET;
 
     private DamageSpecifier RunVanillaModifiers(EntityUid body, DamageSpecifier dmg, EntityUid? origin,

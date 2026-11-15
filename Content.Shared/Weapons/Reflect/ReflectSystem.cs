@@ -67,7 +67,7 @@ public sealed class ReflectSystem : EntitySystem
             return; // only reflect when equipped correctly
 
         var shooter = CompOrNull<ProjectileComponent>(args.ProjUid)?.Shooter;
-        if (HelmetBlockedByLimbTargeting(ent, shooter))
+        if (ArmorBlockedByLimbTargeting(ent, shooter))
             return;
 
         if (TryReflectProjectile(ent, ent.Owner, args.ProjUid))
@@ -82,7 +82,7 @@ public sealed class ReflectSystem : EntitySystem
         if (!ent.Comp.InRightPlace)
             return; // only reflect when equipped correctly
 
-        if (HelmetBlockedByLimbTargeting(ent, args.Shooter))
+        if (ArmorBlockedByLimbTargeting(ent, args.Shooter))
             return;
 
         if (TryReflectHitscan(ent, ent.Owner, args.Shooter, args.SourceItem, args.Direction, args.Reflective, out var dir))
@@ -92,14 +92,33 @@ public sealed class ReflectSystem : EntitySystem
         }
     }
 
-    private bool HelmetBlockedByLimbTargeting(Entity<ReflectComponent> reflector, EntityUid? shooter)
+    private bool ArmorBlockedByLimbTargeting(Entity<ReflectComponent> reflector, EntityUid? shooter)
     {
-        if (!_inventory.TryGetContainingSlot(reflector.Owner, out var slot) || slot.Name != "head")
+        if (!_inventory.TryGetContainingSlot(reflector.Owner, out var slot))
             return false;
 
-        return shooter is { } s
-            && TryComp<BodyTargetingComponent>(s, out var targeting)
-            && targeting.SelectedLimb != LimbType.Head;
+        if (shooter is not { } s || !TryComp<BodyTargetingComponent>(s, out var targeting))
+            return false;
+
+        var targetedLimb = targeting.SelectedLimb;
+
+        // Helmet only protects Head
+        if (slot.Name is "head" or "mask" or "eyes" or "ears")
+            return targetedLimb != LimbType.Head;
+
+        // Body armor (vests/suits) only protects Chest and Abdomen
+        if (slot.Name is "outerClothing" or "torso" or "neck" or "belt")
+            return targetedLimb is not (LimbType.Chest or LimbType.Abdomen);
+
+        // Gloves only protect arms
+        if (slot.Name is "gloves")
+            return targetedLimb is not (LimbType.LeftArm or LimbType.RightArm);
+
+        // Boots/greaves only protect legs
+        if (slot.Name is "shoes" or "legs" or "feet")
+            return targetedLimb is not (LimbType.LeftLeg or LimbType.RightLeg);
+
+        return false;
     }
 
     private void OnReflectCollide(Entity<ReflectComponent> ent, ref ProjectileReflectAttemptEvent args)

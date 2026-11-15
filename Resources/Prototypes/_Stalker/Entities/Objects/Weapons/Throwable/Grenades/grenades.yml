@@ -29,34 +29,60 @@
           - stageTwo
 
 - type: entity
+  id: BulletShrapnelRGD5
+  name: осколок гранаты РГД-5
+  categories: [ HideSpawnMenu ]
+  parent: BaseBullet
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Projectiles/projectiles2.rsi
+    state: smallfrag
+  - type: Projectile
+    deleteOnCollide: true
+    damage:
+      types:
+        Piercing: 18
+        Slash: 7
+  - type: StaminaDamageOnCollide
+    damage: 15
+  - type: TimedDespawn
+    lifetime: 0.10
+
+- type: entity
   name: граната РГД-5
-  description: Советская наступательная ручная граната, относится к противопехотным осколочным ручным гранатам дистанционного действия наступательного типа.
+  description: Советская наступательная ручная граната. Поражает живую силу плотным снопом лёгких осколков в радиусе 2 метров (2 тайла), не создавая тяжёлой фугасной волны.
   parent: GrenadeBase
   id: RGD5Grenade
   suffix: Stalker, Граната
   components:
-    - type: Explosive
-      explosionType: Default
-      maxIntensity: 5
-      intensitySlope: 2
-      totalIntensity: 40 # about a ~4 tile radius
-      canCreateVacuum: false
-    - type: TriggerOnUse
-    - type: TimerTrigger
-    - type: ScatteringGrenade
-      fillPrototype: PelletClusterLethal
-      capacity: 80
+    - type: ProjectileGrenade
+      fillPrototype: BulletShrapnelRGD5
+      capacity: 28
+      randomAngle: false
+      minVelocity: 0.5
+      maxVelocity: 2.0
     - type: ContainerContainer
       containers:
         cluster-payload: !type:Container
-    - type: TwoStageTrigger
+    - type: TriggerOnUse
+    - type: TimerTrigger
+      delay: 3.5
+    - type: EmitSoundOnTrigger
       keysIn:
       - timer
-      triggerDelay: 0
-      components:
-        - type: ExplodeOnTrigger
-          keysIn:
-          - stageTwo
+      sound:
+        collection: ExplosionSmall
+        params:
+          volume: 7
+      positional: true
+    - type: SpawnOnTrigger
+      keysIn:
+      - timer
+      proto: GrenadeFlashEffect
+      predicted: true
+    - type: DeleteOnTrigger
+      keysIn:
+      - timer
     - type: Sprite
       sprite: _Stalker/Objects/Weapons/Grenades/rgdgrenade.rsi
       layers:

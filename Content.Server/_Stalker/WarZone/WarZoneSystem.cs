@@ -327,6 +327,14 @@ public sealed partial class WarZoneSystem : EntitySystem
                     {
                         _chatManager.DispatchServerAnnouncement($"Захват точки '{comp.PortalName}' был успешно отбит защитниками!", Color.Cyan);
                     }
+                    else if (comp.ZoneProto == "DutyBase" || comp.PortalName == "RFBase" || comp.DefendingBandProtoId == "RFBand")
+                    {
+                        _chatManager.DispatchServerAnnouncement("Защитники ВС РФ успешно отбили захват своей базы!", Color.Cyan);
+                    }
+                    else if (comp.ZoneProto == "FreedomBase" || comp.PortalName == "CRIBase" || comp.DefendingBandProtoId == "CRIBand")
+                    {
+                        _chatManager.DispatchServerAnnouncement("Защитники ВС ЧРИ успешно отбили захват своей базы!", Color.Cyan);
+                    }
                 }
             }
 
@@ -415,11 +423,42 @@ public sealed partial class WarZoneSystem : EntitySystem
         bool isNewAttacker = (currentAttackerBand != comp.CurrentAttackerBandProtoId || currentAttackerFaction != comp.CurrentAttackerFactionProtoId);
         if (isNewAttacker)
         {
+            if (comp.CaptureProgressTime > 0f)
+            {
+                // Standing on the point to roll back the other faction's capture progress
+                comp.CaptureInProgress = false;
+                comp.CaptureProgressTime = MathF.Max(0f, comp.CaptureProgressTime - effectiveFrameTime);
+                comp.CaptureProgress = Math.Clamp(comp.CaptureProgressTime / wzProto.CaptureTime, 0f, 1f);
+
+                var step = (int)Math.Ceiling(comp.CaptureProgress * 10);
+                if (step < comp.LastAnnouncedProgressStep)
+                {
+                    comp.LastAnnouncedProgressStep = step;
+                    if (feedbackEntity.HasValue)
+                        AnnounceCaptureProgressLocal(zone, comp, (int)(comp.CaptureProgress * 100));
+                }
+
+                if (comp.CaptureProgressTime <= 0f)
+                {
+                    ResetCaptureProgress(comp);
+                    comp.CurrentAttackerBandProtoId = currentAttackerBand;
+                    comp.CurrentAttackerFactionProtoId = currentAttackerFaction;
+                    string attackerName = GetAttackerName(currentAttackerBand, currentAttackerFaction);
+                    AnnounceCaptureStartedLocal(zone, comp, attackerName);
+                    if (IsControlPoint(comp))
+                    {
+                        _chatManager.DispatchServerAnnouncement($"Прогресс захвата точки '{comp.PortalName}' был полностью сброшен!", Color.Cyan);
+                    }
+                }
+
+                return;
+            }
+
             ResetCaptureProgress(comp);
             comp.CurrentAttackerBandProtoId = currentAttackerBand;
             comp.CurrentAttackerFactionProtoId = currentAttackerFaction;
-            string attackerName = GetAttackerName(currentAttackerBand, currentAttackerFaction);
-            AnnounceCaptureStartedLocal(zone, comp, attackerName);
+            string newAttackerName = GetAttackerName(currentAttackerBand, currentAttackerFaction);
+            AnnounceCaptureStartedLocal(zone, comp, newAttackerName);
         }
 
         comp.CaptureInProgress = true;

@@ -32,6 +32,7 @@ public sealed class LimbHealthSystem : EntitySystem
     private bool _syncing;
 
     private EntityUid? _bulletHitTarget;
+    private bool _bulletHitLimbsOnly;
 
     public override void Initialize()
     {
@@ -80,7 +81,10 @@ public sealed class LimbHealthSystem : EntitySystem
     private void OnProjectileHit(Entity<ProjectileComponent> ent, ref ProjectileHitEvent args)
     {
         if (_net.IsServer)
+        {
             _bulletHitTarget = args.Target;
+            _bulletHitLimbsOnly = HasComp<TargetLimbsOnlyComponent>(ent.Owner);
+        }
     }
 
     private void OnMapInit(Entity<LimbHealthComponent> ent, ref MapInitEvent args)
@@ -125,7 +129,9 @@ public sealed class LimbHealthSystem : EntitySystem
             return;
 
         var isBullet = _bulletHitTarget == ent.Owner;
+        var limbsOnly = isBullet && _bulletHitLimbsOnly;
         _bulletHitTarget = null;
+        _bulletHitLimbsOnly = false;
 
         var raw = new DamageSpecifier(args.Damage);
 
@@ -156,7 +162,7 @@ public sealed class LimbHealthSystem : EntitySystem
         var dealt = positive.GetTotal() > 0;
         if (dealt)
             RouteDamage(ent, positive, args.Origin, args.IgnoreResistances, args.IgnoreGlobalModifiers,
-                args.IgnoreResistors, isBullet, destroyedNow);
+                args.IgnoreResistors, isBullet, destroyedNow, limbsOnly);
 
         if (!negative.Empty)
             DistributeHeal(ent.Comp, negative);
@@ -174,11 +180,11 @@ public sealed class LimbHealthSystem : EntitySystem
 
     private void RouteDamage(Entity<LimbHealthComponent> ent, DamageSpecifier raw, EntityUid? origin,
         bool ignoreResistances, bool ignoreGlobal, List<EntityUid>? ignoreResistors, bool isBullet,
-        List<LimbType> destroyedNow)
+        List<LimbType> destroyedNow, bool limbsOnly = false)
     {
         var bleedTrigger = isBullet || HasSharpDamage(raw);
 
-        if (origin is { } attacker && _targeting.TryGetAimed(attacker, out var selected))
+        if (!limbsOnly && origin is { } attacker && _targeting.TryGetAimed(attacker, out var selected))
         {
             var allowHead = selected == LimbType.Head;
 
@@ -213,7 +219,7 @@ public sealed class LimbHealthSystem : EntitySystem
             return;
         }
 
-        if (origin == null)
+        if (origin == null && !limbsOnly)
         {
             if (IsStandingInHazard(ent.Owner) && PickAliveLeg(ent.Comp) is { } leg)
             {
@@ -238,8 +244,21 @@ public sealed class LimbHealthSystem : EntitySystem
             }
         }
 
-        var defaultAllowHead = origin == null;
-        if (PickWeightedRandomAlive(ent.Comp, allowHead: defaultAllowHead) is { } limb)
+        var defaultAllowHead = origin == null && !limbsOnly;
+        var pickedLimb = limbsOnly
+            ? PickWeightedRandomArmOrLeg(ent.Comp)
+            : PickWeightedRandomAlive(ent.Comp, allowHead: defaultAllowHead);
+
+        if (limbsOnly && pickedLimb == null)
+        {
+            // If limbs-only pool exhausted (all arms/legs destroyed), overflow shrapnel into Abdomen/Chest
+            if (ent.Comp.Limbs.TryGetValue(LimbType.Abdomen, out var abd) && !abd.Destroyed)
+                pickedLimb = LimbType.Abdomen;
+            else if (ent.Comp.Limbs.TryGetValue(LimbType.Chest, out var ch) && !ch.Destroyed)
+                pickedLimb = LimbType.Chest;
+        }
+
+        if (pickedLimb is { } limb)
         {
             var incoming = HasSharpDamage(raw)
                 ? new DamageSpecifier(raw)
@@ -250,7 +269,7 @@ public sealed class LimbHealthSystem : EntitySystem
 
             if (dmg.GetTotal() > 0)
             {
-                ApplyToLimb(ent, limb, dmg, destroyedNow, allowHead: defaultAllowHead);
+                ApplyToLimb(ent, limb, dmg, destroyedNow, allowHead: defaultAllowHead, limbsOnly: limbsOnly);
                 if (bleedTrigger)
                     RollBleed(ent, limb);
             }
@@ -278,12 +297,12 @@ public sealed class LimbHealthSystem : EntitySystem
     }
 
     private void ApplyToLimb(Entity<LimbHealthComponent> ent, LimbType limb, DamageSpecifier dmg,
-        List<LimbType> destroyedNow, bool allowHead = true)
+        List<LimbType> destroyedNow, bool allowHead = true, bool limbsOnly = false)
     {
         var leftover = AbsorbInto(ent.Comp, limb, dmg, destroyedNow);
 
         if (!leftover.Empty && leftover.GetTotal() > 0)
-            DistributeDamage(ent, leftover, destroyedNow, exclude: limb, allowHead: allowHead);
+            DistributeDamage(ent, leftover, destroyedNow, exclude: limb, allowHead: allowHead, limbsOnly: limbsOnly);
     }
 
     private void RollBleed(Entity<LimbHealthComponent> ent, LimbType limb)
@@ -379,14 +398,26 @@ public sealed class LimbHealthSystem : EntitySystem
     }
 
     private void DistributeDamage(Entity<LimbHealthComponent> ent, DamageSpecifier dmg,
-        List<LimbType> destroyedNow, LimbType? exclude = null, bool allowHead = true)
+        List<LimbType> destroyedNow, LimbType? exclude = null, bool allowHead = true, bool limbsOnly = false)
     {
         var remaining = new DamageSpecifier(dmg);
         while (remaining.GetTotal() > 0)
         {
-            var alive = GetAliveLimbs(ent.Comp, exclude, allowHead: allowHead);
+            var alive = GetAliveLimbs(ent.Comp, exclude, allowHead: allowHead, limbsOnly: limbsOnly);
             if (alive.Count == 0)
-                return;
+            {
+                if (limbsOnly)
+                {
+                    // If limbs-only pool exhausted (all arms/legs destroyed), allow overflow to torso (Abdomen, Chest) but NEVER Head
+                    alive = GetAliveLimbs(ent.Comp, exclude, allowHead: false, limbsOnly: false);
+                    if (alive.Count == 0)
+                        return;
+                }
+                else
+                {
+                    return;
+                }
+            }
 
             FixedPoint2 totalMax = 0;
             foreach (var l in alive)
@@ -794,15 +825,47 @@ public sealed class LimbHealthSystem : EntitySystem
         return total;
     }
 
-    private List<LimbType> GetAliveLimbs(LimbHealthComponent comp, LimbType? exclude = null, bool allowHead = true)
+    private List<LimbType> GetAliveLimbs(LimbHealthComponent comp, LimbType? exclude = null, bool allowHead = true, bool limbsOnly = false)
     {
         var list = new List<LimbType>();
         foreach (var (limb, st) in comp.Limbs)
         {
-            if (!st.Destroyed && limb != exclude && (allowHead || limb != LimbType.Head))
-                list.Add(limb);
+            if (st.Destroyed || limb == exclude)
+                continue;
+
+            if (limbsOnly && !limb.IsLeg() && !limb.IsArm())
+                continue;
+
+            if (!allowHead && limb == LimbType.Head)
+                continue;
+
+            list.Add(limb);
         }
         return list;
+    }
+
+    private LimbType? PickWeightedRandomArmOrLeg(LimbHealthComponent comp)
+    {
+        var limbs = GetAliveLimbs(comp, allowHead: false, limbsOnly: true);
+        if (limbs.Count == 0)
+            return null;
+
+        FixedPoint2 totalMax = 0;
+        foreach (var l in limbs)
+            totalMax += comp.MaxHealth[l];
+
+        if (totalMax <= 0)
+            return _random.Pick(limbs);
+
+        var roll = _random.NextFloat() * totalMax.Float();
+        foreach (var l in limbs)
+        {
+            roll -= comp.MaxHealth[l].Float();
+            if (roll <= 0)
+                return l;
+        }
+
+        return limbs[^1];
     }
 
     private LimbType PickOtherAlive(LimbHealthComponent comp, LimbType selected, bool allowHead = true)

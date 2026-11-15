@@ -143,10 +143,13 @@
     requiredLegs: 2
   - type: LimbHealth
   - type: BodyTargeting
+  - type: MobState
+    allowedStates:
+    - Alive
+    - Dead
   - type: MobThresholds
     thresholds:
       0: Alive
-      370: Critical
       440: Dead
   - type: Identity
   - type: IdExaminable

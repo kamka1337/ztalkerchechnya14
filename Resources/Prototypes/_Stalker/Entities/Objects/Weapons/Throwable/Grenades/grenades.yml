@@ -41,12 +41,11 @@
     deleteOnCollide: true
     damage:
       types:
-        Piercing: 18
-        Slash: 7
-  - type: StaminaDamageOnCollide
-    damage: 15
+        Piercing: 36
+        Slash: 14
+  - type: TargetLimbsOnly
   - type: TimedDespawn
-    lifetime: 0.10
+    lifetime: 0.20
 
 - type: entity
   name: граната РГД-5
@@ -57,10 +56,10 @@
   components:
     - type: ProjectileGrenade
       fillPrototype: BulletShrapnelRGD5
-      capacity: 28
+      capacity: 32
       randomAngle: false
-      minVelocity: 0.5
-      maxVelocity: 2.0
+      minVelocity: 8.0
+      maxVelocity: 11.0
     - type: ContainerContainer
       containers:
         cluster-payload: !type:Container
@@ -75,11 +74,6 @@
         params:
           volume: 7
       positional: true
-    - type: SpawnOnTrigger
-      keysIn:
-      - timer
-      proto: GrenadeFlashEffect
-      predicted: true
     - type: DeleteOnTrigger
       keysIn:
       - timer

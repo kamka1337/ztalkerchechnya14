@@ -100,6 +100,9 @@ public sealed class MobThresholdSystem : EntitySystem
         if (!Resolve(target, ref thresholdComponent))
             return FixedPoint2.Zero;
 
+        if (TryComp<MobStateComponent>(target, out var mobStateComp) && !mobStateComp.AllowedStates.Contains(mobState))
+            return FixedPoint2.Zero;
+
         foreach (var pair in thresholdComponent.Thresholds)
         {
             if (pair.Value == mobState)
@@ -125,6 +128,9 @@ public sealed class MobThresholdSystem : EntitySystem
     {
         threshold = null;
         if (!Resolve(target, ref thresholdComponent))
+            return false;
+
+        if (TryComp<MobStateComponent>(target, out var mobStateComp) && !mobStateComp.AllowedStates.Contains(mobState))
             return false;
 
         foreach (var pair in thresholdComponent.Thresholds)
@@ -339,6 +345,9 @@ public sealed class MobThresholdSystem : EntitySystem
     {
         foreach (var (threshold, mobState) in thresholdsComponent.Thresholds.Reverse())
         {
+            if (!mobStateComponent.AllowedStates.Contains(mobState))
+                continue;
+
             if (damageableComponent.TotalDamage < threshold)
                 continue;
 

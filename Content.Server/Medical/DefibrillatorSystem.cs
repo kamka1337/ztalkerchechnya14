@@ -221,7 +221,8 @@ public sealed class DefibrillatorSystem : EntitySystem
                 TryComp<DamageableComponent>(target, out var damageableComponent) &&
                 damageableComponent.TotalDamage < threshold)
             {
-                _mobState.ChangeMobState(target, MobState.Critical, mob, uid);
+                var reviveState = _mobState.HasState(target, MobState.Critical, mob) ? MobState.Critical : MobState.Alive;
+                _mobState.ChangeMobState(target, reviveState, mob, uid);
                 dead = false;
             }
 

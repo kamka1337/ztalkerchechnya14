@@ -60,6 +60,9 @@ public sealed class ReflectSystem : EntitySystem
         if (args.Cancelled)
             return;
 
+        if (HasComp<TargetLimbsOnlyComponent>(args.ProjUid))
+            return;
+
         if (!ent.Comp.InRightPlace)
             return; // only reflect when equipped correctly
 
@@ -102,6 +105,9 @@ public sealed class ReflectSystem : EntitySystem
     private void OnReflectCollide(Entity<ReflectComponent> ent, ref ProjectileReflectAttemptEvent args)
     {
         if (args.Cancelled)
+            return;
+
+        if (HasComp<TargetLimbsOnlyComponent>(args.ProjUid))
             return;
 
         if (TryReflectProjectile(ent, ent.Owner, args.ProjUid))

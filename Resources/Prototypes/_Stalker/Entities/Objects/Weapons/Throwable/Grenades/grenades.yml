@@ -39,13 +39,16 @@
     state: smallfrag
   - type: Projectile
     deleteOnCollide: true
+    ignoreResistances: true
     damage:
       types:
         Piercing: 36
         Slash: 14
+  - type: Reflective
+    reflective: None
   - type: TargetLimbsOnly
   - type: TimedDespawn
-    lifetime: 0.20
+    lifetime: 0.22
 
 - type: entity
   name: граната РГД-5
@@ -56,9 +59,9 @@
   components:
     - type: ProjectileGrenade
       fillPrototype: BulletShrapnelRGD5
-      capacity: 32
+      capacity: 36
       randomAngle: false
-      minVelocity: 8.0
+      minVelocity: 9.0
       maxVelocity: 11.0
     - type: ContainerContainer
       containers:
